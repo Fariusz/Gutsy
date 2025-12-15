@@ -1,4 +1,4 @@
-# 10x Astro Starter
+# Gutsy
 
 A modern, opinionated starter template for building fast, accessible, and AI-friendly web applications.
 
