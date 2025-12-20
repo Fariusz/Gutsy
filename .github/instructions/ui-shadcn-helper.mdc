@@ -1,0 +1,85 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Shadcn UI components — helper
+
+This file documents how to use shadcn/ui components in this project.
+
+## Overview
+
+- Library: `@shadcn/ui`
+- Installed components live in: `src/components/ui`
+- Import alias: `@/` (configured via project aliases)
+
+## Import examples
+
+```tsx
+import { Button } from "@/components/ui/button"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+```
+
+## Usage examples
+
+```tsx
+<Button variant="outline">Click me</Button>
+
+<Card>
+  <CardHeader>
+    <CardTitle>Card Title</CardTitle>
+    <CardDescription>Card Description</CardDescription>
+  </CardHeader>
+  <CardContent>
+    <p>Card Content</p>
+  </CardContent>
+  <CardFooter>
+    <p>Card Footer</p>
+  </CardFooter>
+</Card>
+```
+
+## Install additional components
+
+Use the shadcn CLI to add components:
+
+```bash
+npx shadcn@latest add <component-name>
+```
+
+Example:
+
+```bash
+npx shadcn@latest add accordion
+```
+
+Note: `npx shadcn-ui@latest` is deprecated; use `npx shadcn@latest`.
+
+## Common components
+
+- Accordion, Alert, AlertDialog, AspectRatio, Avatar
+- Calendar, Checkbox, Collapsible, Command, ContextMenu
+- DataTable, DatePicker, Dropdown Menu, Form, Hover Card
+- Menubar, Navigation Menu, Popover, Progress, Radio Group
+- ScrollArea, Select, Separator, Sheet, Skeleton
+- Slider, Switch, Table, Textarea, Sonner (Toast)
+- Toggle, Tooltip
+
+## Styling
+
+- Project uses the "new-york" variant and base color "neutral" (see `components.json`).
+- Theme customization via CSS variables and Tailwind where applicable.
+
+## Notes
+
+- Keep components in `src/components/ui` to match project aliases.
+- Follow project conventions for imports and styling.
+- Update this file when components or aliases change.
