@@ -1,0 +1,7 @@
+---
+alwaysApply: true
+---
+
+When creating React components, always follow the so-called Rules of Hooks
+Develop styles using Tailwind – do not create dedicated CSS files
+Always move repetitive API logic fragments to the middleware layer
