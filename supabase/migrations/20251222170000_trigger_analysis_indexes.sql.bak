@@ -1,0 +1,37 @@
+-- Performance indexes for trigger analysis RPC function
+-- Created: 2025-12-22
+-- Purpose: Optimize get_top_triggers function performance with composite indexes
+
+-- Primary index for logs filtering by user and date range
+CREATE INDEX IF NOT EXISTS logs_user_date_analysis_idx 
+ON logs (user_id, log_date) 
+WHERE log_date IS NOT NULL;
+
+-- Index for log_ingredients joins in trigger analysis
+CREATE INDEX IF NOT EXISTS log_ingredients_analysis_idx 
+ON log_ingredients (log_id, ingredient_id)
+WHERE ingredient_id IS NOT NULL;
+
+-- Index for log_symptoms severity calculations
+CREATE INDEX IF NOT EXISTS log_symptoms_severity_idx 
+ON log_symptoms (log_id, severity)
+WHERE severity IS NOT NULL;
+
+-- Covering index for ingredients name lookups
+CREATE INDEX IF NOT EXISTS ingredients_name_covering_idx 
+ON ingredients (id) INCLUDE (name);
+
+-- Partial index for recent logs (frequently analyzed period)
+CREATE INDEX IF NOT EXISTS logs_recent_analysis_idx 
+ON logs (user_id, log_date DESC) 
+WHERE log_date >= CURRENT_DATE - INTERVAL '90 days';
+
+-- Composite index for log_ingredients with ingredient name joins
+CREATE INDEX IF NOT EXISTS log_ingredients_with_ingredient_idx
+ON log_ingredients (ingredient_id, log_id);
+
+-- Add comments for index documentation
+COMMENT ON INDEX logs_user_date_analysis_idx IS 'Primary filter index for trigger analysis by user and date range';
+COMMENT ON INDEX log_ingredients_analysis_idx IS 'Join optimization for ingredient consumption tracking';
+COMMENT ON INDEX log_symptoms_severity_idx IS 'Severity calculation optimization for symptom analysis';
+COMMENT ON INDEX logs_recent_analysis_idx IS 'Optimizes queries for recent trigger analysis (90 days)';
