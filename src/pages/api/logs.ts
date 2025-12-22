@@ -1,9 +1,28 @@
 import type { APIContext } from "astro";
-import { CreateLogSchema, LogsQuerySchema } from "../../lib/validation/ingredient-schemas";
+import { z } from "zod";
 import { LogService } from "../../lib/services/log-service";
 import type { CreateLogRequest, ErrorResponse } from "../../types";
 
 export const prerender = false;
+
+const CreateLogSchema = z.object({
+  log_date: z.string().refine((val) => !isNaN(Date.parse(val)), {
+    message: "Invalid date format",
+  }),
+  notes: z.string().optional(),
+  ingredients: z.array(z.string()),
+  symptoms: z.array(
+    z.object({
+      symptom_id: z.number(),
+      severity: z.number().min(1).max(5),
+    })
+  ),
+});
+
+const LogsQuerySchema = z.object({
+  page: z.preprocess((val) => Number(val), z.number().int().min(1)).default(1),
+  per_page: z.preprocess((val) => Number(val), z.number().int().min(1).max(100)).default(10),
+});
 
 /**
  * POST /api/logs - Create a new meal log entry
@@ -105,7 +124,7 @@ export async function POST(context: APIContext): Promise<Response> {
 }
 
 /**
- * GET /api/logs - Retrieve paginated list of user's meal logs
+ * GET /api/logs - Get meal log entries
  */
 export async function GET(context: APIContext): Promise<Response> {
   try {
@@ -130,22 +149,21 @@ export async function GET(context: APIContext): Promise<Response> {
       );
     }
 
-    // 2. Parse and validate query parameters
-    const url = new URL(context.request.url);
-    const queryParams = Object.fromEntries(url.searchParams);
+    // 2. Validate query parameters
+    const queryParams = Object.fromEntries(context.url.searchParams.entries());
+    const validationResult = LogsQuerySchema.safeParse(queryParams);
 
-    const validatedParams = LogsQuerySchema.safeParse(queryParams);
-
-    if (!validatedParams.success) {
+    if (!validationResult.success) {
+      const validationErrors = validationResult.error.errors.map((error) => ({
+        field: error.path.join("."),
+        message: error.message,
+      }));
       return new Response(
         JSON.stringify({
           error: {
             type: "validation_error",
             message: "Invalid query parameters",
-            details: validatedParams.error.errors.map((err) => ({
-              field: err.path.join("."),
-              message: err.message,
-            })),
+            details: validationErrors,
           },
         } as ErrorResponse),
         {
@@ -155,14 +173,9 @@ export async function GET(context: APIContext): Promise<Response> {
       );
     }
 
-    // 3. Create service and retrieve logs
+    // 3. Get logs using service layer
     const logService = new LogService(context.locals.supabase);
-    const userId = session.user.id;
-
-    const logsResponse = await logService.getUserLogs({
-      userId,
-      ...validatedParams.data,
-    });
+    const logsResponse = await logService.getLogs(session.user.id, validationResult.data);
 
     // 4. Return success response
     return new Response(JSON.stringify(logsResponse), {
@@ -170,13 +183,13 @@ export async function GET(context: APIContext): Promise<Response> {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error retrieving logs:", error);
+    console.error("Error fetching logs:", error);
 
     return new Response(
       JSON.stringify({
         error: {
           type: "business_logic_error",
-          message: "Failed to retrieve logs",
+          message: "Failed to fetch logs",
           details: error instanceof Error ? error.message : "Unknown error",
         },
       } as ErrorResponse),

@@ -1,13 +1,11 @@
-import type { Database, Tables } from "./db/database.types";
+import type { Tables } from "./db/database.types";
 
 // =============================================================================
 // Database Entity Type Aliases
 // =============================================================================
 
-export type Ingredient = Tables<"ingredients">;
 export type Symptom = Tables<"symptoms">;
 export type Log = Tables<"logs">;
-export type LogIngredient = Tables<"log_ingredients">;
 export type LogSymptom = Tables<"log_symptoms">;
 
 // =============================================================================
@@ -18,28 +16,77 @@ export type LogSymptom = Tables<"log_symptoms">;
  * Reusable pagination metadata structure for paginated API responses
  */
 export interface PaginationMeta {
-  current_page: number;
+  page: number;
+  per_page: number;
+  total: number;
   total_pages: number;
-  total_count: number;
-  has_next: boolean;
-  has_prev: boolean;
+}
+
+// =============================================================================
+// Log Resource DTOs
+// =============================================================================
+
+/**
+ * Symptom data for log creation
+ */
+export interface CreateLogSymptomItem {
+  symptom_id: number;
+  severity: number; // 1-5 scale
 }
 
 /**
- * Confidence interval structure for statistical analysis
+ * Request payload for creating a new meal log
  */
-export interface ConfidenceInterval {
-  lower: number;
-  upper: number;
-  width: number;
+export interface CreateLogRequest {
+  log_date: string; // ISO date string (YYYY-MM-DD)
+  notes?: string;
+  ingredients: string[];
+  symptoms: CreateLogSymptomItem[];
 }
 
 /**
- * Date range structure for filtering operations
+ * Populated symptom data in log responses
+ * Combines log_symptoms with symptoms entity data
  */
-export interface DateRange {
-  start: string;
-  end: string;
+export interface LogSymptomResponse {
+  log_symptom_id: number;
+  symptom_id: number;
+  name: string; // From symptoms.name
+  severity: number; // From log_symptoms.severity
+}
+
+/**
+ * Complete log data for API responses
+ */
+export interface LogResponse {
+  id: string;
+  log_date: string;
+  notes?: string | null;
+  ingredients: string[];
+  symptoms: LogSymptomResponse[];
+}
+
+/**
+ * Paginated response for logs listing
+ */
+export interface LogsListResponse {
+  data: LogResponse[];
+  meta: PaginationMeta;
+}
+
+// =============================================================================
+// Error Handling
+// =============================================================================
+
+/**
+ * Standardized error response for API failures
+ */
+export interface ErrorResponse {
+  error: {
+    type: "validation_error" | "authorization_error" | "business_logic_error" | "not_found";
+    message: string;
+    details?: any;
+  };
 }
 
 // =============================================================================
