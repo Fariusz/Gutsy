@@ -1,0 +1,19 @@
+meta {
+  name: supabase get token
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://127.0.0.1:54321/auth/v1/token?grant_type=password
+  body: none
+  auth: inherit
+}
+
+params:query {
+  grant_type: password
+}
+
+settings {
+  encodeUrl: true
+}
