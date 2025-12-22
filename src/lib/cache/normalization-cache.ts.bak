@@ -1,0 +1,139 @@
+import type { NormalizeIngredientResponse } from "../../types";
+
+/**
+ * Cache entry for normalization results
+ */
+interface CacheEntry {
+  result: NormalizeIngredientResponse;
+  expires: number;
+  accessCount: number;
+  lastAccessed: number;
+}
+
+/**
+ * High-performance cache for ingredient normalization results
+ * Uses LRU eviction and TTL expiration
+ */
+export class NormalizationCache {
+  private cache = new Map<string, CacheEntry>();
+  private readonly maxSize: number;
+  private readonly defaultTTL: number;
+
+  constructor(maxSize = 1000, defaultTTL = 3600000) {
+    // 1 hour default TTL
+    this.maxSize = maxSize;
+    this.defaultTTL = defaultTTL;
+  }
+
+  /**
+   * Generates a cache key from raw ingredient text
+   */
+  generateKey(rawText: string): string {
+    return `normalize:${rawText.toLowerCase().trim().replace(/\s+/g, " ")}`;
+  }
+
+  /**
+   * Retrieves cached result if valid and not expired
+   */
+  get(key: string): NormalizeIngredientResponse | null {
+    const entry = this.cache.get(key);
+    if (!entry) return null;
+
+    const now = Date.now();
+    if (entry.expires < now) {
+      this.cache.delete(key);
+      return null;
+    }
+
+    // Update access statistics for LRU
+    entry.accessCount++;
+    entry.lastAccessed = now;
+
+    return entry.result;
+  }
+
+  /**
+   * Stores result in cache with optional TTL override
+   */
+  set(key: string, result: NormalizeIngredientResponse, ttl?: number): void {
+    const now = Date.now();
+    const expires = now + (ttl || this.defaultTTL);
+
+    // Check if cache is at capacity
+    if (this.cache.size >= this.maxSize && !this.cache.has(key)) {
+      this.evictLRU();
+    }
+
+    this.cache.set(key, {
+      result,
+      expires,
+      accessCount: 1,
+      lastAccessed: now,
+    });
+  }
+
+  /**
+   * Removes least recently used entry
+   */
+  private evictLRU(): void {
+    let oldestKey = null;
+    let oldestTime = Infinity;
+
+    for (const [key, entry] of this.cache) {
+      if (entry.lastAccessed < oldestTime) {
+        oldestTime = entry.lastAccessed;
+        oldestKey = key;
+      }
+    }
+
+    if (oldestKey) {
+      this.cache.delete(oldestKey);
+    }
+  }
+
+  /**
+   * Clears expired entries from cache
+   */
+  cleanup(): number {
+    const now = Date.now();
+    let removedCount = 0;
+
+    for (const [key, entry] of this.cache) {
+      if (entry.expires < now) {
+        this.cache.delete(key);
+        removedCount++;
+      }
+    }
+
+    return removedCount;
+  }
+
+  /**
+   * Returns cache statistics for monitoring
+   */
+  getStats(): {
+    size: number;
+    maxSize: number;
+    hitRate: number;
+    avgAccessCount: number;
+  } {
+    const totalAccess = Array.from(this.cache.values()).reduce((sum, entry) => sum + entry.accessCount, 0);
+
+    return {
+      size: this.cache.size,
+      maxSize: this.maxSize,
+      hitRate: this.cache.size > 0 ? totalAccess / this.cache.size : 0,
+      avgAccessCount: this.cache.size > 0 ? totalAccess / this.cache.size : 0,
+    };
+  }
+
+  /**
+   * Clears all cache entries
+   */
+  clear(): void {
+    this.cache.clear();
+  }
+}
+
+// Singleton cache instance
+export const normalizationCache = new NormalizationCache();
