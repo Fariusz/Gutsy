@@ -160,7 +160,27 @@ export interface Database {
       };
     };
     Views: Record<never, never>;
-    Functions: Record<never, never>;
+    Functions: {
+      get_top_triggers: {
+        Args: {
+          p_user_id: string;
+          p_start_date: string;
+          p_end_date: string;
+          p_limit: number;
+        };
+        Returns: {
+          ingredient_id: number;
+          ingredient_name: string;
+          consumption_count: number;
+          avg_severity_when_present: number;
+          baseline_avg_severity: number;
+          trigger_score: number;
+          confidence_lower: number;
+          confidence_upper: number;
+          confidence_width: number;
+        }[];
+      };
+    };
     Enums: Record<never, never>;
     CompositeTypes: Record<never, never>;
   };
