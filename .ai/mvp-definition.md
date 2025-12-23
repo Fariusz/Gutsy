@@ -1,17 +1,20 @@
 # Application - Gutsy (MVP)
 
 ## Main problem
-Users need a quick, reliable way to log meals (photo + normalized ingredients), record symptom severity, and surface likely trigger ingredients using a reproducible correlation engine to guide dietary decisions.
+
+Users need a quick, reliable way to log meals (photo + simple ingredient text input), record symptom severity, and surface likely trigger ingredients using a reproducible correlation engine to guide dietary decisions.
 
 ## Minimal feature set
+
 - Auth: register / login (Supabase) — session handling, protected API routes, RLS.
-- Create log: photo upload (Supabase Storage), normalized ingredient selector, symptom selector + severity (1–5), notes.
+- Create log: photo upload (Supabase Storage), simple ingredient text input, symptom selector + severity (1–5), notes.
 - View logs: calendar month view + day drilldown showing photo, ingredients, symptoms, severity.
 - Correlation engine: Postgres RPC get_top_triggers(user_id, start_date, end_date, limit) returning ranked ingredients with consumption_count, avg_severity_when_present, baseline_avg_severity, trigger_score, confidence_interval.
 - Server: Zod-validated endpoints (POST /api/logs, GET /api/logs, GET /api/triggers), use supabase from context.locals.
 - Tests: unit tests for validation/service logic and one E2E smoke (sign-up → create log → view triggers).
 
 ## Must-have examples included in MVP spec
+
 - Auth handling (required)
   - Description: Supabase Auth for sign-up / sign-in; server endpoints read user from context.locals.supabase.auth.getSession() and enforce RLS.
   - Deliverable: working auth flow and protected API examples.
@@ -38,6 +41,7 @@ Users need a quick, reliable way to log meals (photo + normalized ingredients), 
   - Deploy step (optional gated): on main merge, build and deploy preview or production (e.g., Vercel/Supabase migration runner) with required env secrets.
 
 ## Out of scope for MVP
+
 - Advanced image optimization pipeline or heavy media processing.
 - Full UI/UX polish (shadcn components) beyond functional UI.
 - Advanced statistical models, cohort comparisons, or ML workflows beyond the RPC and simple guardrails.
@@ -45,6 +49,7 @@ Users need a quick, reliable way to log meals (photo + normalized ingredients), 
 - Full retention/feedback systems (beyond a minimal feedback mechanism).
 
 ## Success criteria
+
 - Functional
   - ≥100 registered pilot users OR ≥20 active users.
   - ≥50 logs created across pilot users.

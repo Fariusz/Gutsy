@@ -6,14 +6,30 @@ meta {
 
 post {
   url: http://127.0.0.1:54321/auth/v1/token?grant_type=password
-  body: none
-  auth: inherit
+  body: json
+  auth: bearer
 }
 
 params:query {
   grant_type: password
 }
 
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: 
+}
+
+body:json {
+  {
+    "email": "test@test.com",
+    "password": "test1234"
+  }
+}
+
 settings {
   encodeUrl: true
+  timeout: 0
 }

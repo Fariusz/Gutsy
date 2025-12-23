@@ -1,9 +1,13 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
-export interface Database {
+export type Database = {
   graphql_public: {
-    Tables: Record<never, never>;
-    Views: Record<never, never>;
+    Tables: {
+      [_ in never]: never;
+    };
+    Views: {
+      [_ in never]: never;
+    };
     Functions: {
       graphql: {
         Args: {
@@ -15,83 +19,33 @@ export interface Database {
         Returns: Json;
       };
     };
-    Enums: Record<never, never>;
-    CompositeTypes: Record<never, never>;
+    Enums: {
+      [_ in never]: never;
+    };
+    CompositeTypes: {
+      [_ in never]: never;
+    };
   };
   public: {
     Tables: {
-      ingredients: {
-        Row: {
-          created_at: string;
-          id: number;
-          name: string;
-        };
-        Insert: {
-          created_at?: string;
-          id?: number;
-          name: string;
-        };
-        Update: {
-          created_at?: string;
-          id?: number;
-          name?: string;
-        };
-        Relationships: [];
-      };
-      log_ingredients: {
-        Row: {
-          created_at: string;
-          ingredient_id: number;
-          log_id: string;
-          match_confidence: number | null;
-          raw_text: string | null;
-        };
-        Insert: {
-          created_at?: string;
-          ingredient_id: number;
-          log_id: string;
-          match_confidence?: number | null;
-          raw_text?: string | null;
-        };
-        Update: {
-          created_at?: string;
-          ingredient_id?: number;
-          log_id?: string;
-          match_confidence?: number | null;
-          raw_text?: string | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "log_ingredients_ingredient_id_fkey";
-            columns: ["ingredient_id"];
-            isOneToOne: false;
-            referencedRelation: "ingredients";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "log_ingredients_log_id_fkey";
-            columns: ["log_id"];
-            isOneToOne: false;
-            referencedRelation: "logs";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
       log_symptoms: {
         Row: {
           created_at: string;
+          id: number;
           log_id: string;
           severity: number;
           symptom_id: number;
         };
         Insert: {
           created_at?: string;
+          id?: number;
           log_id: string;
           severity: number;
           symptom_id: number;
         };
         Update: {
           created_at?: string;
+          id?: number;
           log_id?: string;
           severity?: number;
           symptom_id?: number;
@@ -117,24 +71,24 @@ export interface Database {
         Row: {
           created_at: string;
           id: string;
+          ingredient_names: string[] | null;
           log_date: string;
-          meal_photo_url: string | null;
           notes: string | null;
           user_id: string;
         };
         Insert: {
           created_at?: string;
           id?: string;
+          ingredient_names?: string[] | null;
           log_date: string;
-          meal_photo_url?: string | null;
           notes?: string | null;
           user_id: string;
         };
         Update: {
           created_at?: string;
           id?: string;
+          ingredient_names?: string[] | null;
           log_date?: string;
-          meal_photo_url?: string | null;
           notes?: string | null;
           user_id?: string;
         };
@@ -159,32 +113,20 @@ export interface Database {
         Relationships: [];
       };
     };
-    Views: Record<never, never>;
-    Functions: {
-      get_top_triggers: {
-        Args: {
-          p_user_id: string;
-          p_start_date: string;
-          p_end_date: string;
-          p_limit: number;
-        };
-        Returns: {
-          ingredient_id: number;
-          ingredient_name: string;
-          consumption_count: number;
-          avg_severity_when_present: number;
-          baseline_avg_severity: number;
-          trigger_score: number;
-          confidence_lower: number;
-          confidence_upper: number;
-          confidence_width: number;
-        }[];
-      };
+    Views: {
+      [_ in never]: never;
     };
-    Enums: Record<never, never>;
-    CompositeTypes: Record<never, never>;
+    Functions: {
+      [_ in never]: never;
+    };
+    Enums: {
+      [_ in never]: never;
+    };
+    CompositeTypes: {
+      [_ in never]: never;
+    };
   };
-}
+};
 
 type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">;
 

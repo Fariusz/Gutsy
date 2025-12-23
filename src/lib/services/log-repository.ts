@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "../../db/database.types";
-import type { LogResponse, LogSymptomResponse } from "../../types";
+import type { LogResponse, LogSymptomResponse, LogIngredientResponse, GetLogsQuery } from "../../types";
 import type { CreateLogCommand } from "./log-service";
 
 /**
@@ -10,7 +10,7 @@ export class LogRepository {
   constructor(private readonly supabase: SupabaseClient<Database>) {}
 
   /**
-   * Create a new log with associated ingredients and symptoms in a transaction
+   * Create a new log with associated ingredients and symptoms
    * @param logData - Log creation command data
    * @returns Created log ID
    */
@@ -23,7 +23,7 @@ export class LogRepository {
           user_id: logData.userId,
           log_date: logData.logDate,
           notes: logData.notes || null,
-          ingredient_names: logData.ingredients,
+          ingredient_names: logData.ingredients, // Keep backwards compatibility
         })
         .select("id")
         .single();
@@ -33,6 +33,9 @@ export class LogRepository {
       }
 
       const logId = logResult.id;
+
+      // Ingredients are already stored in the ingredient_names text[] column
+      // No additional ingredient processing needed for simple approach
 
       // Insert symptom associations
       if (logData.symptoms.length > 0) {
@@ -75,165 +78,6 @@ export class LogRepository {
 
     if (logError || !logData) {
       throw new Error(`Failed to get log: ${logError?.message || "Log not found"}`);
-    }
-
-    // Get associated symptoms
-    const { data: symptoms, error: symptomsError } = await this.supabase
-      .from("log_symptoms")
-      .select("*, symptoms(name)")
-      .eq("log_id", logId);
-
-    if (symptomsError) {
-      throw new Error(`Failed to get log symptoms: ${symptomsError.message}`);
-    }
-
-    const populatedSymptoms: LogSymptomResponse[] =
-      symptoms?.map((s) => ({
-        log_symptom_id: s.id,
-        symptom_id: s.symptom_id,
-        name: s.symptoms?.name ?? "Unknown",
-        severity: s.severity,
-      })) ?? [];
-
-    return {
-      id: logData.id,
-      log_date: logData.log_date,
-      notes: logData.notes,
-      ingredients: logData.ingredient_names ?? [],
-      symptoms: populatedSymptoms,
-    };
-  }
-
-  /**
-   * Get paginated logs for a user
-   */
-  async getPaginatedLogs(userId: string, query: any) {
-    const { page = 1, per_page = 10 } = query;
-    const start = (page - 1) * per_page;
-    const end = start + per_page - 1;
-
-    const { data, count, error } = await this.supabase
-      .from("logs")
-      .select("*", { count: "exact" })
-      .eq("user_id", userId)
-      .order("log_date", { ascending: false })
-      .range(start, end);
-
-    return { data, count, error };
-  }
-}
-
-/**
- * Repository for log database operations
- */
-export class LogRepository {
-  constructor(private readonly supabase: SupabaseClient<Database>) {}
-
-  /**
-   * Create a new log with associated ingredients and symptoms in a transaction
-   * @param logData - Log creation command data
-   * @param normalizedIngredients - Normalized ingredient matches
-   * @returns Created log ID
-   */
-  async createLogWithAssociations(
-    logData: CreateLogCommand,
-    normalizedIngredients: LogIngredientResponse[]
-  ): Promise<string> {
-    try {
-      // Start by creating the main log entry
-      const { data: logResult, error: logError } = await this.supabase
-        .from("logs")
-        .insert({
-          user_id: logData.userId,
-          log_date: logData.logDate,
-          notes: logData.notes || null,
-          meal_photo_url: logData.mealPhotoUrl || null,
-        })
-        .select("id")
-        .single();
-
-      if (logError || !logResult) {
-        throw new Error(`Failed to create log: ${logError?.message || "Unknown error"}`);
-      }
-
-      const logId = logResult.id;
-
-      // Insert ingredient associations
-      if (normalizedIngredients.length > 0) {
-        const ingredientInserts = normalizedIngredients.map((ingredient) => ({
-          log_id: logId,
-          ingredient_id: ingredient.ingredient_id,
-          raw_text: ingredient.raw_text,
-          match_confidence: ingredient.match_confidence,
-        }));
-
-        const { error: ingredientsError } = await this.supabase.from("log_ingredients").insert(ingredientInserts);
-
-        if (ingredientsError) {
-          throw new Error(`Failed to insert log ingredients: ${ingredientsError.message}`);
-        }
-      }
-
-      // Insert symptom associations
-      if (logData.symptoms.length > 0) {
-        const symptomInserts = logData.symptoms.map((symptom) => ({
-          log_id: logId,
-          symptom_id: symptom.symptom_id,
-          severity: symptom.severity,
-        }));
-
-        const { error: symptomsError } = await this.supabase.from("log_symptoms").insert(symptomInserts);
-
-        if (symptomsError) {
-          throw new Error(`Failed to insert log symptoms: ${symptomsError.message}`);
-        }
-      }
-
-      return logId;
-    } catch (error) {
-      if (error instanceof Error) {
-        throw error;
-      }
-      throw new Error("Failed to create log with associations");
-    }
-  }
-
-  /**
-   * Get a populated log with ingredients and symptoms
-   * @param logId - Log ID to retrieve
-   * @param userId - User ID for authorization
-   * @returns Complete log data with populated associations
-   */
-  async getPopulatedLog(logId: string, userId: string): Promise<LogResponse> {
-    // Get the main log data
-    const { data: logData, error: logError } = await this.supabase
-      .from("logs")
-      .select("*")
-      .eq("id", logId)
-      .eq("user_id", userId)
-      .single();
-
-    if (logError || !logData) {
-      throw new Error(`Failed to get log: ${logError?.message || "Log not found"}`);
-    }
-
-    // Get associated ingredients
-    const { data: ingredientsData, error: ingredientsError } = await this.supabase
-      .from("log_ingredients")
-      .select(
-        `
-        ingredient_id,
-        raw_text,
-        match_confidence,
-        ingredients!inner (
-          name
-        )
-      `
-      )
-      .eq("log_id", logId);
-
-    if (ingredientsError) {
-      throw new Error(`Failed to get log ingredients: ${ingredientsError.message}`);
     }
 
     // Get associated symptoms
@@ -254,12 +98,10 @@ export class LogRepository {
       throw new Error(`Failed to get log symptoms: ${symptomsError.message}`);
     }
 
-    // Transform the data into response format
-    const ingredients: LogIngredientResponse[] = (ingredientsData || []).map((item) => ({
-      ingredient_id: item.ingredient_id,
-      name: (item.ingredients as any).name,
-      raw_text: item.raw_text,
-      match_confidence: item.match_confidence,
+    // Transform ingredients from text array (simple approach)
+    const ingredients: LogIngredientResponse[] = (logData.ingredient_names || []).map((name: string) => ({
+      name,
+      source: "user_input" as const,
     }));
 
     const symptoms: LogSymptomResponse[] = (symptomsData || []).map((item) => ({
@@ -295,6 +137,24 @@ export class LogRepository {
       ingredients,
       symptoms,
     };
+  }
+
+  /**
+   * Get paginated logs for a user
+   */
+  async getPaginatedLogs(userId: string, query: any) {
+    const { page = 1, per_page = 10 } = query;
+    const start = (page - 1) * per_page;
+    const end = start + per_page - 1;
+
+    const { data, count, error } = await this.supabase
+      .from("logs")
+      .select("*", { count: "exact" })
+      .eq("user_id", userId)
+      .order("log_date", { ascending: false })
+      .range(start, end);
+
+    return { data, count, error };
   }
 
   /**

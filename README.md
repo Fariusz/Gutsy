@@ -39,6 +39,7 @@ Source files with more details: [\.ai/tech-stack.md](.ai/tech-stack.md)
 ## Getting started locally
 
 Prerequisites
+
 - Node.js: version specified in `.nvmrc` (22.14.0)
 - A package manager: `npm`, `pnpm`, or `yarn`
 - (Optional) Supabase project for backend services
@@ -50,6 +51,7 @@ npm install
 ```
 
 Environment
+
 - Create a `.env` file (not committed). At minimum, provide Supabase environment variables if you plan to use backend features:
 
 ```env
@@ -73,6 +75,7 @@ npm run preview
 ```
 
 Notes
+
 - This repo expects Supabase usage (auth, storage, RPCs). If you don't have a Supabase project, the frontend will still run but API features will be disabled until configured.
 
 ## Available scripts
@@ -99,6 +102,7 @@ Planned MVP features (from project notes):
 - Unit tests for deterministic logic and an E2E smoke test
 
 Key design decisions / trade-offs
+
 - React is used selectively only for interactive components.
 - Supabase is used as the primary backend (no custom backend server).
 
@@ -182,12 +186,12 @@ npm run build
 ```md
 .
 ├── src/
-│   ├── layouts/    # Astro layouts
-│   ├── pages/      # Astro pages
-│   │   └── api/    # API endpoints
-│   ├── components/ # UI components (Astro & React)
-│   └── assets/     # Static assets
-├── public/         # Public assets
+│ ├── layouts/ # Astro layouts
+│ ├── pages/ # Astro pages
+│ │ └── api/ # API endpoints
+│ ├── components/ # UI components (Astro & React)
+│ └── assets/ # Static assets
+├── public/ # Public assets
 ```
 
 ## AI Development Support

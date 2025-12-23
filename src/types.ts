@@ -94,11 +94,10 @@ export interface ErrorResponse {
 // =============================================================================
 
 /**
- * Ingredient data for log creation - either reference existing ingredient or provide raw text
+ * Ingredient data for log creation - simplified to just ingredient names
  */
 export interface CreateLogIngredientItem {
-  ingredient_id?: number;
-  raw_text?: string;
+  name: string;
 }
 
 /**
@@ -123,13 +122,11 @@ export interface CreateLogRequest {
 
 /**
  * Populated ingredient data in log responses
- * Combines log_ingredients with ingredients entity data
+ * Simplified to work with ingredient_names text[] from database
  */
 export interface LogIngredientResponse {
-  ingredient_id: number;
-  name: string; // From ingredients.name
-  raw_text?: string | null; // From log_ingredients.raw_text
-  match_confidence?: number | null; // From log_ingredients.match_confidence
+  name: string;
+  source: "user_input"; // Always user input since no normalization
 }
 
 /**
@@ -165,6 +162,17 @@ export interface LogsQueryParams {
   end?: string; // ISO date string
   page?: number; // Default: 1
   limit?: number; // Default: 20, max: 100
+}
+
+/**
+ * Internal query model for repository layer
+ */
+export interface GetLogsQuery {
+  userId: string;
+  start?: string;
+  end?: string;
+  page: number;
+  limit: number;
 }
 
 /**
@@ -232,35 +240,6 @@ export interface ProposeIngredientResponse {
 }
 
 // =============================================================================
-// Ingredient Normalization DTOs
-// =============================================================================
-
-/**
- * Request payload for ingredient normalization
- */
-export interface NormalizeIngredientRequest {
-  raw_text: string;
-}
-
-/**
- * Normalized ingredient match result
- */
-export interface NormalizedIngredientMatch {
-  ingredient_id: number;
-  name: string;
-  match_confidence: number; // 0.0-1.0 scale
-  match_method: "deterministic" | "fuzzy" | "llm";
-}
-
-/**
- * Response payload for ingredient normalization
- */
-export interface NormalizeIngredientResponse {
-  data: NormalizedIngredientMatch[];
-  raw_text: string;
-}
-
-// =============================================================================
 // Symptoms Resource DTOs
 // =============================================================================
 
@@ -268,7 +247,10 @@ export interface NormalizeIngredientResponse {
  * Symptom data for API responses
  * Derived from: symptoms entity, excluding created_at
  */
-export interface SymptomResponse extends Pick<Symptom, "id" | "name"> {}
+export interface SymptomResponse {
+  id: number;
+  name: string;
+}
 
 /**
  * Response payload for symptoms listing

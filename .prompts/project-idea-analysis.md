@@ -3,6 +3,7 @@
 </project-idea>
 
 I'm a developer analyzing a project idea that I'll be working on as part of the 10xDevs course. I'm interested in analysis based on the following criteria:
+
 1. Does the application solve a real problem?
 2. Can the application focus on 1-2 key features?
 3. Am I able to implement this idea within 6 weeks working on it after hours with AI?

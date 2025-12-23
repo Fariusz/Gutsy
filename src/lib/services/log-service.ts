@@ -39,7 +39,7 @@ export class LogService {
         userId,
         logDate: request.log_date,
         notes: request.notes,
-        ingredients: request.ingredients,
+        ingredients: request.ingredients.map((ing) => ing.name), // Extract names from ingredient objects
         symptoms: request.symptoms,
       };
 

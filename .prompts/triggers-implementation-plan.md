@@ -20,11 +20,13 @@ The GET /api/triggers endpoint provides correlation analysis results by computin
 ### Parameters
 
 **Optional Query Parameters:**
+
 - `start` (string): ISO date string (YYYY-MM-DD), default 30 days ago
 - `end` (string): ISO date string (YYYY-MM-DD), default today
 - `limit` (number): Maximum results to return, default 10, maximum 50
 
 ### Example URLs
+
 ```
 GET /api/triggers
 GET /api/triggers?start=2024-11-01&end=2025-01-15
@@ -35,6 +37,7 @@ GET /api/triggers?start=2024-12-01&limit=5
 ## 3. Used Types
 
 ### Request/Response DTOs
+
 - `TriggersQueryParams` - Query parameter validation type
 - `TriggersResponse` - Response wrapper with data and metadata
 - `TriggerResponse` - Individual trigger analysis result
@@ -43,6 +46,7 @@ GET /api/triggers?start=2024-12-01&limit=5
 - `DateRange` - Date range metadata
 
 ### Service Models
+
 - `TriggerAnalysisQuery` - Internal service query model
 - `TriggerCalculationResult` - Raw RPC function result
 - `StatisticalThresholds` - Configuration for analysis parameters
@@ -50,6 +54,7 @@ GET /api/triggers?start=2024-12-01&limit=5
 ## 4. Response Details
 
 ### Success Response (200 OK)
+
 ```typescript
 {
   data: [
@@ -81,6 +86,7 @@ GET /api/triggers?start=2024-12-01&limit=5
 ```
 
 ### Error Responses
+
 - **400 Bad Request**: Invalid date parameters, future dates
 - **401 Unauthorized**: Missing or invalid authentication token
 - **422 Unprocessable Entity**: Insufficient data for analysis
@@ -98,6 +104,7 @@ GET /api/triggers?start=2024-12-01&limit=5
 8. **Response Formatting**: Structure data according to TriggersResponse
 
 ### Database RPC Function
+
 ```sql
 -- get_top_triggers RPC function signature
 CREATE OR REPLACE FUNCTION get_top_triggers(
@@ -120,22 +127,23 @@ RETURNS TABLE (
 ```
 
 ### Statistical Calculations (within RPC)
+
 ```sql
 -- Core correlation calculation logic
 WITH ingredient_logs AS (
-  SELECT 
+  SELECT
     li.ingredient_id,
     l.log_date,
     COALESCE(AVG(ls.severity), 0) as daily_avg_severity
   FROM logs l
   LEFT JOIN log_ingredients li ON l.id = li.log_id
   LEFT JOIN log_symptoms ls ON l.id = ls.log_id
-  WHERE l.user_id = p_user_id 
+  WHERE l.user_id = p_user_id
     AND l.log_date BETWEEN p_start_date AND p_end_date
   GROUP BY li.ingredient_id, l.log_date
 ),
 trigger_analysis AS (
-  SELECT 
+  SELECT
     ingredient_id,
     COUNT(*) as consumption_count,
     AVG(daily_avg_severity) as avg_severity_when_present,
@@ -151,11 +159,13 @@ trigger_analysis AS (
 ## 6. Security Considerations
 
 ### Authentication & Authorization
+
 - **User Data Isolation**: RLS policies in RPC function ensure user-specific data
 - **Function Security**: SECURITY DEFINER on RPC with proper user validation
 - **Parameter Sanitization**: All inputs validated before RPC execution
 
 ### Data Privacy
+
 - **Aggregate Data Only**: No individual log data exposed in results
 - **Statistical Thresholds**: Minimum data requirements prevent profile inference
 - **Time-bounded Analysis**: Date range limits prevent excessive historical analysis
@@ -163,19 +173,23 @@ trigger_analysis AS (
 ## 7. Error Handling
 
 ### Query Parameter Errors (400)
+
 - Invalid date formats or ranges
 - Future dates in analysis period
 - Invalid limit values (exceeding 50)
 
 ### Business Logic Errors (422)
+
 - Insufficient total logs (less than 10)
 - No ingredient consumption in date range
 - All ingredients below consumption threshold
 
 ### Authentication Errors (401)
+
 - Missing or expired authentication token
 
 ### Server Errors (500)
+
 - RPC function execution failures
 - Database performance issues
 - Statistical calculation errors
@@ -183,12 +197,14 @@ trigger_analysis AS (
 ## 8. Performance Considerations
 
 ### Optimization Strategies
+
 - **RPC Function**: Server-side calculations avoid data transfer overhead
 - **Indexed Queries**: Composite indexes on `(user_id, log_date)` and foreign keys
 - **Result Caching**: Cache results for identical query parameters
 - **Threshold Filtering**: Early filtering reduces computation overhead
 
 ### Potential Bottlenecks
+
 - **Complex Statistics**: Bootstrap confidence intervals are computationally expensive
 - **Large Date Ranges**: Analysis over months/years may timeout
 - **Multiple Users**: Concurrent analysis requests may strain database
@@ -196,25 +212,38 @@ trigger_analysis AS (
 ## 9. Implementation Steps
 
 ### Step 1: Create Query Parameter Validation Schema
+
 ```typescript
 // src/lib/validation/trigger-schemas.ts
-const TriggersQuerySchema = z.object({
-  start: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  end: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(), 
-  limit: z.coerce.number().int().min(1).max(50).default(10)
-}).refine(data => {
-  const now = new Date().toISOString().split('T')[0];
-  if (data.end && data.end > now) {
-    return false; // End date cannot be in future
-  }
-  if (data.start && data.end) {
-    return new Date(data.start) <= new Date(data.end);
-  }
-  return true;
-}, { message: "Invalid date range" });
+const TriggersQuerySchema = z
+  .object({
+    start: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/)
+      .optional(),
+    end: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/)
+      .optional(),
+    limit: z.coerce.number().int().min(1).max(50).default(10),
+  })
+  .refine(
+    (data) => {
+      const now = new Date().toISOString().split("T")[0];
+      if (data.end && data.end > now) {
+        return false; // End date cannot be in future
+      }
+      if (data.start && data.end) {
+        return new Date(data.start) <= new Date(data.end);
+      }
+      return true;
+    },
+    { message: "Invalid date range" }
+  );
 ```
 
 ### Step 2: Implement PostgreSQL RPC Function
+
 ```sql
 -- supabase/migrations/20251221150000_get_top_triggers_rpc.sql
 CREATE OR REPLACE FUNCTION get_top_triggers(
@@ -233,7 +262,7 @@ RETURNS TABLE (
   confidence_lower DECIMAL,
   confidence_upper DECIMAL,
   confidence_width DECIMAL
-) 
+)
 LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
@@ -244,12 +273,12 @@ DECLARE
 BEGIN
   -- Check if user has sufficient logs for analysis
   SELECT COUNT(*) INTO total_user_logs
-  FROM logs 
-  WHERE user_id = p_user_id 
+  FROM logs
+  WHERE user_id = p_user_id
     AND log_date BETWEEN p_start_date AND p_end_date;
-  
+
   IF total_user_logs < min_logs_threshold THEN
-    RAISE EXCEPTION 'Insufficient data: minimum % logs required, found %', 
+    RAISE EXCEPTION 'Insufficient data: minimum % logs required, found %',
       min_logs_threshold, total_user_logs;
   END IF;
 
@@ -273,6 +302,7 @@ GRANT EXECUTE ON FUNCTION get_top_triggers TO authenticated;
 ```
 
 ### Step 3: Create Service Layer
+
 ```typescript
 // src/lib/services/trigger-analysis-service.ts
 export class TriggerAnalysisService {
@@ -280,13 +310,13 @@ export class TriggerAnalysisService {
 
   async getTriggerAnalysis(query: TriggerAnalysisQuery): Promise<TriggersResponse> {
     const dateRange = this.calculateDateRange(query.start, query.end);
-    
+
     try {
-      const { data, error } = await this.supabase.rpc('get_top_triggers', {
+      const { data, error } = await this.supabase.rpc("get_top_triggers", {
         p_user_id: query.userId,
         p_start_date: dateRange.start,
         p_end_date: dateRange.end,
-        p_limit: query.limit
+        p_limit: query.limit,
       });
 
       if (error) throw error;
@@ -296,16 +326,16 @@ export class TriggerAnalysisService {
 
       return { data: triggers, meta };
     } catch (error) {
-      if (error.message.includes('Insufficient data')) {
-        throw new BusinessLogicError('Insufficient data for trigger analysis', error.message);
+      if (error.message.includes("Insufficient data")) {
+        throw new BusinessLogicError("Insufficient data for trigger analysis", error.message);
       }
       throw error;
     }
   }
 
   private calculateDateRange(start?: string, end?: string): DateRange {
-    const endDate = end || new Date().toISOString().split('T')[0];
-    const startDate = start || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const endDate = end || new Date().toISOString().split("T")[0];
+    const startDate = start || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
     return { start: startDate, end: endDate };
   }
 
@@ -320,14 +350,15 @@ export class TriggerAnalysisService {
       confidence_interval: {
         lower: Number(rpcResult.confidence_lower),
         upper: Number(rpcResult.confidence_upper),
-        width: Number(rpcResult.confidence_width)
-      }
+        width: Number(rpcResult.confidence_width),
+      },
     };
   }
 }
 ```
 
 ### Step 4: Create Astro Endpoint
+
 ```typescript
 // src/pages/api/triggers.ts
 export const prerender = false;
@@ -335,19 +366,19 @@ export const prerender = false;
 export async function GET(context: APIContext): Promise<Response> {
   try {
     const userId = await validateAuthToken(context);
-    
+
     const url = new URL(context.request.url);
     const queryParams = TriggersQuerySchema.parse(Object.fromEntries(url.searchParams));
-    
+
     const triggerService = new TriggerAnalysisService(context.locals.supabase);
     const result = await triggerService.getTriggerAnalysis({
       userId,
-      ...queryParams
+      ...queryParams,
     });
 
     return new Response(JSON.stringify(result), {
       status: 200,
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
     return handleApiError(error);
@@ -356,15 +387,16 @@ export async function GET(context: APIContext): Promise<Response> {
 ```
 
 ### Step 5: Add Result Caching
+
 ```typescript
 // src/lib/cache/trigger-analysis-cache.ts
 export class TriggerAnalysisCache {
-  private cache = new Map<string, { result: TriggersResponse, expires: number }>();
-  
+  private cache = new Map<string, { result: TriggersResponse; expires: number }>();
+
   generateKey(userId: string, start: string, end: string, limit: number): string {
     return `${userId}:${start}:${end}:${limit}`;
   }
-  
+
   get(key: string): TriggersResponse | null {
     const cached = this.cache.get(key);
     if (cached && cached.expires > Date.now()) {
@@ -373,14 +405,16 @@ export class TriggerAnalysisCache {
     this.cache.delete(key);
     return null;
   }
-  
-  set(key: string, result: TriggersResponse, ttl: number = 3600000): void { // 1 hour TTL
+
+  set(key: string, result: TriggersResponse, ttl: number = 3600000): void {
+    // 1 hour TTL
     this.cache.set(key, { result, expires: Date.now() + ttl });
   }
 }
 ```
 
 ### Step 6: Add Custom Error Types
+
 ```typescript
 // src/lib/errors/business-logic-error.ts
 export class BusinessLogicError extends Error {
@@ -390,18 +424,19 @@ export class BusinessLogicError extends Error {
     public statusCode: number = 422
   ) {
     super(message);
-    this.name = 'BusinessLogicError';
+    this.name = "BusinessLogicError";
   }
 }
 
 export class InsufficientDataError extends BusinessLogicError {
   constructor(details: string) {
-    super('Insufficient data for analysis', details);
+    super("Insufficient data for analysis", details);
   }
 }
 ```
 
 ### Step 7: Add Performance Monitoring
+
 ```typescript
 // src/lib/middleware/rpc-performance-monitor.ts
 export function monitorRpcPerformance() {
@@ -410,11 +445,12 @@ export function monitorRpcPerformance() {
     try {
       const result = await rpcCall();
       const duration = Date.now() - startTime;
-      
-      if (duration > 5000) { // Log slow RPC calls
+
+      if (duration > 5000) {
+        // Log slow RPC calls
         console.warn(`Slow RPC call detected: ${duration}ms`);
       }
-      
+
       return result;
     } catch (error) {
       const duration = Date.now() - startTime;
@@ -426,27 +462,29 @@ export function monitorRpcPerformance() {
 ```
 
 ### Step 8: Add Database Indexes for RPC Performance
+
 ```sql
 -- supabase/migrations/20251221160000_trigger_analysis_indexes.sql
 -- Optimize RPC function performance
-CREATE INDEX IF NOT EXISTS logs_user_date_analysis_idx 
-ON logs (user_id, log_date) 
+CREATE INDEX IF NOT EXISTS logs_user_date_analysis_idx
+ON logs (user_id, log_date)
 WHERE log_date IS NOT NULL;
 
-CREATE INDEX IF NOT EXISTS log_ingredients_analysis_idx 
+CREATE INDEX IF NOT EXISTS log_ingredients_analysis_idx
 ON log_ingredients (log_id, ingredient_id)
 WHERE ingredient_id IS NOT NULL;
 
-CREATE INDEX IF NOT EXISTS log_symptoms_severity_idx 
+CREATE INDEX IF NOT EXISTS log_symptoms_severity_idx
 ON log_symptoms (log_id, severity);
 
 -- Consider partial indexes for frequent queries
-CREATE INDEX IF NOT EXISTS logs_recent_analysis_idx 
-ON logs (user_id, log_date DESC) 
+CREATE INDEX IF NOT EXISTS logs_recent_analysis_idx
+ON logs (user_id, log_date DESC)
 WHERE log_date >= CURRENT_DATE - INTERVAL '90 days';
 ```
 
 ### Step 9: Add Comprehensive Tests
+
 ```typescript
 // tests/api/triggers.test.ts
 describe('GET /api/triggers', () => {
@@ -464,6 +502,7 @@ describe('GET /api/triggers', () => {
 ```
 
 ### Step 10: Add Analytics Configuration
+
 ```typescript
 // src/lib/config/analytics-config.ts
 export const AnalyticsConfig = {
@@ -472,6 +511,6 @@ export const AnalyticsConfig = {
   CONFIDENCE_LEVEL: 0.95,
   MAX_CONFIDENCE_INTERVAL_WIDTH: 1.0,
   DEFAULT_ANALYSIS_PERIOD_DAYS: 30,
-  CACHE_TTL_MINUTES: 60
+  CACHE_TTL_MINUTES: 60,
 } as const;
 ```
