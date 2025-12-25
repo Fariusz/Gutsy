@@ -1,0 +1,26 @@
+---
+interface Props {
+  href: string;
+  text: string;
+  icon?: string;
+}
+
+const { href, text, icon = "+" } = Astro.props;
+---
+
+<div class="fixed bottom-6 right-6 z-50">
+  <a
+    href={href}
+    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-4 rounded-full shadow-xl hover:shadow-2xl transform hover:scale-110 transition-all duration-200 flex items-center space-x-2 group"
+  >
+    <span class="text-xl">{icon}</span>
+    <span class="hidden group-hover:block text-sm whitespace-nowrap">{text}</span>
+  </a>
+</div>
+
+<style>
+  /* Ensure the button is accessible and visible */
+  .fixed {
+    position: fixed !important;
+  }
+</style>
