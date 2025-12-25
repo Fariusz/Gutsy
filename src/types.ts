@@ -115,8 +115,7 @@ export interface CreateLogSymptomItem {
 export interface CreateLogRequest {
   log_date: string; // ISO date string (YYYY-MM-DD)
   notes?: string;
-  meal_photo?: string | null; // base64 encoded image
-  ingredients: CreateLogIngredientItem[];
+  ingredients: string[]; // Array of ingredient names
   symptoms: CreateLogSymptomItem[];
 }
 

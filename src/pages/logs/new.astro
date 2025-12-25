@@ -1,0 +1,31 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import CreateLogForm from "../../components/CreateLogForm.tsx";
+import TestComponent from "../../components/TestComponent.tsx";
+import SimpleLogForm from "../../components/SimpleLogForm.tsx";
+---
+
+<Layout title="Create New Log - Gutsy" hideFloatingButton={true}>
+  <main class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-4xl mx-auto px-4">
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Create New Meal Log</h1>
+        <p class="text-gray-600">
+          Record what you ate and any symptoms you experienced to help identify potential food triggers.
+        </p>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="p-6">
+          <TestComponent client:load />
+          <div class="mt-6">
+            <SimpleLogForm client:load />
+          </div>
+          <div class="mt-6">
+            <CreateLogForm client:load />
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>
