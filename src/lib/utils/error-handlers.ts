@@ -184,29 +184,6 @@ export function createNotFoundErrorResponse(resource: string): Response {
 }
 
 /**
- * Custom business logic error class
- */
-export class BusinessLogicError extends Error {
-  constructor(
-    message: string,
-    public details: string
-  ) {
-    super(message);
-    this.name = "BusinessLogicError";
-  }
-}
-
-/**
- * Custom rate limiting error class
- */
-export class RateLimitError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "RateLimitError";
-  }
-}
-
-/**
  * Create successful JSON response with proper headers
  */
 export function createSuccessResponse<T>(
