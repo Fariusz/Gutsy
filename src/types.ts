@@ -45,28 +45,6 @@ export interface CreateLogRequest {
 }
 
 /**
- * Populated symptom data in log responses
- * Combines log_symptoms with symptoms entity data
- */
-export interface LogSymptomResponse {
-  log_symptom_id: number;
-  symptom_id: number;
-  name: string; // From symptoms.name
-  severity: number; // From log_symptoms.severity
-}
-
-/**
- * Complete log data for API responses
- */
-export interface LogResponse {
-  id: string;
-  log_date: string;
-  notes?: string | null;
-  ingredients: string[];
-  symptoms: LogSymptomResponse[];
-}
-
-/**
  * Paginated response for logs listing
  */
 export interface LogsListResponse {
@@ -179,7 +157,7 @@ export interface GetLogsQuery {
  */
 export interface LogsListResponse {
   data: LogResponse[];
-  pagination: PaginationMeta;
+  meta: PaginationMeta;
 }
 
 // =============================================================================
@@ -370,4 +348,47 @@ export interface SuccessResponse<T> {
 export interface PaginatedSuccessResponse<T> {
   data: T[];
   pagination: PaginationMeta;
+}
+
+// =============================================================================
+// Authentication DTOs
+// =============================================================================
+
+/**
+ * Request payload for user registration
+ */
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
+/**
+ * Request payload for user login
+ */
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+/**
+ * Request payload for password reset
+ */
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+/**
+ * Response for successful authentication
+ */
+export interface AuthResponse {
+  user: {
+    id: string;
+    email: string;
+  };
+  session: {
+    access_token: string;
+    refresh_token: string;
+    expires_at: number;
+  };
 }
