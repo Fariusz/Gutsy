@@ -39,7 +39,7 @@ export class LogService {
         userId,
         logDate: request.log_date,
         notes: request.notes,
-        ingredients: request.ingredients.map((ing) => ing.name), // Extract names from ingredient objects
+        ingredients: request.ingredients, // ingredients are already strings
         symptoms: request.symptoms,
       };
 
@@ -65,6 +65,19 @@ export class LogService {
       throw new Error("Failed to retrieve logs");
     }
 
+    // Populate each log with ingredients and symptoms
+    const populatedLogs: LogResponse[] = [];
+    for (const rawLog of data || []) {
+      try {
+        const populatedLog = await this.logRepository.getPopulatedLog(rawLog.id, userId);
+        populatedLogs.push(populatedLog);
+      } catch (error) {
+        console.error(`Failed to populate log ${rawLog.id}:`, error);
+        // Skip this log if we can't populate it
+        continue;
+      }
+    }
+
     const pagination: PaginationMeta = {
       page: query.page,
       per_page: query.per_page,
@@ -73,7 +86,7 @@ export class LogService {
     };
 
     return {
-      data,
+      data: populatedLogs,
       meta: pagination,
     };
   }

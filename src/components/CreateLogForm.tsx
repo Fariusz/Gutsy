@@ -116,8 +116,8 @@ export default function CreateLogForm({ onSuccess }: CreateLogFormProps) {
     if (result && onSuccess) {
       onSuccess(result.id);
     } else if (result) {
-      // Default redirect to home page if no onSuccess callback provided
-      window.location.href = "/";
+      // Redirect to logs page to see the newly created log
+      window.location.href = "/logs";
     }
   };
 
