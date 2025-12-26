@@ -12,7 +12,10 @@ const { title = "10x Astro Starter", hideFloatingButton = false } = Astro.props;
 // Check if user is authenticated
 let user = null;
 try {
-  const { data: { session }, error } = await Astro.locals.supabase.auth.getSession();
+  const {
+    data: { session },
+    error,
+  } = await Astro.locals.supabase.auth.getSession();
   if (!error && session?.user) {
     user = session.user;
   }
@@ -37,79 +40,78 @@ try {
         <div class="flex justify-between items-center py-4">
           <div class="flex items-center space-x-8">
             <a href="/" class="text-xl font-bold text-gray-900">Gutsy</a>
-            {user && (
-              <div class="flex space-x-4">
-                <a href="/logs/new" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 text-sm">
-                  + New Log
-                </a>
-                <div class="hidden md:flex space-x-6 items-center">
-                  <a href="/logs" class="text-gray-600 hover:text-gray-900 font-medium">
-                    My Logs
+            {
+              user && (
+                <div class="flex space-x-4">
+                  <a
+                    href="/logs/new"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
+                  >
+                    + New Log
                   </a>
+                  <div class="hidden md:flex space-x-6 items-center">
+                    <a href="/logs" class="text-gray-600 hover:text-gray-900 font-medium">
+                      My Logs
+                    </a>
+                  </div>
                 </div>
-              </div>
-            )}
+              )
+            }
           </div>
           <div class="flex items-center space-x-4">
-            {user ? (
-              <div class="flex items-center space-x-4">
-                <span class="text-sm text-gray-600 hidden sm:inline">
-                  {user.email}
-                </span>
-                <button 
-                  id="logout-btn"
-                  class="text-gray-600 hover:text-gray-900 font-medium text-sm"
-                >
-                  Sign Out
-                </button>
-              </div>
-            ) : (
-              <div class="flex items-center space-x-4">
-                <a href="/login" class="text-gray-600 hover:text-gray-900 font-medium text-sm">
-                  Sign In
-                </a>
-                <a href="/register" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 text-sm">
-                  Sign Up
-                </a>
-              </div>
-            )}
+            {
+              user ? (
+                <div class="flex items-center space-x-4">
+                  <span class="text-sm text-gray-600 hidden sm:inline">{user.email}</span>
+                  <button id="logout-btn" class="text-gray-600 hover:text-gray-900 font-medium text-sm">
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <div class="flex items-center space-x-4">
+                  <a href="/login" class="text-gray-600 hover:text-gray-900 font-medium text-sm">
+                    Sign In
+                  </a>
+                  <a
+                    href="/register"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
+                  >
+                    Sign Up
+                  </a>
+                </div>
+              )
+            }
           </div>
         </div>
       </nav>
     </header>
     <slot />
-    
+
     <!-- Floating Action Button for creating new logs -->
-    {!hideFloatingButton && user && (
-      <FloatingActionButton 
-        href="/logs/new" 
-        text="New Meal Log" 
-        icon="🍽️" 
-      />
-    )}
-    
+    {!hideFloatingButton && user && <FloatingActionButton href="/logs/new" text="New Meal Log" icon="🍽️" />}
+
     <script>
       // Handle logout functionality
-      document.addEventListener('DOMContentLoaded', () => {
-        const logoutBtn = document.getElementById('logout-btn');
+      document.addEventListener("DOMContentLoaded", () => {
+        const logoutBtn = document.getElementById("logout-btn");
         if (logoutBtn) {
-          logoutBtn.addEventListener('click', async () => {
+          logoutBtn.addEventListener("click", async () => {
             try {
-              const response = await fetch('/api/auth/logout', {
-                method: 'POST',
+              const response = await fetch("/api/auth/logout", {
+                method: "POST",
                 headers: {
-                  'Content-Type': 'application/json',
+                  "Content-Type": "application/json",
                 },
               });
-              
+
               if (response.ok) {
                 // Redirect to home page after successful logout
-                window.location.href = '/';
+                window.location.href = "/";
               } else {
-                console.error('Logout failed');
+                console.error("Logout failed");
               }
             } catch (error) {
-              console.error('Error during logout:', error);
+              console.error("Error during logout:", error);
             }
           });
         }

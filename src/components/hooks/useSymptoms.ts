@@ -15,28 +15,37 @@ export function useSymptoms(): UseSymptomsReturn {
   useEffect(() => {
     const fetchSymptoms = async () => {
       try {
-        console.log('Fetching symptoms...');
         const response = await fetch("/api/symptoms");
-        const data = await response.json();
-
-        console.log('Symptoms API response:', { response: response.ok, status: response.status, data });
-
+        
+        // Check if the response is ok first
         if (!response.ok) {
-          const errorResponse = data as ErrorResponse;
-          throw new Error(errorResponse.error?.message || "Failed to fetch symptoms");
+          // Try to parse error response if possible
+          let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.error?.message || errorMessage;
+          } catch {
+            // If parsing fails, use the status message
+          }
+          throw new Error(errorMessage);
         }
+
+        // Parse successful response
+        const data = await response.json();
 
         // Check if data has the expected structure
         if (data && Array.isArray(data.data)) {
-          console.log('Setting symptoms:', data.data);
           setSymptoms(data.data);
+        } else if (data && data.error) {
+          // Handle API-level errors
+          throw new Error(data.error);
         } else {
-          console.error('Invalid symptoms data structure:', data);
-          throw new Error('Invalid symptoms data structure received');
+          console.error("Invalid symptoms data structure:", data);
+          throw new Error("Invalid symptoms data structure received");
         }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred";
-        console.error('Symptoms fetch error:', err);
+        console.error("Symptoms fetch error:", err);
         setError(errorMessage);
       } finally {
         setIsLoading(false);

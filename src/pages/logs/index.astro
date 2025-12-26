@@ -3,7 +3,10 @@ import Layout from "../../layouts/Layout.astro";
 import LogsList from "../../components/LogsList.tsx";
 
 // Check if user is authenticated
-const { data: { session }, error } = await Astro.locals.supabase.auth.getSession();
+const {
+  data: { session },
+  error,
+} = await Astro.locals.supabase.auth.getSession();
 
 if (error || !session?.user) {
   // Redirect to login page if not authenticated
@@ -17,9 +20,7 @@ if (error || !session?.user) {
       <div class="flex justify-between items-center mb-8">
         <div>
           <h1 class="text-3xl font-bold text-gray-900 mb-2">My Meal Logs</h1>
-          <p class="text-gray-600">
-            Track and review your meal history and symptoms
-          </p>
+          <p class="text-gray-600">Track and review your meal history and symptoms</p>
         </div>
         <a
           href="/logs/new"
