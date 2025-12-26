@@ -16,7 +16,7 @@ export function useSymptoms(): UseSymptomsReturn {
     const fetchSymptoms = async () => {
       try {
         const response = await fetch("/api/symptoms");
-        
+
         // Check if the response is ok first
         if (!response.ok) {
           // Try to parse error response if possible

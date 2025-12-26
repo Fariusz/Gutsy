@@ -8,7 +8,7 @@ export const prerender = false;
 export async function POST(context: APIContext): Promise<Response> {
   try {
     console.log("Logout: Starting request");
-    
+
     // 1. Check if user is authenticated
     const {
       data: { session },

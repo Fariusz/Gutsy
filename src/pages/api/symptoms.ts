@@ -11,7 +11,7 @@ export async function GET(context: APIContext): Promise<Response> {
   try {
     // 1. Check authentication
     console.log("Symptoms API: Starting request");
-    
+
     const {
       data: { session },
       error: sessionError,
@@ -55,7 +55,11 @@ export async function GET(context: APIContext): Promise<Response> {
     const symptomService = new SymptomService(context.locals.supabase);
     const response = await symptomService.getAllSymptoms();
 
-    console.log("Service response:", { hasData: !!response.data, dataLength: response.data?.length, hasError: !!response.error });
+    console.log("Service response:", {
+      hasData: !!response.data,
+      dataLength: response.data?.length,
+      hasError: !!response.error,
+    });
 
     return new Response(JSON.stringify(response), {
       status: 200,

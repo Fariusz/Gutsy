@@ -15,7 +15,7 @@ const LoginSchema = z.object({
 export async function POST(context: APIContext): Promise<Response> {
   try {
     console.log("Login: Starting request");
-    
+
     // 1. Parse and validate request body
     let requestBody: unknown;
     try {

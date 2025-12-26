@@ -30,7 +30,7 @@ const LogsQuerySchema = z.object({
 export async function POST(context: APIContext): Promise<Response> {
   try {
     console.log("Logs POST: Starting request");
-    
+
     // 1. Check authentication
     const {
       data: { session },
@@ -136,7 +136,7 @@ export async function POST(context: APIContext): Promise<Response> {
       }),
       {
         status: 500,
-      headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" },
       }
     );
   }
@@ -148,7 +148,7 @@ export async function POST(context: APIContext): Promise<Response> {
 export async function GET(context: APIContext): Promise<Response> {
   try {
     console.log("Logs GET: Starting request");
-    
+
     // 1. Check authentication
     const {
       data: { session },
@@ -192,7 +192,7 @@ export async function GET(context: APIContext): Promise<Response> {
     // 2. Parse query parameters
     const queryParams = Object.fromEntries(context.url.searchParams.entries());
     console.log("Logs GET: Query params:", queryParams);
-    
+
     const validationResult = LogsQuerySchema.safeParse(queryParams);
     if (!validationResult.success) {
       console.error("Logs GET: Query validation failed:", validationResult.error);
@@ -218,10 +218,10 @@ export async function GET(context: APIContext): Promise<Response> {
     const logService = new LogService(context.locals.supabase);
     const logsResponse = await logService.getLogs(session.user.id, validationResult.data);
 
-    console.log("Logs GET: Service response:", { 
-      hasData: !!logsResponse.data, 
-      dataLength: logsResponse.data?.length, 
-      hasError: !!logsResponse.error 
+    console.log("Logs GET: Service response:", {
+      hasData: !!logsResponse.data,
+      dataLength: logsResponse.data?.length,
+      hasError: !!logsResponse.error,
     });
 
     return new Response(JSON.stringify(logsResponse), {
