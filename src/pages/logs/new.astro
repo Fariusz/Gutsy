@@ -1,8 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import CreateLogForm from "../../components/CreateLogForm.tsx";
-import TestComponent from "../../components/TestComponent.tsx";
-import SimpleLogForm from "../../components/SimpleLogForm.tsx";
 ---
 
 <Layout title="Create New Log - Gutsy" hideFloatingButton={true}>
@@ -17,13 +15,7 @@ import SimpleLogForm from "../../components/SimpleLogForm.tsx";
 
       <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="p-6">
-          <TestComponent client:load />
-          <div class="mt-6">
-            <SimpleLogForm client:load />
-          </div>
-          <div class="mt-6">
-            <CreateLogForm client:load />
-          </div>
+          <CreateLogForm client:idle />
         </div>
       </div>
     </div>
