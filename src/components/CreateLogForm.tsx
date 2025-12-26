@@ -173,70 +173,109 @@ export default function CreateLogForm({ onSuccess }: CreateLogFormProps) {
       <div className="space-y-4">
         <h3 className="text-sm font-medium text-gray-700">Symptoms</h3>
 
+        {/* Show loading/error states for symptoms */}
+        {symptomsLoading && (
+          <div className="p-3 text-sm text-blue-700 bg-blue-50 border border-blue-200 rounded-lg">
+            Loading symptoms...
+          </div>
+        )}
+
+        {symptomsError && (
+          <div className="p-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg">
+            Error loading symptoms: {symptomsError}
+          </div>
+        )}
+
         {/* Add Symptom Form */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border border-gray-200 rounded-lg">
-          <div className="space-y-1">
-            <label className="block text-xs text-gray-600">Symptom</label>
-            <Select
-              value={symptomSelector.selectedSymptomId}
-              onValueChange={(value) => setSymptomSelector((prev) => ({ ...prev, selectedSymptomId: value }))}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select symptom" />
-              </SelectTrigger>
-              <SelectContent>
-                {symptoms.map((symptom) => (
-                  <SelectItem key={symptom.id} value={symptom.id.toString()}>
-                    {symptom.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        <div className="space-y-4 p-4 border border-gray-200 rounded-lg">
+          {/* Debug info - only show if there are issues */}
+          {(symptomsLoading || symptomsError || symptoms.length === 0) && (
+            <div className="p-3 bg-gray-100 rounded text-sm">
+              <strong>Symptoms Status:</strong> {symptomsLoading ? 'Loading...' : symptomsError ? `Error: ${symptomsError}` : symptoms.length === 0 ? 'No symptoms found' : `Loaded: ${symptoms.length} symptoms`}
+              {symptoms.length > 0 && (
+                <div className="mt-1 text-xs text-gray-600">
+                  Available: {symptoms.map(s => s.name).join(', ')}
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* Form fields in stable layout */}
+          <div className="space-y-4">
+            <div className="space-y-1">
+              <label className="block text-xs text-gray-600">Symptom</label>
+              <Select
+                value={symptomSelector.selectedSymptomId}
+                onValueChange={(value) => {
+                  console.log("Select value changed:", value);
+                  setSymptomSelector((prev) => ({ ...prev, selectedSymptomId: value }));
+                }}
+                disabled={symptomsLoading || symptomsError !== null || symptoms.length === 0}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={symptomsLoading ? "Loading..." : symptomsError ? "Error loading symptoms" : symptoms.length === 0 ? "No symptoms available" : "Select symptom"} />
+                </SelectTrigger>
+                <SelectContent 
+                  className="relative z-50 min-w-[8rem] overflow-hidden rounded-md border bg-white dark:bg-gray-800 text-gray-950 dark:text-gray-100 shadow-md" 
+                  position="popper" 
+                  sideOffset={4}
+                >
+                  {symptoms.map((symptom) => (
+                    <SelectItem key={symptom.id} value={symptom.id.toString()}>
+                      {symptom.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div className="space-y-1">
-            <label className="block text-xs text-gray-600">Severity (1-5)</label>
-            <Select
-              value={symptomSelector.selectedSeverity}
-              onValueChange={(value) => setSymptomSelector((prev) => ({ ...prev, selectedSeverity: value }))}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select severity" />
-              </SelectTrigger>
-              <SelectContent>
-                {[1, 2, 3, 4, 5].map((severity) => (
-                  <SelectItem key={severity} value={severity.toString()}>
-                    {severity} -{" "}
-                    {severity === 1
-                      ? "Very Mild"
-                      : severity === 2
-                        ? "Mild"
-                        : severity === 3
-                          ? "Moderate"
-                          : severity === 4
-                            ? "Severe"
-                            : "Very Severe"}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+            <div className="space-y-1">
+              <label className="block text-xs text-gray-600">Severity (1-5)</label>
+              <Select
+                value={symptomSelector.selectedSeverity}
+                onValueChange={(value) => {
+                  console.log("Severity changed:", value);
+                  setSymptomSelector((prev) => ({ ...prev, selectedSeverity: value }));
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select severity" />
+                </SelectTrigger>
+                <SelectContent 
+                  className="relative z-50 min-w-[8rem] overflow-hidden rounded-md border bg-white dark:bg-gray-800 text-gray-950 dark:text-gray-100 shadow-md" 
+                  position="popper" 
+                  sideOffset={4}
+                >
+                  {[1, 2, 3, 4, 5].map((severity) => (
+                    <SelectItem key={severity} value={severity.toString()}>
+                      {severity} -{" "}
+                      {severity === 1
+                        ? "Very Mild"
+                        : severity === 2
+                          ? "Mild"
+                          : severity === 3
+                            ? "Moderate"
+                            : severity === 4
+                              ? "Severe"
+                              : "Very Severe"}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div className="flex items-end">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleAddSymptom}
-              disabled={!symptomSelector.selectedSymptomId || !symptomSelector.selectedSeverity}
-              className="w-full"
-            >
-              Add Symptom
-            </Button>
-          </div>
-
-          <div className="flex items-end">
-            <div className="text-xs text-gray-500">Select symptom and severity, then click Add</div>
+            <div className="flex justify-center pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleAddSymptom}
+                disabled={!symptomSelector.selectedSymptomId || !symptomSelector.selectedSeverity}
+                className="px-6"
+              >
+                Add Symptom
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -281,7 +320,7 @@ export default function CreateLogForm({ onSuccess }: CreateLogFormProps) {
       </div>
 
       {formErrors.length > 0 && (
-        <div className="p-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg">
+        <div className="p-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg dark:text-red-400 dark:bg-red-900/20 dark:border-red-800">
           <ul className="list-disc list-inside space-y-1">
             {formErrors.map((error, index) => (
               <li key={index}>{error}</li>
