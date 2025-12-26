@@ -19,12 +19,14 @@ export class SymptomService {
    */
   async getAllSymptoms(): Promise<SymptomsResponse> {
     try {
+      console.log("SymptomService: Starting getAllSymptoms");
       const symptoms = await this.symptomRepository.getAllSymptoms();
+      console.log(`SymptomService: Successfully retrieved ${symptoms.length} symptoms`);
       return { data: symptoms };
     } catch (error) {
-      console.error("Error in SymptomService.getAllSymptoms:", error);
-      // In a real app, you'd want more robust error handling and logging
-      return { data: [], error: "Failed to retrieve symptoms" };
+      console.error("SymptomService error in getAllSymptoms:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to retrieve symptoms";
+      return { data: [], error: errorMessage };
     }
   }
 }

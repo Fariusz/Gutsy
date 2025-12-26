@@ -1,7 +1,7 @@
 import type { APIContext } from "astro";
 import { z } from "zod";
 import { LogService } from "../../lib/services/log-service";
-import type { CreateLogRequest, ErrorResponse } from "../../types";
+import type { CreateLogRequest } from "../../types";
 
 export const prerender = false;
 
@@ -29,20 +29,23 @@ const LogsQuerySchema = z.object({
  */
 export async function POST(context: APIContext): Promise<Response> {
   try {
-    // 1. Validate authentication
+    console.log("Logs POST: Starting request");
+    
+    // 1. Check authentication
     const {
       data: { session },
       error: sessionError,
     } = await context.locals.supabase.auth.getSession();
 
-    if (sessionError || !session?.user) {
+    if (sessionError) {
+      console.error("Logs POST session error:", sessionError);
       return new Response(
         JSON.stringify({
           error: {
             type: "authorization_error",
-            message: "Authentication required",
+            message: "Session error: " + sessionError.message,
           },
-        } as ErrorResponse),
+        }),
         {
           status: 401,
           headers: { "Content-Type": "application/json" },
@@ -50,19 +53,38 @@ export async function POST(context: APIContext): Promise<Response> {
       );
     }
 
+    if (!session?.user) {
+      console.log("Logs POST: No session found");
+      return new Response(
+        JSON.stringify({
+          error: {
+            type: "authorization_error",
+            message: "Authentication required",
+          },
+        }),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    console.log("Logs POST: Session validated for user:", session.user.id);
+
     // 2. Parse and validate request body
     let requestBody: unknown;
     try {
       requestBody = await context.request.json();
+      console.log("Logs POST: Parsed request body");
     } catch {
+      console.error("Logs POST: Failed to parse JSON body");
       return new Response(
         JSON.stringify({
           error: {
             type: "validation_error",
             message: "Invalid JSON in request body",
-            details: [],
           },
-        } as ErrorResponse),
+        }),
         {
           status: 400,
           headers: { "Content-Type": "application/json" },
@@ -70,22 +92,20 @@ export async function POST(context: APIContext): Promise<Response> {
       );
     }
 
-    // 3. Validate request schema
     const validationResult = CreateLogSchema.safeParse(requestBody);
     if (!validationResult.success) {
-      const validationErrors = validationResult.error.errors.map((error) => ({
-        field: error.path.join("."),
-        message: error.message,
-      }));
-
+      console.error("Logs POST: Body validation failed:", validationResult.error);
       return new Response(
         JSON.stringify({
           error: {
             type: "validation_error",
             message: "Request validation failed",
-            details: validationErrors,
+            details: validationResult.error.errors.map((error) => ({
+              field: error.path.join("."),
+              message: error.message,
+            })),
           },
-        } as ErrorResponse),
+        }),
         {
           status: 400,
           headers: { "Content-Type": "application/json" },
@@ -95,29 +115,28 @@ export async function POST(context: APIContext): Promise<Response> {
 
     const validatedRequest = validationResult.data as CreateLogRequest;
 
-    // 4. Create log using service layer
+    // 3. Create log
     const logService = new LogService(context.locals.supabase);
     const createdLog = await logService.createLog(validatedRequest, session.user.id);
 
-    // 5. Return success response
+    console.log("Logs POST: Log created successfully");
+
     return new Response(JSON.stringify({ data: createdLog }), {
       status: 201,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error creating log:", error);
-
+    console.error("Logs POST API error:", error);
     return new Response(
       JSON.stringify({
         error: {
-          type: "business_logic_error",
-          message: "Failed to create log",
-          details: error instanceof Error ? error.message : "Unknown error",
+          type: "server_error",
+          message: error instanceof Error ? error.message : "Internal server error",
         },
-      } as ErrorResponse),
+      }),
       {
         status: 500,
-        headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" },
       }
     );
   }
@@ -128,20 +147,23 @@ export async function POST(context: APIContext): Promise<Response> {
  */
 export async function GET(context: APIContext): Promise<Response> {
   try {
-    // 1. Validate authentication
+    console.log("Logs GET: Starting request");
+    
+    // 1. Check authentication
     const {
       data: { session },
       error: sessionError,
     } = await context.locals.supabase.auth.getSession();
 
-    if (sessionError || !session?.user) {
+    if (sessionError) {
+      console.error("Logs GET session error:", sessionError);
       return new Response(
         JSON.stringify({
           error: {
             type: "authorization_error",
-            message: "Authentication required",
+            message: "Session error: " + sessionError.message,
           },
-        } as ErrorResponse),
+        }),
         {
           status: 401,
           headers: { "Content-Type": "application/json" },
@@ -149,23 +171,42 @@ export async function GET(context: APIContext): Promise<Response> {
       );
     }
 
-    // 2. Validate query parameters
-    const queryParams = Object.fromEntries(context.url.searchParams.entries());
-    const validationResult = LogsQuerySchema.safeParse(queryParams);
+    if (!session?.user) {
+      console.log("Logs GET: No session found");
+      return new Response(
+        JSON.stringify({
+          error: {
+            type: "authorization_error",
+            message: "Authentication required",
+          },
+        }),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
 
+    console.log("Logs GET: Session validated for user:", session.user.id);
+
+    // 2. Parse query parameters
+    const queryParams = Object.fromEntries(context.url.searchParams.entries());
+    console.log("Logs GET: Query params:", queryParams);
+    
+    const validationResult = LogsQuerySchema.safeParse(queryParams);
     if (!validationResult.success) {
-      const validationErrors = validationResult.error.errors.map((error) => ({
-        field: error.path.join("."),
-        message: error.message,
-      }));
+      console.error("Logs GET: Query validation failed:", validationResult.error);
       return new Response(
         JSON.stringify({
           error: {
             type: "validation_error",
             message: "Invalid query parameters",
-            details: validationErrors,
+            details: validationResult.error.errors.map((error) => ({
+              field: error.path.join("."),
+              message: error.message,
+            })),
           },
-        } as ErrorResponse),
+        }),
         {
           status: 400,
           headers: { "Content-Type": "application/json" },
@@ -173,26 +214,29 @@ export async function GET(context: APIContext): Promise<Response> {
       );
     }
 
-    // 3. Get logs using service layer
+    // 3. Get logs
     const logService = new LogService(context.locals.supabase);
     const logsResponse = await logService.getLogs(session.user.id, validationResult.data);
 
-    // 4. Return success response
+    console.log("Logs GET: Service response:", { 
+      hasData: !!logsResponse.data, 
+      dataLength: logsResponse.data?.length, 
+      hasError: !!logsResponse.error 
+    });
+
     return new Response(JSON.stringify(logsResponse), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error fetching logs:", error);
-
+    console.error("Logs GET API error:", error);
     return new Response(
       JSON.stringify({
         error: {
-          type: "business_logic_error",
-          message: "Failed to fetch logs",
-          details: error instanceof Error ? error.message : "Unknown error",
+          type: "server_error",
+          message: error instanceof Error ? error.message : "Internal server error",
         },
-      } as ErrorResponse),
+      }),
       {
         status: 500,
         headers: { "Content-Type": "application/json" },

@@ -44,7 +44,7 @@ export class RateLimitError extends Error {
  * Handle API errors and return appropriate Response objects
  * Centralizes error handling logic across all endpoints
  */
-export function handleApiError(error: unknown): Response {
+export function handleApiError(error: unknown, customMessage?: string): Response {
   console.error("API Error:", error);
 
   // Validation errors (Zod)
@@ -68,7 +68,7 @@ export function handleApiError(error: unknown): Response {
   }
 
   // Generic server errors
-  return createServerErrorResponse();
+  return createServerErrorResponse(customMessage);
 }
 
 /**
@@ -152,11 +152,11 @@ function createRateLimitErrorResponse(message: string): Response {
 /**
  * Create generic server error response (500)
  */
-function createServerErrorResponse(): Response {
+function createServerErrorResponse(customMessage?: string): Response {
   const errorResponse = {
     error: {
       type: "server_error" as const,
-      message: "An unexpected error occurred. Please try again later.",
+      message: customMessage || "An unexpected error occurred. Please try again later.",
     },
   };
 

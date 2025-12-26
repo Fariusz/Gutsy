@@ -234,6 +234,7 @@ export interface SymptomResponse {
  */
 export interface SymptomsResponse {
   data: SymptomResponse[];
+  error?: string;
 }
 
 // =============================================================================

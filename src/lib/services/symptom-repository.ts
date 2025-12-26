@@ -13,16 +13,35 @@ export class SymptomRepository {
    * @returns Array of symptoms
    */
   async getAllSymptoms(): Promise<SymptomResponse[]> {
-    const { data, error } = await this.supabase.from("symptoms").select("id, name");
+    try {
+      const { data, error } = await this.supabase.from("symptoms").select("id, name");
 
-    if (error) {
-      console.error("Error fetching symptoms:", error);
-      throw new Error("Failed to fetch symptoms");
+      if (error) {
+        console.error("Supabase error fetching symptoms:", {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code,
+        });
+        throw new Error(`Database error: ${error.message}`);
+      }
+
+      if (!data) {
+        console.warn("No symptoms data returned from database");
+        return [];
+      }
+
+      console.log(`Successfully fetched ${data.length} symptoms`);
+      return data.map((symptom) => ({
+        id: symptom.id,
+        name: symptom.name,
+      }));
+    } catch (error) {
+      console.error("Repository error in getAllSymptoms:", error);
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error("Unexpected error fetching symptoms");
     }
-
-    return (data || []).map((symptom) => ({
-      id: symptom.id,
-      name: symptom.name,
-    }));
   }
 }

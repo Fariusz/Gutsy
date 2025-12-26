@@ -1,6 +1,6 @@
 import type { APIContext } from "astro";
 import { z } from "zod";
-import type { LoginRequest, AuthResponse, ErrorResponse } from "../../../types";
+import type { AuthResponse } from "../../../types";
 
 export const prerender = false;
 
@@ -14,19 +14,22 @@ const LoginSchema = z.object({
  */
 export async function POST(context: APIContext): Promise<Response> {
   try {
+    console.log("Login: Starting request");
+    
     // 1. Parse and validate request body
     let requestBody: unknown;
     try {
       requestBody = await context.request.json();
+      console.log("Login: Parsed request body");
     } catch {
+      console.error("Login: Failed to parse JSON body");
       return new Response(
         JSON.stringify({
           error: {
             type: "validation_error",
             message: "Invalid JSON in request body",
-            details: [],
           },
-        } as ErrorResponse),
+        }),
         {
           status: 400,
           headers: { "Content-Type": "application/json" },
@@ -37,19 +40,18 @@ export async function POST(context: APIContext): Promise<Response> {
     // 2. Validate request schema
     const validationResult = LoginSchema.safeParse(requestBody);
     if (!validationResult.success) {
-      const validationErrors = validationResult.error.errors.map((error) => ({
-        field: error.path.join("."),
-        message: error.message,
-      }));
-
+      console.error("Login: Body validation failed:", validationResult.error);
       return new Response(
         JSON.stringify({
           error: {
             type: "validation_error",
             message: "Login validation failed",
-            details: validationErrors,
+            details: validationResult.error.errors.map((error) => ({
+              field: error.path.join("."),
+              message: error.message,
+            })),
           },
-        } as ErrorResponse),
+        }),
         {
           status: 400,
           headers: { "Content-Type": "application/json" },
@@ -58,6 +60,7 @@ export async function POST(context: APIContext): Promise<Response> {
     }
 
     const { email, password } = validationResult.data;
+    console.log("Login: Attempting to authenticate user:", email);
 
     // 3. Authenticate with Supabase
     const { data, error } = await context.locals.supabase.auth.signInWithPassword({
@@ -66,14 +69,14 @@ export async function POST(context: APIContext): Promise<Response> {
     });
 
     if (error) {
+      console.error("Login: Supabase auth error:", error);
       return new Response(
         JSON.stringify({
           error: {
             type: "authorization_error",
             message: "Invalid email or password",
-            details: error,
           },
-        } as ErrorResponse),
+        }),
         {
           status: 401,
           headers: { "Content-Type": "application/json" },
@@ -82,20 +85,22 @@ export async function POST(context: APIContext): Promise<Response> {
     }
 
     if (!data.user || !data.session) {
+      console.error("Login: No user or session in response");
       return new Response(
         JSON.stringify({
           error: {
-            type: "business_logic_error",
+            type: "server_error",
             message: "Login failed - session not created",
-            details: [],
           },
-        } as ErrorResponse),
+        }),
         {
           status: 500,
           headers: { "Content-Type": "application/json" },
         }
       );
     }
+
+    console.log("Login: Successfully authenticated user:", data.user.id);
 
     // 4. Return success response
     const authResponse: AuthResponse = {
@@ -115,16 +120,14 @@ export async function POST(context: APIContext): Promise<Response> {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error during login:", error);
-
+    console.error("Login API error:", error);
     return new Response(
       JSON.stringify({
         error: {
-          type: "business_logic_error",
-          message: "Login failed",
-          details: error instanceof Error ? error.message : "Unknown error",
+          type: "server_error",
+          message: error instanceof Error ? error.message : "Internal server error",
         },
-      } as ErrorResponse),
+      }),
       {
         status: 500,
         headers: { "Content-Type": "application/json" },
