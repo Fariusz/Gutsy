@@ -145,7 +145,7 @@ export default function LogsList({ onEditLog }: LogsListProps) {
                 <div className="space-y-2">
                   {log.symptoms.map((symptom) => (
                     <div key={symptom.symptom_id} className="flex items-center justify-between">
-                      <span className="text-sm text-gray-700">{symptom.name}</span>
+                      <span className="text-sm text-gray-700">{formatSymptomName(symptom.name)}</span>
                       <div className="flex items-center">
                         <span className="text-sm text-gray-600 mr-2">Severity:</span>
                         <div className="flex space-x-1">

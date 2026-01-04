@@ -8,6 +8,7 @@ import { Textarea } from "./ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { useCreateLog } from "./hooks/useCreateLog";
 import { useSymptoms } from "./hooks/useSymptoms";
+import { formatSymptomName } from "../lib/utils";
 import type { CreateLogRequest } from "../types";
 
 interface CreateLogFormProps {
@@ -44,7 +45,7 @@ const SymptomItem = memo(function SymptomItem({
       role="listitem"
     >
       <div>
-        <span className="font-medium">{symptom.symptomName}</span>
+        <span className="font-medium">{formatSymptomName(symptom.symptomName)}</span>
         <span className="ml-2 text-sm text-gray-600">Severity: {symptom.severity}/5</span>
       </div>
       <Button
@@ -131,7 +132,7 @@ export default memo(function CreateLogForm({ onSuccess }: CreateLogFormProps) {
         ...prev,
         {
           symptomId: symptomIdNum,
-          symptomName: symptom.name,
+          symptomName: formatSymptomName(symptom.name),
           severity: severityNum,
         },
       ]);
@@ -279,7 +280,7 @@ export default memo(function CreateLogForm({ onSuccess }: CreateLogFormProps) {
                     ? "No symptoms found"
                     : `Loaded: ${symptoms.length} symptoms`}
               {symptoms.length > 0 && (
-                <div className="mt-1 text-xs text-gray-600">Available: {symptoms.map((s) => s.name).join(", ")}</div>
+                <div className="mt-1 text-xs text-gray-600">Available: {symptoms.map((s) => formatSymptomName(s.name)).join(", ")}</div>
               )}
             </div>
           )}
@@ -318,7 +319,7 @@ export default memo(function CreateLogForm({ onSuccess }: CreateLogFormProps) {
                 >
                   {symptoms.map((symptom) => (
                     <SelectItem key={symptom.id} value={symptom.id.toString()}>
-                      {symptom.name}
+                      {formatSymptomName(symptom.name)}
                     </SelectItem>
                   ))}
                 </SelectContent>
