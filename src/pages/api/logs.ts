@@ -2,24 +2,12 @@ import type { APIContext } from "astro";
 import { z } from "zod";
 import { LogService } from "../../lib/services/log-service";
 import type { CreateLogRequest } from "../../types";
+import { CreateLogSchema, LogsQuerySchema } from "../../lib/validation/schemas.js";
 
 export const prerender = false;
 
-const CreateLogSchema = z.object({
-  log_date: z.string().refine((val) => !isNaN(Date.parse(val)), {
-    message: "Invalid date format",
-  }),
-  notes: z.string().optional(),
-  ingredients: z.array(z.string()),
-  symptoms: z.array(
-    z.object({
-      symptom_id: z.number(),
-      severity: z.number().min(1).max(5),
-    })
-  ),
-});
-
-const LogsQuerySchema = z.object({
+// Extend the base query schema with pagination
+const PaginatedLogsQuerySchema = LogsQuerySchema.extend({
   page: z.preprocess((val) => Number(val), z.number().int().min(1)).default(1),
   per_page: z.preprocess((val) => Number(val), z.number().int().min(1).max(100)).default(10),
 });
@@ -193,7 +181,7 @@ export async function GET(context: APIContext): Promise<Response> {
     const queryParams = Object.fromEntries(context.url.searchParams.entries());
     console.log("Logs GET: Query params:", queryParams);
 
-    const validationResult = LogsQuerySchema.safeParse(queryParams);
+    const validationResult = PaginatedLogsQuerySchema.safeParse(queryParams);
     if (!validationResult.success) {
       console.error("Logs GET: Query validation failed:", validationResult.error);
       return new Response(

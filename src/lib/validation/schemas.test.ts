@@ -1,23 +1,226 @@
 import { describe, it, expect } from "vitest";
 import { z } from "zod";
+import {
+  CreateLogSchema,
+  LogsQuerySchema,
+  MessageSchema,
+  ResponseFormatSchema,
+  ModelParametersSchema,
+  ChatRequestSchema,
+  ChatResponseSchema,
+  OpenRouterErrorSchema,
+  ModelSchema,
+} from "./schemas.js";
 
-// Import schemas from the API files (these would need to be exported)
-// For now, we'll recreate them here for testing
-const CreateLogSchema = z.object({
-  log_date: z.string().refine((val) => !isNaN(Date.parse(val)), {
-    message: "Invalid date format",
-  }),
-  notes: z.string().optional(),
-  ingredients: z.array(z.string()),
-  symptoms: z.array(
-    z.object({
-      symptom_id: z.number(),
-      severity: z.number().min(1).max(5),
-    })
-  ),
+describe("Log Schemas", () => {
+  describe("CreateLogSchema", () => {
+    it("should validate a valid log creation request", () => {
+      const validLog = {
+        log_date: "2023-12-29T10:00:00Z",
+        notes: "Had lunch",
+        ingredients: ["chicken", "rice"],
+        symptoms: [{ symptom_id: 1, severity: 3 }],
+      };
+
+      expect(() => CreateLogSchema.parse(validLog)).not.toThrow();
+    });
+
+    it("should reject invalid date format", () => {
+      const invalidLog = {
+        log_date: "invalid-date",
+        notes: "Had lunch",
+        ingredients: ["chicken"],
+        symptoms: [],
+      };
+
+      expect(() => CreateLogSchema.parse(invalidLog)).toThrow();
+    });
+
+    it("should reject severity outside valid range", () => {
+      const invalidLog = {
+        log_date: "2023-12-29T10:00:00Z",
+        ingredients: ["chicken"],
+        symptoms: [{ symptom_id: 1, severity: 6 }], // Invalid severity > 5
+      };
+
+      expect(() => CreateLogSchema.parse(invalidLog)).toThrow();
+    });
+  });
+
+  describe("LogsQuerySchema", () => {
+    it("should validate query parameters", () => {
+      const validQuery = {
+        start_date: "2023-12-01",
+        end_date: "2023-12-29",
+        limit: "10",
+      };
+
+      const result = LogsQuerySchema.parse(validQuery);
+      expect(result.limit).toBe(10); // Should be transformed to number
+    });
+  });
 });
 
-const LogsQuerySchema = z.object({
+describe("OpenRouter Schemas", () => {
+  describe("MessageSchema", () => {
+    it("should validate user message", () => {
+      const validMessage = {
+        role: "user",
+        content: "Hello, how are you?",
+      };
+
+      expect(() => MessageSchema.parse(validMessage)).not.toThrow();
+    });
+
+    it("should reject empty content", () => {
+      const invalidMessage = {
+        role: "user",
+        content: "",
+      };
+
+      expect(() => MessageSchema.parse(invalidMessage)).toThrow();
+    });
+
+    it("should reject invalid role", () => {
+      const invalidMessage = {
+        role: "invalid",
+        content: "Hello",
+      };
+
+      expect(() => MessageSchema.parse(invalidMessage)).toThrow();
+    });
+  });
+
+  describe("ResponseFormatSchema", () => {
+    it("should validate JSON schema response format", () => {
+      const validFormat = {
+        type: "json_schema",
+        json_schema: {
+          name: "test_schema",
+          strict: true,
+          schema: {
+            type: "object",
+            properties: {
+              result: { type: "string" },
+            },
+          },
+        },
+      };
+
+      expect(() => ResponseFormatSchema.parse(validFormat)).not.toThrow();
+    });
+
+    it("should reject invalid type", () => {
+      const invalidFormat = {
+        type: "invalid_type",
+        json_schema: {
+          name: "test",
+          strict: true,
+          schema: {},
+        },
+      };
+
+      expect(() => ResponseFormatSchema.parse(invalidFormat)).toThrow();
+    });
+  });
+
+  describe("ModelParametersSchema", () => {
+    it("should validate model parameters", () => {
+      const validParams = {
+        temperature: 0.7,
+        max_tokens: 1000,
+        top_p: 0.9,
+      };
+
+      expect(() => ModelParametersSchema.parse(validParams)).not.toThrow();
+    });
+
+    it("should reject temperature out of range", () => {
+      const invalidParams = {
+        temperature: 3.0, // > 2.0
+      };
+
+      expect(() => ModelParametersSchema.parse(invalidParams)).toThrow();
+    });
+
+    it("should reject unknown properties", () => {
+      const invalidParams = {
+        temperature: 0.7,
+        unknown_param: "invalid",
+      };
+
+      expect(() => ModelParametersSchema.parse(invalidParams)).toThrow();
+    });
+  });
+
+  describe("ChatRequestSchema", () => {
+    it("should validate complete chat request", () => {
+      const validRequest = {
+        model: "anthropic/claude-3.5-sonnet",
+        messages: [
+          { role: "user", content: "Hello" },
+        ],
+        systemMessage: "You are a helpful assistant",
+        parameters: {
+          temperature: 0.7,
+          max_tokens: 1000,
+        },
+      };
+
+      expect(() => ChatRequestSchema.parse(validRequest)).not.toThrow();
+    });
+
+    it("should require at least one message", () => {
+      const invalidRequest = {
+        model: "anthropic/claude-3.5-sonnet",
+        messages: [],
+      };
+
+      expect(() => ChatRequestSchema.parse(invalidRequest)).toThrow();
+    });
+  });
+
+  describe("ChatResponseSchema", () => {
+    it("should validate chat response", () => {
+      const validResponse = {
+        id: "chatcmpl-123",
+        model: "anthropic/claude-3.5-sonnet",
+        choices: [
+          {
+            message: {
+              role: "assistant",
+              content: "Hello! How can I help?",
+            },
+            finish_reason: "stop",
+          },
+        ],
+        usage: {
+          prompt_tokens: 10,
+          completion_tokens: 15,
+          total_tokens: 25,
+        },
+      };
+
+      expect(() => ChatResponseSchema.parse(validResponse)).not.toThrow();
+    });
+  });
+
+  describe("ModelSchema", () => {
+    it("should validate model information", () => {
+      const validModel = {
+        id: "anthropic/claude-3.5-sonnet",
+        name: "Claude 3.5 Sonnet",
+        description: "Advanced language model",
+        pricing: {
+          prompt: "0.000003",
+          completion: "0.000015",
+        },
+      };
+
+      expect(() => ModelSchema.parse(validModel)).not.toThrow();
+    });
+  });
+});
   page: z.preprocess((val) => Number(val), z.number().int().min(1)).default(1),
   per_page: z.preprocess((val) => Number(val), z.number().int().min(1).max(100)).default(10),
 });
