@@ -21,6 +21,16 @@ export const LogsQuerySchema = z.object({
   limit: z.string().transform(Number).optional(),
 });
 
+export const TriggersQuerySchema = z.object({
+  start_date: z.string().refine((val) => !isNaN(Date.parse(val)), {
+    message: "Invalid start date format",
+  }),
+  end_date: z.string().refine((val) => !isNaN(Date.parse(val)), {
+    message: "Invalid end date format",
+  }),
+  limit: z.preprocess((val) => Number(val), z.number().int().min(1).max(50)).default(10),
+});
+
 // OpenRouter API schemas
 export const MessageSchema = z.object({
   role: z.enum(['user', 'assistant', 'system']),

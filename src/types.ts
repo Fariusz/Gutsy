@@ -9,6 +9,47 @@ export type Log = Tables<"logs">;
 export type LogSymptom = Tables<"log_symptoms">;
 
 // =============================================================================
+// Trigger Analysis Types
+// =============================================================================
+
+export interface TriggerAnalysis {
+  ingredient_name: string;
+  consumption_count: number;
+  avg_severity_when_present: number;
+  baseline_avg_severity: number;
+  trigger_score: number;
+  confidence_interval: number;
+}
+
+export interface IngredientSymptomCorrelation {
+  ingredient_name: string;
+  symptom_name: string;
+  consumption_count: number;
+  symptom_occurrence_with_ingredient: number;
+  symptom_occurrence_without_ingredient: number;
+  baseline_symptom_rate: number;
+  trigger_score: number;
+  confidence_interval: number;
+}
+
+export interface TriggerAnalysisRequest {
+  start_date: string;
+  end_date: string;
+  limit?: number;
+  detailed?: boolean; // Whether to return detailed symptom correlations
+}
+
+export interface TriggerAnalysisResponse {
+  triggers: TriggerAnalysis[];
+  correlations?: IngredientSymptomCorrelation[]; // Optional detailed correlations
+  analysis_period: {
+    start_date: string;
+    end_date: string;
+    total_logs: number;
+  };
+}
+
+// =============================================================================
 // Common Utility Types
 // =============================================================================
 

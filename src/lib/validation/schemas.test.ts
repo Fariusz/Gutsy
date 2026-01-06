@@ -221,9 +221,6 @@ describe("OpenRouter Schemas", () => {
     });
   });
 });
-  page: z.preprocess((val) => Number(val), z.number().int().min(1)).default(1),
-  per_page: z.preprocess((val) => Number(val), z.number().int().min(1).max(100)).default(10),
-});
 
 describe("API Validation Schemas", () => {
   describe("CreateLogSchema", () => {
