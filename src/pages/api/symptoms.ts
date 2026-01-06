@@ -13,17 +13,17 @@ export async function GET(context: APIContext): Promise<Response> {
     console.log("Symptoms API: Starting request");
 
     const {
-      data: { session },
-      error: sessionError,
-    } = await context.locals.supabase.auth.getSession();
+      data: { user },
+      error: userError,
+    } = await context.locals.supabase.auth.getUser();
 
-    if (sessionError) {
-      console.error("Session error:", sessionError);
+    if (userError) {
+      console.error("User authentication error:", userError);
       return new Response(
         JSON.stringify({
           error: {
             type: "authorization_error",
-            message: "Session error: " + sessionError.message,
+            message: "Authentication error: " + userError.message,
           },
         }),
         {
@@ -33,8 +33,8 @@ export async function GET(context: APIContext): Promise<Response> {
       );
     }
 
-    if (!session?.user) {
-      console.log("No session found");
+    if (!user) {
+      console.log("No authenticated user found");
       return new Response(
         JSON.stringify({
           error: {
@@ -49,7 +49,7 @@ export async function GET(context: APIContext): Promise<Response> {
       );
     }
 
-    console.log("Session validated for user:", session.user.id);
+    console.log("User authenticated:", user.id);
 
     // 2. Get symptoms
     const symptomService = new SymptomService(context.locals.supabase);

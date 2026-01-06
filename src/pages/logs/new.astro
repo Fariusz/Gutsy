@@ -4,11 +4,11 @@ import CreateLogForm from "../../components/CreateLogForm.tsx";
 
 // Check if user is authenticated
 const {
-  data: { session },
+  data: { user },
   error,
-} = await Astro.locals.supabase.auth.getSession();
+} = await Astro.locals.supabase.auth.getUser();
 
-if (error || !session?.user) {
+if (error || !user) {
   // Redirect to login page if not authenticated
   return Astro.redirect("/login");
 }

@@ -11,17 +11,17 @@ export async function POST(context: APIContext): Promise<Response> {
 
     // 1. Check if user is authenticated
     const {
-      data: { session },
-      error: sessionError,
-    } = await context.locals.supabase.auth.getSession();
+      data: { user },
+      error: userError,
+    } = await context.locals.supabase.auth.getUser();
 
-    if (sessionError) {
-      console.error("Logout session error:", sessionError);
+    if (userError) {
+      console.error("Logout user error:", userError);
       return new Response(
         JSON.stringify({
           error: {
             type: "authorization_error",
-            message: "Session error: " + sessionError.message,
+            message: "Authentication error: " + userError.message,
           },
         }),
         {
@@ -31,8 +31,8 @@ export async function POST(context: APIContext): Promise<Response> {
       );
     }
 
-    if (!session?.user) {
-      console.log("Logout: No session found, but treating as success");
+    if (!user) {
+      console.log("Logout: No user found, but treating as success");
       // If no session, consider it already logged out
       return new Response(
         JSON.stringify({

@@ -21,17 +21,17 @@ export async function POST(context: APIContext): Promise<Response> {
 
     // 1. Check authentication
     const {
-      data: { session },
-      error: sessionError,
-    } = await context.locals.supabase.auth.getSession();
+      data: { user },
+      error: userError,
+    } = await context.locals.supabase.auth.getUser();
 
-    if (sessionError) {
-      console.error("Logs POST session error:", sessionError);
+    if (userError) {
+      console.error("Logs POST user error:", userError);
       return new Response(
         JSON.stringify({
           error: {
             type: "authorization_error",
-            message: "Session error: " + sessionError.message,
+            message: "Authentication error: " + userError.message,
           },
         }),
         {
@@ -41,8 +41,8 @@ export async function POST(context: APIContext): Promise<Response> {
       );
     }
 
-    if (!session?.user) {
-      console.log("Logs POST: No session found");
+    if (!user) {
+      console.log("Logs POST: No user found");
       return new Response(
         JSON.stringify({
           error: {
@@ -57,7 +57,9 @@ export async function POST(context: APIContext): Promise<Response> {
       );
     }
 
-    console.log("Logs POST: Session validated for user:", session.user.id);
+    console.log("Logs POST: User validated:", user.id);
+    console.log("Logs POST: User email:", user.email);
+    console.log("Logs POST: User confirmed at:", user.email_confirmed_at);
 
     // 2. Parse and validate request body
     let requestBody: unknown;
@@ -105,7 +107,7 @@ export async function POST(context: APIContext): Promise<Response> {
 
     // 3. Create log
     const logService = new LogService(context.locals.supabase);
-    const createdLog = await logService.createLog(validatedRequest, session.user.id);
+    const createdLog = await logService.createLog(validatedRequest, user.id);
 
     console.log("Logs POST: Log created successfully");
 
@@ -139,17 +141,17 @@ export async function GET(context: APIContext): Promise<Response> {
 
     // 1. Check authentication
     const {
-      data: { session },
-      error: sessionError,
-    } = await context.locals.supabase.auth.getSession();
+      data: { user },
+      error: userError,
+    } = await context.locals.supabase.auth.getUser();
 
-    if (sessionError) {
-      console.error("Logs GET session error:", sessionError);
+    if (userError) {
+      console.error("Logs GET user error:", userError);
       return new Response(
         JSON.stringify({
           error: {
             type: "authorization_error",
-            message: "Session error: " + sessionError.message,
+            message: "Authentication error: " + userError.message,
           },
         }),
         {
@@ -159,8 +161,8 @@ export async function GET(context: APIContext): Promise<Response> {
       );
     }
 
-    if (!session?.user) {
-      console.log("Logs GET: No session found");
+    if (!user) {
+      console.log("Logs GET: No user found");
       return new Response(
         JSON.stringify({
           error: {
@@ -175,7 +177,7 @@ export async function GET(context: APIContext): Promise<Response> {
       );
     }
 
-    console.log("Logs GET: Session validated for user:", session.user.id);
+    console.log("Logs GET: User validated:", user.id);
 
     // 2. Parse query parameters
     const queryParams = Object.fromEntries(context.url.searchParams.entries());
@@ -204,7 +206,7 @@ export async function GET(context: APIContext): Promise<Response> {
 
     // 3. Get logs
     const logService = new LogService(context.locals.supabase);
-    const logsResponse = await logService.getLogs(session.user.id, validationResult.data);
+    const logsResponse = await logService.getLogs(user.id, validationResult.data);
 
     console.log("Logs GET: Service response:", {
       hasData: !!logsResponse.data,

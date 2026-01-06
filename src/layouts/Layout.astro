@@ -13,14 +13,14 @@ const { title = "10x Astro Starter", hideFloatingButton = false } = Astro.props;
 let user = null;
 try {
   const {
-    data: { session },
+    data: { user: authUser },
     error,
-  } = await Astro.locals.supabase.auth.getSession();
-  if (!error && session?.user) {
-    user = session.user;
+  } = await Astro.locals.supabase.auth.getUser();
+  if (!error && authUser) {
+    user = authUser;
   }
 } catch (error) {
-  console.error("Error checking session:", error);
+  console.error("Error checking user authentication:", error);
 }
 ---
 
