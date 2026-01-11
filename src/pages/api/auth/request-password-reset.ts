@@ -1,6 +1,6 @@
 import type { APIContext } from "astro";
 import { z } from "zod";
-import type { ForgotPasswordRequest, ErrorResponse } from "../../../types";
+import type { ErrorResponse } from "../../../types";
 
 export const prerender = false;
 

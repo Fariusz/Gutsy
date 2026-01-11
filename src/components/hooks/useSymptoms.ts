@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { SymptomResponse, ErrorResponse } from "../../types";
+import type { SymptomResponse } from "../../types";
 
 interface UseSymptomsReturn {
   symptoms: SymptomResponse[];

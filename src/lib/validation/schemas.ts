@@ -2,7 +2,7 @@ import { z } from "zod";
 
 // Existing log schemas (centralized from API files)
 export const CreateLogSchema = z.object({
-  log_date: z.string().refine((val) => !isNaN(Date.parse(val)), {
+  log_date: z.string().refine((val) => !Number.isNaN(Date.parse(val)), {
     message: "Invalid date format",
   }),
   notes: z.string().optional(),
@@ -24,48 +24,51 @@ export const LogsQuerySchema = z.object({
 });
 
 export const TriggersQuerySchema = z.object({
-  start_date: z.string().refine((val) => !isNaN(Date.parse(val)), {
+  start_date: z.string().refine((val) => !Number.isNaN(Date.parse(val)), {
     message: "Invalid start date format",
   }),
-  end_date: z.string().refine((val) => !isNaN(Date.parse(val)), {
+  end_date: z.string().refine((val) => !Number.isNaN(Date.parse(val)), {
     message: "Invalid end date format",
   }),
-  limit: z.preprocess((val) => Number(val), z.number().int().min(1).max(50)).default(10),
+  limit: z.preprocess(Number, z.number().int().min(1).max(50)).default(10),
 });
 
 // OpenRouter API schemas
 export const MessageSchema = z.object({
-  role: z.enum(['user', 'assistant', 'system']),
+  role: z.enum(["user", "assistant", "system"]),
   content: z.string().min(1, "Message content cannot be empty"),
 });
 
 export const ResponseFormatSchema = z.object({
-  type: z.literal('json_schema'),
+  type: z.literal("json_schema"),
   json_schema: z.object({
     name: z.string().min(1, "Schema name is required"),
     strict: z.boolean(),
-    schema: z.record(z.any()).refine(
-      (schema) => typeof schema === 'object' && schema !== null,
-      { message: "Schema must be a valid JSON object" }
-    ),
+    schema: z.record(z.any()).refine((schema) => typeof schema === "object" && schema !== null, {
+      message: "Schema must be a valid JSON object",
+    }),
   }),
 });
 
-export const ModelParametersSchema = z.object({
-  temperature: z.number().min(0).max(2).optional(),
-  max_tokens: z.number().min(1).max(32768).optional(),
-  top_p: z.number().min(0).max(1).optional(),
-  frequency_penalty: z.number().min(-2).max(2).optional(),
-  presence_penalty: z.number().min(-2).max(2).optional(),
-}).strict();
+export const ModelParametersSchema = z
+  .object({
+    temperature: z.number().min(0).max(2).optional(),
+    max_tokens: z.number().min(1).max(32768).optional(),
+    top_p: z.number().min(0).max(1).optional(),
+    frequency_penalty: z.number().min(-2).max(2).optional(),
+    presence_penalty: z.number().min(-2).max(2).optional(),
+  })
+  .strict();
 
-export const ChatRequestSchema = z.object({
-  model: z.string().min(1, "Model name is required"),
-  messages: z.array(MessageSchema).min(1, "At least one message is required"),
-  systemMessage: z.string().optional(),
-  responseFormat: ResponseFormatSchema.optional(),
-  parameters: ModelParametersSchema.optional(),
-}).strict();
+export const ChatRequestSchema = z
+  .object({
+    model: z.string().min(1, "Model name is required"),
+    messages: z.array(MessageSchema).min(1, "At least one message is required"),
+    systemMessage: z.string().optional(),
+    responseFormat: ResponseFormatSchema.optional(),
+    parameters: ModelParametersSchema.optional(),
+  })
+  .strict();
 
 export const ChatResponseChoiceSchema = z.object({
   message: z.object({
