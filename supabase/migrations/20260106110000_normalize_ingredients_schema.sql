@@ -4,7 +4,7 @@
 -- It creates proper tables for ingredients and their relationships to logs
 
 -- Create ingredients table for normalized ingredient storage
-create table public.ingredients (
+create table if not exists public.ingredients (
     id serial primary key,
     name text not null unique,
     normalized_name text not null, -- lowercase, trimmed version for matching
@@ -13,7 +13,7 @@ create table public.ingredients (
 alter table public.ingredients enable row level security;
 
 -- Create junction table for log-ingredient relationships
-create table public.log_ingredients (
+create table if not exists public.log_ingredients (
     id serial primary key,
     log_id uuid not null references public.logs(id) on delete cascade,
     ingredient_id integer not null references public.ingredients(id) on delete cascade,
@@ -23,9 +23,9 @@ create table public.log_ingredients (
 alter table public.log_ingredients enable row level security;
 
 -- Add indexes for performance
-create index idx_ingredients_normalized_name on public.ingredients(normalized_name);
-create index idx_log_ingredients_log_id on public.log_ingredients(log_id);
-create index idx_log_ingredients_ingredient_id on public.log_ingredients(ingredient_id);
+create index if not exists idx_ingredients_normalized_name on public.ingredients(normalized_name);
+create index if not exists idx_log_ingredients_log_id on public.log_ingredients(log_id);
+create index if not exists idx_log_ingredients_ingredient_id on public.log_ingredients(ingredient_id);
 
 -- RLS policies for ingredients (read-only for all authenticated users)
 create policy "authenticated_read_ingredients" on public.ingredients 
