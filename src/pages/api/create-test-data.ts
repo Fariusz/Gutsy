@@ -35,9 +35,10 @@ export async function POST(context: APIContext): Promise<Response> {
     console.log("Create test data: User ID:", userId);
 
     // 2. Call the function to create test data for this user
-    const { data, error } = await context.locals.supabase.rpc("create_test_data_for_user", {
+    const rpcResult = await context.locals.supabase.rpc("create_test_data_for_user" as any, {
       target_user_id: userId,
     });
+    const { error } = rpcResult;
 
     if (error) {
       console.error("Create test data RPC error:", error);
@@ -55,11 +56,7 @@ export async function POST(context: APIContext): Promise<Response> {
       .select("*", { count: "exact", head: true })
       .eq("user_id", userId);
 
-    // For simplicity, just count total relationships without complex joins
-    const { count: ingredientsCount } = await context.locals.supabase
-      .from("log_ingredients")
-      .select("*", { count: "exact", head: true });
-
+    // For simplicity, just count logs and related data
     const { count: symptomsCount } = await context.locals.supabase
       .from("log_symptoms")
       .select("*", { count: "exact", head: true });
@@ -70,7 +67,6 @@ export async function POST(context: APIContext): Promise<Response> {
         summary: {
           user_id: userId,
           total_logs: logsCount,
-          ingredients_relationships: ingredientsCount,
           symptoms_relationships: symptomsCount,
         },
         next_steps: [

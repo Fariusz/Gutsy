@@ -24,12 +24,10 @@ export interface TriggerAnalysis {
 export interface IngredientSymptomCorrelation {
   ingredient_name: string;
   symptom_name: string;
-  consumption_count: number;
-  symptom_occurrence_with_ingredient: number;
-  symptom_occurrence_without_ingredient: number;
-  baseline_symptom_rate: number;
-  trigger_score: number;
-  confidence_interval: number;
+  correlation_strength: number;
+  co_occurrence_count: number;
+  total_ingredient_logs: number;
+  total_symptom_logs: number;
 }
 
 export interface TriggerAnalysisRequest {
