@@ -13,7 +13,7 @@ import {
   ChatResponseSchema,
   ModelsResponseSchema,
   OpenRouterErrorSchema,
-} from '../validation/schemas.js';
+} from "../validation/schemas.js";
 
 export interface ChatOptions {
   model: string;
@@ -27,11 +27,11 @@ export class OpenRouterServiceError extends Error {
   constructor(
     message: string,
     public code: string,
-    public retryable: boolean = false,
+    public retryable = false,
     public details?: any
   ) {
     super(message);
-    this.name = 'OpenRouterServiceError';
+    this.name = "OpenRouterServiceError";
   }
 }
 
@@ -51,12 +51,12 @@ export class OpenRouterService {
   private readonly httpClient: typeof fetch;
 
   constructor(apiKey: string, baseUrl?: string) {
-    if (!apiKey || typeof apiKey !== 'string') {
-      throw new Error('OpenRouter API key is required and must be a string');
+    if (!apiKey || typeof apiKey !== "string") {
+      throw new Error("OpenRouter API key is required and must be a string");
     }
 
     this.apiKey = apiKey;
-    this.baseUrl = baseUrl || 'https://openrouter.ai/api/v1';
+    this.baseUrl = baseUrl || "https://openrouter.ai/api/v1";
     this.httpClient = fetch;
   }
 
@@ -69,7 +69,7 @@ export class OpenRouterService {
     if (!validationResult.success) {
       throw new OpenRouterServiceError(
         `Invalid chat request: ${validationResult.error.message}`,
-        'VALIDATION_ERROR',
+        "VALIDATION_ERROR",
         false,
         validationResult.error
       );
@@ -98,8 +98,8 @@ export class OpenRouterService {
 
     try {
       // Make the API request
-      const response = await this.makeRequest<any>('/chat/completions', {
-        method: 'POST',
+      const response = await this.makeRequest<any>("/chat/completions", {
+        method: "POST",
         headers: {},
         body: JSON.stringify(requestBody),
       });
@@ -108,8 +108,8 @@ export class OpenRouterService {
       const parsedResponse = ChatResponseSchema.safeParse(response);
       if (!parsedResponse.success) {
         throw new OpenRouterServiceError(
-          'Invalid response format from OpenRouter API',
-          'RESPONSE_PARSE_ERROR',
+          "Invalid response format from OpenRouter API",
+          "RESPONSE_PARSE_ERROR",
           false,
           parsedResponse.error
         );
@@ -120,13 +120,8 @@ export class OpenRouterService {
       if (error instanceof OpenRouterServiceError) {
         throw error;
       }
-      
-      throw new OpenRouterServiceError(
-        'Failed to complete chat request',
-        'CHAT_REQUEST_FAILED',
-        true,
-        error
-      );
+
+      throw new OpenRouterServiceError("Failed to complete chat request", "CHAT_REQUEST_FAILED", true, error);
     }
   }
 
@@ -135,16 +130,16 @@ export class OpenRouterService {
    */
   async getAvailableModels(): Promise<Model[]> {
     try {
-      const response = await this.makeRequest<any>('/models', {
-        method: 'GET',
+      const response = await this.makeRequest<any>("/models", {
+        method: "GET",
         headers: {},
       });
 
       const parsedResponse = ModelsResponseSchema.safeParse(response);
       if (!parsedResponse.success) {
         throw new OpenRouterServiceError(
-          'Invalid models response format from OpenRouter API',
-          'RESPONSE_PARSE_ERROR',
+          "Invalid models response format from OpenRouter API",
+          "RESPONSE_PARSE_ERROR",
           false,
           parsedResponse.error
         );
@@ -155,13 +150,8 @@ export class OpenRouterService {
       if (error instanceof OpenRouterServiceError) {
         throw error;
       }
-      
-      throw new OpenRouterServiceError(
-        'Failed to retrieve available models',
-        'MODELS_REQUEST_FAILED',
-        true,
-        error
-      );
+
+      throw new OpenRouterServiceError("Failed to retrieve available models", "MODELS_REQUEST_FAILED", true, error);
     }
   }
 
@@ -171,29 +161,56 @@ export class OpenRouterService {
   async validateApiKey(): Promise<boolean> {
     try {
       // Make a simple request to test the API key
-      await this.makeRequest<any>('/models', {
-        method: 'GET',
+      await this.makeRequest<any>("/models", {
+        method: "GET",
         headers: {},
       });
-      
+
       return true;
     } catch (error) {
       if (error instanceof OpenRouterServiceError) {
         // Only authentication errors indicate invalid key
-        if (error.code === 'AUTHENTICATION_ERROR') {
+        if (error.code === "AUTHENTICATION_ERROR") {
           return false;
         }
         // Other errors might be temporary, so we re-throw them
         throw error;
       }
-      
-      throw new OpenRouterServiceError(
-        'Failed to validate API key',
-        'VALIDATION_REQUEST_FAILED',
-        true,
-        error
-      );
+
+      throw new OpenRouterServiceError("Failed to validate API key", "VALIDATION_REQUEST_FAILED", true, error);
     }
+  }
+
+  /**
+   * Calculate exponential backoff delay
+   */
+  private calculateBackoffDelay(attempt: number): number {
+    return Math.pow(2, attempt) * 1000; // 2s, 4s, 8s
+  }
+
+  /**
+   * Create request headers for OpenRouter API
+   */
+  private createHeaders(additionalHeaders?: Record<string, string>): Record<string, string> {
+    return {
+      Authorization: `Bearer ${this.apiKey}`,
+      "Content-Type": "application/json",
+      "HTTP-Referer": "https://localhost:3000", // Required by OpenRouter
+      "X-Title": "Gutsy App", // Required by OpenRouter
+      ...additionalHeaders,
+    };
+  }
+
+  /**
+   * Handle rate limiting with exponential backoff
+   */
+  private async handleRateLimit(attempt: number, maxRetries: number): Promise<boolean> {
+    if (attempt < maxRetries) {
+      const delay = this.calculateBackoffDelay(attempt);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      return true; // Continue retrying
+    }
+    return false; // Stop retrying
   }
 
   /**
@@ -208,39 +225,30 @@ export class OpenRouterService {
       try {
         const response = await this.httpClient(url, {
           ...options,
-          headers: {
-            'Authorization': `Bearer ${this.apiKey}`,
-            'Content-Type': 'application/json',
-            'HTTP-Referer': 'https://localhost:3000', // Required by OpenRouter
-            'X-Title': 'Gutsy App', // Required by OpenRouter
-            ...options.headers,
-          },
+          headers: this.createHeaders(options.headers),
         });
 
         // Handle rate limiting with exponential backoff
         if (response.status === 429) {
-          if (attempt < maxRetries) {
-            const delay = Math.pow(2, attempt) * 1000; // 2s, 4s, 8s
-            await new Promise(resolve => setTimeout(resolve, delay));
-            continue;
-          }
+          const shouldRetry = await this.handleRateLimit(attempt, maxRetries);
+          if (shouldRetry) continue;
+          throw new Error("Rate limit exceeded after maximum retries");
         }
 
         // Handle server errors with retry
         if (response.status >= 500 && attempt < maxRetries) {
-          const delay = Math.pow(2, attempt) * 1000;
-          await new Promise(resolve => setTimeout(resolve, delay));
-          continue;
+          const shouldRetry = await this.handleRateLimit(attempt, maxRetries);
+          if (shouldRetry) continue;
         }
 
         if (!response.ok) {
           const errorText = await response.text();
           let errorData;
-          
+
           try {
             errorData = JSON.parse(errorText);
           } catch {
-            errorData = { error: { code: 'PARSE_ERROR', message: errorText } };
+            errorData = { error: { code: "PARSE_ERROR", message: errorText } };
           }
 
           const parsedError = OpenRouterErrorSchema.safeParse(errorData);
@@ -252,7 +260,7 @@ export class OpenRouterService {
           } else {
             this.handleApiError({
               status: response.status,
-              data: { error: { code: 'UNKNOWN_ERROR', message: 'Unknown API error' } },
+              data: { error: { code: "UNKNOWN_ERROR", message: "Unknown API error" } },
             });
           }
         }
@@ -261,16 +269,14 @@ export class OpenRouterService {
         try {
           return JSON.parse(responseText) as T;
         } catch (parseError) {
-          throw new OpenRouterServiceError(
-            'Failed to parse API response as JSON',
-            'PARSE_ERROR',
-            false,
-            { responseText, parseError }
-          );
+          throw new OpenRouterServiceError("Failed to parse API response as JSON", "PARSE_ERROR", false, {
+            responseText,
+            parseError,
+          });
         }
       } catch (error) {
         lastError = error;
-        
+
         if (error instanceof OpenRouterServiceError) {
           throw error;
         }
@@ -278,19 +284,14 @@ export class OpenRouterService {
         // Network errors - retry if not the last attempt
         if (attempt < maxRetries) {
           const delay = Math.pow(2, attempt) * 1000;
-          await new Promise(resolve => setTimeout(resolve, delay));
+          await new Promise((resolve) => setTimeout(resolve, delay));
           continue;
         }
       }
     }
 
     // If we've exhausted all retries
-    throw new OpenRouterServiceError(
-      `Request failed after ${maxRetries} attempts`,
-      'NETWORK_ERROR',
-      true,
-      lastError
-    );
+    throw new OpenRouterServiceError(`Request failed after ${maxRetries} attempts`, "NETWORK_ERROR", true, lastError);
   }
 
   /**
@@ -300,9 +301,9 @@ export class OpenRouterService {
     const formattedMessages: Message[] = [];
 
     // Add system message first if provided
-    if (systemMessage && systemMessage.trim()) {
+    if (systemMessage?.trim()) {
       formattedMessages.push({
-        role: 'system',
+        role: "system",
         content: systemMessage.trim(),
       });
     }
@@ -340,54 +341,39 @@ export class OpenRouterService {
 
     switch (status) {
       case 401:
-        throw new OpenRouterServiceError(
-          'Invalid API key',
-          'AUTHENTICATION_ERROR',
-          false,
-          error
-        );
+        throw new OpenRouterServiceError("Invalid API key", "AUTHENTICATION_ERROR", false, error);
       case 403:
         throw new OpenRouterServiceError(
-          'Access forbidden - check your API key permissions',
-          'AUTHORIZATION_ERROR',
+          "Access forbidden - check your API key permissions",
+          "AUTHORIZATION_ERROR",
           false,
           error
         );
       case 404:
-        throw new OpenRouterServiceError(
-          'Model not found - check the model name',
-          'MODEL_NOT_FOUND',
-          false,
-          error
-        );
+        throw new OpenRouterServiceError("Model not found - check the model name", "MODEL_NOT_FOUND", false, error);
       case 400:
         throw new OpenRouterServiceError(
-          `Invalid request: ${error.message || 'Bad request'}`,
-          'VALIDATION_ERROR',
+          `Invalid request: ${error.message || "Bad request"}`,
+          "VALIDATION_ERROR",
           false,
           error
         );
       case 429:
-        throw new OpenRouterServiceError(
-          'Rate limit exceeded - please retry later',
-          'RATE_LIMIT_ERROR',
-          true,
-          error
-        );
+        throw new OpenRouterServiceError("Rate limit exceeded - please retry later", "RATE_LIMIT_ERROR", true, error);
       case 500:
       case 502:
       case 503:
       case 504:
         throw new OpenRouterServiceError(
-          'OpenRouter API server error - please retry later',
-          'SERVER_ERROR',
+          "OpenRouter API server error - please retry later",
+          "SERVER_ERROR",
           true,
           error
         );
       default:
         throw new OpenRouterServiceError(
-          `Unexpected API error: ${error.message || 'Unknown error'}`,
-          'UNKNOWN_ERROR',
+          `Unexpected API error: ${error.message || "Unknown error"}`,
+          "UNKNOWN_ERROR",
           false,
           error
         );
