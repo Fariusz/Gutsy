@@ -5,7 +5,7 @@ interface LogsListProps {
   onEditLog?: (logId: string) => void;
 }
 
-export default function LogsList({ onEditLog }: LogsListProps) {
+export default function LogsList({ onEditLog }: Readonly<LogsListProps>) {
   const [logs, setLogs] = useState<LogResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -135,8 +135,8 @@ export default function LogsList({ onEditLog }: LogsListProps) {
             <div className="mb-4">
               <h4 className="text-sm font-medium text-gray-700 mb-2">Ingredients</h4>
               <div className="flex flex-wrap gap-2">
-                {log.ingredients.map((ingredient, index) => (
-                  <span key={index} className="px-2 py-1 bg-green-100 text-green-800 text-sm rounded-full">
+                {log.ingredients.map((ingredient) => (
+                  <span key={ingredient.name} className="px-2 py-1 bg-green-100 text-green-800 text-sm rounded-full">
                     {ingredient.name}
                   </span>
                 ))}
@@ -225,22 +225,24 @@ export default function LogsList({ onEditLog }: LogsListProps) {
                     />
                   </svg>
                 </button>
-                {[...Array(Math.min(5, pagination.total_pages))].map((_, index) => {
-                  const pageNumber = index + 1;
-                  return (
-                    <button
-                      key={pageNumber}
-                      onClick={() => handlePageChange(pageNumber)}
-                      className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
-                        pageNumber === pagination.page
-                          ? "z-10 bg-blue-600 text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-                          : "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                      }`}
-                    >
-                      {pageNumber}
-                    </button>
-                  );
-                })}
+                {Array(Math.min(5, pagination.total_pages))
+                  .fill(null)
+                  .map((_, index) => {
+                    const pageNumber = index + 1;
+                    return (
+                      <button
+                        key={pageNumber}
+                        onClick={() => handlePageChange(pageNumber)}
+                        className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
+                          pageNumber === pagination.page
+                            ? "z-10 bg-blue-600 text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                            : "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+                        }`}
+                      >
+                        {pageNumber}
+                      </button>
+                    );
+                  })}
                 <button
                   onClick={() => handlePageChange(pagination.page + 1)}
                   disabled={pagination.page >= pagination.total_pages}

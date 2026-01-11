@@ -7,7 +7,7 @@ interface RegisterFormProps {
   onSuccess?: () => void;
 }
 
-export default function RegisterForm({ onSuccess }: RegisterFormProps) {
+export default function RegisterForm({ onSuccess }: Readonly<RegisterFormProps>) {
   const [formData, setFormData] = useState<RegisterRequest>({
     email: "",
     password: "",
@@ -46,7 +46,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
       }
 
       // Redirect to OAuth URL
-      window.location.href = data.data.url;
+      globalThis.location.href = data.data.url;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Social login failed");
     } finally {
@@ -86,7 +86,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
       }
 
       // Success - redirect to logs page
-      window.location.href = "/logs";
+      globalThis.location.href = "/logs";
       onSuccess?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unexpected error occurred");

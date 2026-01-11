@@ -7,7 +7,7 @@ interface LoginFormProps {
   onSuccess?: () => void;
 }
 
-export default function LoginForm({ onSuccess }: LoginFormProps) {
+export default function LoginForm({ onSuccess }: Readonly<LoginFormProps>) {
   const [formData, setFormData] = useState<LoginRequest>({
     email: "",
     password: "",
@@ -45,7 +45,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
       }
 
       // Redirect to OAuth URL
-      window.location.href = data.data.url;
+      globalThis.location.href = data.data.url;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Social login failed");
     } finally {
@@ -85,7 +85,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
       }
 
       // Success - redirect to logs page
-      window.location.href = "/logs";
+      globalThis.location.href = "/logs";
       onSuccess?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unexpected error occurred");
@@ -191,7 +191,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
       </Button>
 
       <p className="text-center text-sm text-gray-600">
-        Don't have an account?{" "}
+        Don&apos;t have an account?{" "}
         <a href="/register" className="font-medium text-blue-600 hover:text-blue-500">
           Create one here
         </a>
