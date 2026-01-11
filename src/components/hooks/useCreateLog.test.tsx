@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { renderHook, act, waitFor } from "@testing-library/react";
+import { renderHook, act } from "@testing-library/react";
 import { useCreateLog } from "./useCreateLog";
 import type { CreateLogRequest, LogResponse, ErrorResponse } from "../../types";
 
@@ -53,7 +53,7 @@ describe("useCreateLog", () => {
     const { result } = renderHook(() => useCreateLog());
 
     let logResult: LogResponse | null = null;
-    
+
     await act(async () => {
       logResult = await result.current.createLog(mockLogData);
     });
@@ -78,7 +78,7 @@ describe("useCreateLog", () => {
     const { result } = renderHook(() => useCreateLog());
 
     let logResult: LogResponse | null;
-    
+
     await act(async () => {
       logResult = await result.current.createLog({
         log_date: "2023-12-26T10:00:00Z",
@@ -110,7 +110,7 @@ describe("useCreateLog", () => {
     const { result } = renderHook(() => useCreateLog());
 
     let logResult: LogResponse | null;
-    
+
     await act(async () => {
       logResult = await result.current.createLog({
         log_date: "invalid-date",
@@ -135,7 +135,7 @@ describe("useCreateLog", () => {
     const { result } = renderHook(() => useCreateLog());
 
     let logResult: LogResponse | null;
-    
+
     await act(async () => {
       logResult = await result.current.createLog({
         log_date: "2023-12-26T10:00:00Z",
@@ -173,8 +173,8 @@ describe("useCreateLog", () => {
   });
 
   it("should show loading state during request", async () => {
-    let resolvePromise: (value: any) => void;
-    const pendingPromise = new Promise((resolve) => {
+    let resolvePromise: (value: Response) => void;
+    const pendingPromise = new Promise<Response>((resolve) => {
       resolvePromise = resolve;
     });
 
@@ -198,10 +198,12 @@ describe("useCreateLog", () => {
 
     // Resolve the promise
     await act(async () => {
-      resolvePromise!({
-        ok: true,
-        json: vi.fn().mockResolvedValue({ data: {} }),
-      });
+      if (resolvePromise) {
+        resolvePromise({
+          ok: true,
+          json: vi.fn().mockResolvedValue({ data: {} }),
+        });
+      }
     });
 
     // Should not be loading anymore

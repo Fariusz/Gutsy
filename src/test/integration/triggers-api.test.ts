@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { GET } from "../../pages/api/triggers";
-import { createMockAPIContext, createMockSession, mockSupabaseClient } from "../mocks/supabase";
+import { createMockAPIContext, createMockSession } from "../mocks/supabase";
 import type { TriggerAnalysisResponse, IngredientSymptomCorrelation } from "../../types";
 
 describe("Triggers API Integration", () => {
@@ -23,16 +23,16 @@ describe("Triggers API Integration", () => {
           ingredient_name: "dairy",
           consumption_count: 8,
           avg_severity_when_present: 3.5,
-          baseline_avg_severity: 2.0,
+          baseline_avg_severity: 2,
           trigger_score: 1.5,
           confidence_interval: 0.8,
         },
         {
           ingredient_name: "gluten",
           consumption_count: 5,
-          avg_severity_when_present: 4.0,
-          baseline_avg_severity: 2.0,
-          trigger_score: 2.0,
+          avg_severity_when_present: 4,
+          baseline_avg_severity: 2,
+          trigger_score: 2,
           confidence_interval: 0.6,
         },
       ];
@@ -49,11 +49,16 @@ describe("Triggers API Integration", () => {
         eq: vi.fn().mockReturnThis(),
         gte: vi.fn().mockReturnThis(),
         lte: vi.fn().mockReturnThis(),
-        count: 25,
-        error: null,
       };
 
-      context.locals.supabase.from = vi.fn(() => mockFromChain);
+      // Mock the .from() method to return a proper query chain
+      const mockCountResult = { count: 25, error: null };
+      vi.mocked(mockFromChain.select).mockImplementation(() => mockFromChain);
+      vi.mocked(mockFromChain.eq).mockImplementation(() => mockFromChain);
+      vi.mocked(mockFromChain.gte).mockImplementation(() => mockFromChain);
+      vi.mocked(mockFromChain.lte).mockImplementation(() => mockCountResult);
+
+      (context.locals.supabase.from as any) = vi.fn(() => mockFromChain);
 
       const response = await GET(context);
       const responseData = (await response.json()) as TriggerAnalysisResponse;
@@ -105,9 +110,9 @@ describe("Triggers API Integration", () => {
         {
           ingredient_name: "tomatoes",
           consumption_count: 5,
-          avg_severity_when_present: 3.0,
-          baseline_avg_severity: 2.0,
-          trigger_score: 1.0,
+          avg_severity_when_present: 3,
+          baseline_avg_severity: 2,
+          trigger_score: 1,
           confidence_interval: 0.7,
         },
       ];
@@ -128,7 +133,7 @@ describe("Triggers API Integration", () => {
         error: null,
       };
 
-      context.locals.supabase.from = vi.fn(() => mockFromChain);
+      (context.locals.supabase.from as any) = vi.fn(() => mockFromChain);
 
       const response = await GET(context);
       const responseData = (await response.json()) as TriggerAnalysisResponse;
@@ -158,7 +163,8 @@ describe("Triggers API Integration", () => {
       const responseData = await response.json();
 
       expect(response.status).toBe(401);
-      expect(responseData.error).toBe("Unauthorized");
+      expect(responseData.error.type).toBe("authentication_error");
+      expect(responseData.error.message).toBe("Unauthorized");
     });
 
     it("should return 400 when query parameters are invalid", async () => {
@@ -173,8 +179,9 @@ describe("Triggers API Integration", () => {
       const responseData = await response.json();
 
       expect(response.status).toBe(400);
-      expect(responseData.error).toBe("Invalid query parameters");
-      expect(responseData.details).toBeDefined();
+      expect(responseData.error.type).toBe("validation_error");
+      expect(responseData.error.message).toBe("Invalid query parameters");
+      expect(responseData.error.details).toBeDefined();
     });
 
     it("should handle RPC errors gracefully", async () => {
@@ -191,21 +198,27 @@ describe("Triggers API Integration", () => {
       });
 
       // Mock count query (still needs to work)
-      const mockFromChain = {
+      const mockFromChain2 = {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
         gte: vi.fn().mockReturnThis(),
         lte: vi.fn().mockReturnThis(),
       };
-      mockFromChain.count = vi.fn().mockResolvedValue({ count: 25, error: null });
 
-      context.locals.supabase.from = vi.fn(() => mockFromChain);
+      const mockCountResult2 = { count: 25, error: null };
+      vi.mocked(mockFromChain2.select).mockImplementation(() => mockFromChain2);
+      vi.mocked(mockFromChain2.eq).mockImplementation(() => mockFromChain2);
+      vi.mocked(mockFromChain2.gte).mockImplementation(() => mockFromChain2);
+      vi.mocked(mockFromChain2.lte).mockImplementation(() => mockCountResult2);
+
+      context.locals.supabase.from = vi.fn(() => mockFromChain2);
 
       const response = await GET(context);
       const responseData = await response.json();
 
       expect(response.status).toBe(500);
-      expect(responseData.error).toBe("Failed to analyze triggers");
+      expect(responseData.error.type).toBe("database_error");
+      expect(responseData.error.message).toBe("Failed to analyze triggers");
     });
 
     it("should handle detailed analysis RPC errors gracefully", async () => {
@@ -227,7 +240,8 @@ describe("Triggers API Integration", () => {
       const responseData = await response.json();
 
       expect(response.status).toBe(500);
-      expect(responseData.error).toBe("Failed to analyze detailed triggers");
+      expect(responseData.error.type).toBe("database_error");
+      expect(responseData.error.message).toBe("Failed to analyze detailed triggers");
     });
   });
 });

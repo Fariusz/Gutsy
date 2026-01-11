@@ -30,8 +30,10 @@ export class LogRepository {
 
       if (logError || !logResult) {
         // Check for foreign key constraint violation
-        if (logError?.code === '23503' && logError?.constraint_name === 'logs_user_id_fkey') {
-          throw new Error(`User authentication error: User ID ${logData.userId} does not exist in auth.users table. Please ensure the user is properly registered and authenticated.`);
+        if (logError?.code === "23503" && logError?.constraint_name === "logs_user_id_fkey") {
+          throw new Error(
+            `User authentication error: User ID ${logData.userId} does not exist in auth.users table. Please ensure the user is properly registered and authenticated.`
+          );
         }
         throw new Error(`Failed to create log: ${logError?.message || "Unknown error"}`);
       }

@@ -1,7 +1,8 @@
-import type { APIContext } from "astro";
-import { z } from "zod";
-import { handleApiError, createSuccessResponse } from "./error-handlers";
-import { AuthenticationError } from "../auth/auth-helpers";
+// Utility functions for API helpers - currently unused but kept for future use
+// import type { APIContext } from "astro";
+// import { z } from "zod";
+// import { handleApiError, createSuccessResponse } from "./error-handlers";
+// import { AuthenticationError } from "../auth/auth-helpers";
 
 /**
  * This file contained generic API handlers that were causing response formatting issues.

@@ -8,8 +8,8 @@ export const prerender = false;
 
 // Extend the base query schema with pagination
 const PaginatedLogsQuerySchema = LogsQuerySchema.extend({
-  page: z.preprocess((val) => Number(val), z.number().int().min(1)).default(1),
-  per_page: z.preprocess((val) => Number(val), z.number().int().min(1).max(100)).default(10),
+  page: z.preprocess(Number, z.number().int().min(1)).default(1),
+  per_page: z.preprocess(Number, z.number().int().min(1).max(100)).default(10),
 });
 
 /**

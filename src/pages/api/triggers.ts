@@ -19,18 +19,34 @@ export async function GET(context: APIContext): Promise<Response> {
 
     if (authError) {
       console.error("Triggers GET auth error:", authError);
-      return new Response(JSON.stringify({ error: "Authentication failed" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({
+          error: {
+            type: "authentication_error",
+            message: authError.message,
+          },
+        }),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
     }
 
     if (!user) {
       console.log("Triggers GET: No user found");
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({
+          error: {
+            type: "authentication_error",
+            message: "Unauthorized",
+          },
+        }),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
     }
 
     const userId = user.id;
@@ -45,8 +61,11 @@ export async function GET(context: APIContext): Promise<Response> {
       console.error("Triggers GET validation error:", result.error.errors);
       return new Response(
         JSON.stringify({
-          error: "Invalid query parameters",
-          details: result.error.errors,
+          error: {
+            type: "validation_error",
+            message: "Invalid query parameters",
+            details: result.error.errors,
+          },
         }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
@@ -68,11 +87,19 @@ export async function GET(context: APIContext): Promise<Response> {
       });
 
       if (error) {
-        console.error("Triggers GET detailed RPC error:", error);
-        return new Response(JSON.stringify({ error: "Failed to analyze detailed triggers" }), {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        });
+        console.error("Triggers GET detailed analysis error:", error);
+        return new Response(
+          JSON.stringify({
+            error: {
+              type: "database_error",
+              message: "Failed to analyze detailed triggers",
+            },
+          }),
+          {
+            status: 500,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
       }
 
       correlationsData = data || [];
@@ -85,7 +112,7 @@ export async function GET(context: APIContext): Promise<Response> {
       p_end_date: end_date,
       p_limit: limit,
     });
-    
+
     // Call the main RPC function
     const { data: simplifiedData, error: triggersError } = await context.locals.supabase.rpc("get_top_triggers", {
       p_user_id: userId,
@@ -98,10 +125,18 @@ export async function GET(context: APIContext): Promise<Response> {
 
     if (triggersError) {
       console.error("Triggers GET RPC error:", triggersError);
-      return new Response(JSON.stringify({ error: "Failed to analyze triggers" }), {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({
+          error: {
+            type: "database_error",
+            message: "Failed to analyze triggers",
+          },
+        }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
     }
 
     triggersData = simplifiedData || [];
@@ -112,7 +147,7 @@ export async function GET(context: APIContext): Promise<Response> {
       start_date: start_date,
       end_date: end_date,
     });
-    
+
     const { count: totalLogs, error: countError } = await context.locals.supabase
       .from("logs")
       .select("*", { count: "exact", head: true })
@@ -149,9 +184,17 @@ export async function GET(context: APIContext): Promise<Response> {
     });
   } catch (error) {
     console.error("Triggers GET unexpected error:", error);
-    return new Response(JSON.stringify({ error: "Internal server error" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({
+        error: {
+          type: "server_error",
+          message: "An unexpected error occurred.",
+        },
+      }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   }
 }
