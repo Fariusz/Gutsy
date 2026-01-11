@@ -1,0 +1,52 @@
+---
+import Layout from "../../layouts/Layout.astro";
+
+// Check if user is authenticated
+const {
+  data: { user },
+  error,
+} = await Astro.locals.supabase.auth.getUser();
+
+if (error || !user) {
+  // Redirect to login page if not authenticated
+  return Astro.redirect("/login");
+}
+---
+
+<Layout title="Debug Logs - Gutsy">
+  <main class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Debug Logs</h1>
+        <p class="text-gray-600">Debug information for logs and database queries</p>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div id="debug-info">
+          <p class="text-gray-500">Loading debug information...</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  async function loadDebugInfo() {
+    try {
+      const response = await fetch("/api/debug-logs");
+      const data = await response.json();
+
+      const debugContainer = document.getElementById("debug-info");
+      if (debugContainer) {
+        debugContainer.innerHTML = `<pre class="text-sm">${JSON.stringify(data, null, 2)}</pre>`;
+      }
+    } catch (error) {
+      const debugContainer = document.getElementById("debug-info");
+      if (debugContainer) {
+        debugContainer.innerHTML = `<p class="text-red-600">Error loading debug info: ${error.message}</p>`;
+      }
+    }
+  }
+
+  loadDebugInfo();
+</script>
