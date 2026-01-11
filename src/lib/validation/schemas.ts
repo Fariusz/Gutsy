@@ -19,6 +19,8 @@ export const LogsQuerySchema = z.object({
   start_date: z.string().optional(),
   end_date: z.string().optional(),
   limit: z.string().transform(Number).optional(),
+  page: z.coerce.number().min(1).default(1),
+  per_page: z.coerce.number().min(1).max(100).default(10),
 });
 
 export const TriggersQuerySchema = z.object({

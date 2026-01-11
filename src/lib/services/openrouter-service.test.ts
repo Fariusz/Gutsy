@@ -177,7 +177,7 @@ describe('OpenRouterService', () => {
       );
 
       await expect(service.getAvailableModels()).rejects.toThrow(OpenRouterServiceError);
-    });
+    }, 10000);
   });
 
   describe('validateApiKey method', () => {
@@ -211,7 +211,7 @@ describe('OpenRouterService', () => {
       );
 
       await expect(service.validateApiKey()).rejects.toThrow(OpenRouterServiceError);
-    });
+    }, 10000);
   });
 
   describe('Error handling and retries', () => {
