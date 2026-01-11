@@ -1,5 +1,5 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout title="Trigger Analysis">
@@ -8,24 +8,24 @@ import Layout from '../layouts/Layout.astro';
       <!-- Static content as fallback -->
       <div class="max-w-4xl mx-auto p-6">
         <h1 class="text-3xl font-bold text-gray-900 mb-8">Ingredient Trigger Analysis</h1>
-        
+
         <!-- Date Range Selection -->
         <div class="bg-white rounded-lg shadow-md p-6 mb-8">
           <h2 class="text-xl font-semibold mb-4">Analysis Period</h2>
           <div class="flex flex-col md:flex-row gap-4 items-end">
             <div class="flex-1">
               <label for="start-date" class="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
-              <input 
-                id="start-date" 
-                type="date" 
+              <input
+                id="start-date"
+                type="date"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div class="flex-1">
               <label for="end-date" class="block text-sm font-medium text-gray-700 mb-2">End Date</label>
-              <input 
-                id="end-date" 
-                type="date" 
+              <input
+                id="end-date"
+                type="date"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -35,13 +35,13 @@ import Layout from '../layouts/Layout.astro';
                 <span class="text-sm text-gray-700">Detailed Analysis</span>
               </label>
             </div>
-            <button 
+            <button
               id="analyze-btn"
               class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors duration-200"
             >
               Analyze Triggers
             </button>
-            <button 
+            <button
               id="create-test-data-btn"
               class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
             >
@@ -53,7 +53,9 @@ import Layout from '../layouts/Layout.astro';
         <!-- Results Area -->
         <div id="results-area" class="bg-white rounded-lg shadow-md p-6">
           <div class="text-center py-8">
-            <p class="text-gray-500">Select a date range and click "Analyze Triggers" to see your ingredient trigger analysis.</p>
+            <p class="text-gray-500">
+              Select a date range and click "Analyze Triggers" to see your ingredient trigger analysis.
+            </p>
           </div>
         </div>
       </div>
@@ -66,50 +68,50 @@ import Layout from '../layouts/Layout.astro';
   const today = new Date();
   const thirtyDaysAgo = new Date(today);
   thirtyDaysAgo.setDate(today.getDate() - 30);
-  
-  const startDateInput = document.getElementById('start-date') as HTMLInputElement;
-  const endDateInput = document.getElementById('end-date') as HTMLInputElement;
-  const resultsArea = document.getElementById('results-area');
-  
+
+  const startDateInput = document.getElementById("start-date") as HTMLInputElement;
+  const endDateInput = document.getElementById("end-date") as HTMLInputElement;
+  const resultsArea = document.getElementById("results-area");
+
   if (startDateInput && endDateInput) {
-    startDateInput.value = thirtyDaysAgo.toISOString().split('T')[0];
-    endDateInput.value = today.toISOString().split('T')[0];
+    startDateInput.value = thirtyDaysAgo.toISOString().split("T")[0];
+    endDateInput.value = today.toISOString().split("T")[0];
   }
 
   // Analysis button
-  const analyzeBtn = document.getElementById('analyze-btn') as HTMLButtonElement;
+  const analyzeBtn = document.getElementById("analyze-btn") as HTMLButtonElement;
   if (analyzeBtn) {
-    analyzeBtn.addEventListener('click', async () => {
-      analyzeBtn.textContent = 'Analyzing...';
+    analyzeBtn.addEventListener("click", async () => {
+      analyzeBtn.textContent = "Analyzing...";
       analyzeBtn.disabled = true;
-      
+
       try {
         const startDate = startDateInput.value;
         const endDate = endDateInput.value;
-        const isDetailed = (document.getElementById('detailed') as HTMLInputElement).checked;
-        
+        const isDetailed = (document.getElementById("detailed") as HTMLInputElement).checked;
+
         if (!startDate || !endDate) {
-          throw new Error('Please select both start and end dates');
+          throw new Error("Please select both start and end dates");
         }
-        
+
         // Build query parameters
         const params = new URLSearchParams({
           start_date: startDate,
           end_date: endDate,
-          limit: '10'
+          limit: "10",
         });
-        
+
         if (isDetailed) {
-          params.append('detailed', 'true');
+          params.append("detailed", "true");
         }
-        
+
         const response = await fetch(`/api/triggers?${params}`);
         const data = await response.json();
-        
+
         if (!response.ok) {
-          throw new Error(data.error || 'Failed to fetch triggers');
+          throw new Error(data.error || "Failed to fetch triggers");
         }
-        
+
         // Display results
         let html = `
           <div class="mb-6">
@@ -121,7 +123,7 @@ import Layout from '../layouts/Layout.astro';
             </p>
           </div>
         `;
-        
+
         if (data.triggers.length === 0) {
           html += `
             <div class="text-center py-8">
@@ -143,24 +145,28 @@ import Layout from '../layouts/Layout.astro';
                 </thead>
                 <tbody>
           `;
-          
-          data.triggers.forEach((trigger, index) => {
-            const rowClass = index % 2 === 0 ? 'bg-gray-50' : 'bg-white';
-            const scoreColor = trigger.trigger_score > 1.5 ? 'text-red-600' : 
-                              trigger.trigger_score > 0.5 ? 'text-orange-500' : 'text-green-600';
-            
+
+          data.triggers.forEach((trigger: any, index: number) => {
+            const rowClass = index % 2 === 0 ? "bg-gray-50" : "bg-white";
+            const scoreColor =
+              trigger.trigger_score > 1.5
+                ? "text-red-600"
+                : trigger.trigger_score > 0.5
+                  ? "text-orange-500"
+                  : "text-green-600";
+
             html += `
               <tr class="${rowClass}">
                 <td class="py-3 px-4 font-medium">${trigger.ingredient_name}</td>
                 <td class="py-3 px-4">${trigger.consumption_count}</td>
                 <td class="py-3 px-4 font-semibold ${scoreColor}">
-                  ${trigger.trigger_score > 0 ? '+' : ''}${trigger.trigger_score.toFixed(2)}
+                  ${trigger.trigger_score > 0 ? "+" : ""}${trigger.trigger_score.toFixed(2)}
                 </td>
                 <td class="py-3 px-4">${(trigger.confidence_interval * 100).toFixed(0)}%</td>
               </tr>
             `;
           });
-          
+
           html += `
                 </tbody>
               </table>
@@ -175,71 +181,80 @@ import Layout from '../layouts/Layout.astro';
             </div>
           `;
         }
-        
-        resultsArea.innerHTML = html;
-        
-      } catch (error) {
-        resultsArea.innerHTML = `
-          <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p class="text-red-600">Error: ${error.message}</p>
-          </div>
-        `;
+
+        if (resultsArea) {
+          resultsArea.innerHTML = html;
+        }
+      } catch (error: any) {
+        if (resultsArea) {
+          resultsArea.innerHTML = `
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p class="text-red-600">Error: ${error.message}</p>
+            </div>
+          `;
+        }
       } finally {
-        analyzeBtn.textContent = 'Analyze Triggers';
+        analyzeBtn.textContent = "Analyze Triggers";
         analyzeBtn.disabled = false;
       }
     });
   }
-  
+
   // Test data creation button
-  const createTestDataBtn = document.getElementById('create-test-data-btn') as HTMLButtonElement;
+  const createTestDataBtn = document.getElementById("create-test-data-btn") as HTMLButtonElement;
   if (createTestDataBtn) {
-    createTestDataBtn.addEventListener('click', async () => {
-      createTestDataBtn.textContent = 'Creating...';
+    createTestDataBtn.addEventListener("click", async () => {
+      createTestDataBtn.textContent = "Creating...";
       createTestDataBtn.disabled = true;
-      
+
       try {
-        const response = await fetch('/api/create-test-data', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
+        const response = await fetch("/api/create-test-data", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
         });
-        
+
         const data = await response.json();
-        
+
         if (response.ok) {
-          resultsArea.innerHTML = `
-            <div class="bg-green-50 border border-green-200 rounded-lg p-6">
-              <h3 class="text-lg font-semibold text-green-900 mb-3">✅ Test Data Created Successfully!</h3>
-              <div class="text-sm text-green-800 space-y-2">
-                <p><strong>Total logs:</strong> ${data.summary.total_logs}</p>
-                <p><strong>Next steps:</strong></p>
-                <ul class="list-disc ml-6 space-y-1">
-                  <li>Set date range: 2026-01-01 to 2026-01-12</li>
-                  <li>Click "Analyze Triggers" to see results</li>
-                  <li>Expected: Tomatoes should show as a trigger</li>
-                </ul>
+          if (resultsArea) {
+            resultsArea.innerHTML = `
+              <div class="bg-green-50 border border-green-200 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-green-900 mb-3">✅ Test Data Created Successfully!</h3>
+                <div class="text-sm text-green-800 space-y-2">
+                  <p><strong>Total logs:</strong> ${data.summary.total_logs}</p>
+                  <p><strong>Next steps:</strong></p>
+                  <ul class="list-disc ml-6 space-y-1">
+                    <li>Set date range: 2026-01-01 to 2026-01-12</li>
+                    <li>Click "Analyze Triggers" to see results</li>
+                    <li>Expected: Tomatoes should show as a trigger</li>
+                  </ul>
+                </div>
               </div>
-            </div>
-          `;
-          
+            `;
+          }
+
           // Update date inputs to optimal range
-          startDateInput.value = '2026-01-01';
-          endDateInput.value = '2026-01-12';
+          startDateInput.value = "2026-01-01";
+          endDateInput.value = "2026-01-12";
         } else {
+          if (resultsArea) {
+            resultsArea.innerHTML = `
+              <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p class="text-red-600">Error: ${data.error}</p>
+              </div>
+            `;
+          }
+        }
+      } catch (error: any) {
+        if (resultsArea) {
           resultsArea.innerHTML = `
             <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-              <p class="text-red-600">Error: ${data.error}</p>
+              <p class="text-red-600">Error: ${error.message}</p>
             </div>
           `;
         }
-      } catch (error) {
-        resultsArea.innerHTML = `
-          <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p class="text-red-600">Error: ${error.message}</p>
-          </div>
-        `;
       } finally {
-        createTestDataBtn.textContent = 'Create Test Data';
+        createTestDataBtn.textContent = "Create Test Data";
         createTestDataBtn.disabled = false;
       }
     });

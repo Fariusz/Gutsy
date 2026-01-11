@@ -35,11 +35,11 @@ if (error || !user) {
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
             <p class="text-gray-500">Loading logs...</p>
           </div>
-          
+
           <div id="logs-container" class="hidden">
             <!-- Logs will be loaded here -->
           </div>
-          
+
           <div id="error-container" class="hidden bg-red-50 border border-red-200 rounded-lg p-4">
             <p class="text-red-600" id="error-message"></p>
             <button onclick="loadLogs()" class="mt-2 text-sm text-red-600 underline hover:text-red-800">
@@ -55,32 +55,33 @@ if (error || !user) {
 <script>
   let currentPage = 1;
   const perPage = 10;
-  
+
   async function loadLogs(page = 1) {
-    const loadingDiv = document.getElementById('loading');
-    const logsContainer = document.getElementById('logs-container');
-    const errorContainer = document.getElementById('error-container');
-    
+    const loadingDiv = document.getElementById("loading");
+    const logsContainer = document.getElementById("logs-container");
+    const errorContainer = document.getElementById("error-container");
+
     // Show loading state
-    loadingDiv.classList.remove('hidden');
-    logsContainer.classList.add('hidden');
-    errorContainer.classList.add('hidden');
-    
+    if (loadingDiv) loadingDiv.classList.remove("hidden");
+    if (logsContainer) logsContainer.classList.add("hidden");
+    if (errorContainer) errorContainer.classList.add("hidden");
+
     try {
       const response = await fetch(`/api/logs?page=${page}&per_page=${perPage}`);
-      
+
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: { message: 'Unknown error' } }));
+        const errorData = await response.json().catch(() => ({ error: { message: "Unknown error" } }));
         throw new Error(errorData.error?.message || `API returned status ${response.status}`);
       }
-      
+
       const data = await response.json();
       currentPage = page;
-      
-      loadingDiv.classList.add('hidden');
-      
+
+      if (loadingDiv) loadingDiv.classList.add("hidden");
+
       if (!data.data || data.data.length === 0) {
-        logsContainer.innerHTML = `
+        if (logsContainer) {
+          logsContainer.innerHTML = `
           <div class="text-center py-12">
             <div class="text-gray-400 mb-4">
               <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,13 +95,14 @@ if (error || !user) {
             </a>
           </div>
         `;
+        }
       } else {
         let html = '<div class="space-y-4">';
-        
-        data.data.forEach((log) => {
+
+        data.data.forEach((log: any) => {
           const logDate = new Date(log.log_date).toLocaleDateString();
           const createdAt = new Date(log.created_at).toLocaleDateString();
-          
+
           html += `
             <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
               <div class="flex justify-between items-start mb-4">
@@ -111,49 +113,61 @@ if (error || !user) {
               </div>
               
               <div class="space-y-4">
-                ${log.notes ? `
+                ${
+                  log.notes
+                    ? `
                   <div>
                     <h4 class="font-medium text-gray-900 mb-2">Notes</h4>
                     <p class="text-gray-700">${log.notes}</p>
                   </div>
-                ` : ''}
+                `
+                    : ""
+                }
                 
                 <div>
                   <h4 class="font-medium text-gray-900 mb-2">Ingredients (${log.ingredients?.length || 0})</h4>
                   <div class="flex flex-wrap gap-2">
-                    ${(log.ingredients || []).map(ingredient => {
-                      const ingredientName = typeof ingredient === 'string' ? ingredient : (ingredient.name || ingredient.ingredient_name || JSON.stringify(ingredient));
-                      return `<span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">${ingredientName}</span>`;
-                    }).join('')}
-                    ${(log.ingredients || []).length === 0 ? '<span class="text-gray-500 text-sm">No ingredients logged</span>' : ''}
+                    ${(log.ingredients || [])
+                      .map((ingredient: any) => {
+                        const ingredientName =
+                          typeof ingredient === "string"
+                            ? ingredient
+                            : ingredient.name || ingredient.ingredient_name || JSON.stringify(ingredient);
+                        return `<span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">${ingredientName}</span>`;
+                      })
+                      .join("")}
+                    ${(log.ingredients || []).length === 0 ? '<span class="text-gray-500 text-sm">No ingredients logged</span>' : ""}
                   </div>
                 </div>
                 
                 <div>
                   <h4 class="font-medium text-gray-900 mb-2">Symptoms (${log.symptoms?.length || 0})</h4>
                   <div class="flex flex-wrap gap-2">
-                    ${(log.symptoms || []).map(symptom => {
-                      const symptomName = typeof symptom === 'string' ? symptom : (symptom.name || symptom.symptom_name || 'Unknown');
-                      const severity = typeof symptom === 'object' ? symptom.severity : '';
-                      const severityText = severity ? ` (${severity}/10)` : '';
-                      return `<span class="inline-block bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">${symptomName}${severityText}</span>`;
-                    }).join('')}
-                    ${(log.symptoms || []).length === 0 ? '<span class="text-gray-500 text-sm">No symptoms logged</span>' : ''}
+                    ${(log.symptoms || [])
+                      .map((symptom: any) => {
+                        const symptomName =
+                          typeof symptom === "string" ? symptom : symptom.name || symptom.symptom_name || "Unknown";
+                        const severity = typeof symptom === "object" ? symptom.severity : "";
+                        const severityText = severity ? ` (${severity}/10)` : "";
+                        return `<span class="inline-block bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">${symptomName}${severityText}</span>`;
+                      })
+                      .join("")}
+                    ${(log.symptoms || []).length === 0 ? '<span class="text-gray-500 text-sm">No symptoms logged</span>' : ""}
                   </div>
                 </div>
               </div>
             </div>
           `;
         });
-        
+
         // Add pagination if there are multiple pages
         if (data.meta && data.meta.total_pages > 1) {
           html += `
             <div class="flex justify-center items-center space-x-2 mt-8">
               <button 
                 onclick="loadLogs(${currentPage - 1})" 
-                class="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 ${currentPage <= 1 ? 'opacity-50 cursor-not-allowed' : ''}"
-                ${currentPage <= 1 ? 'disabled' : ''}
+                class="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 ${currentPage <= 1 ? "opacity-50 cursor-not-allowed" : ""}"
+                ${currentPage <= 1 ? "disabled" : ""}
               >
                 Previous
               </button>
@@ -162,37 +176,37 @@ if (error || !user) {
               </span>
               <button 
                 onclick="loadLogs(${currentPage + 1})" 
-                class="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 ${currentPage >= data.meta.total_pages ? 'opacity-50 cursor-not-allowed' : ''}"
-                ${currentPage >= data.meta.total_pages ? 'disabled' : ''}
+                class="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 ${currentPage >= data.meta.total_pages ? "opacity-50 cursor-not-allowed" : ""}"
+                ${currentPage >= data.meta.total_pages ? "disabled" : ""}
               >
                 Next
               </button>
             </div>
           `;
         }
-        
-        html += '</div>';
-        logsContainer.innerHTML = html;
+
+        html += "</div>";
+        if (logsContainer) logsContainer.innerHTML = html;
       }
-      
-      logsContainer.classList.remove('hidden');
-      
+
+      if (logsContainer) logsContainer.classList.remove("hidden");
     } catch (error) {
-      console.error('Error loading logs:', error);
-      
-      loadingDiv.classList.add('hidden');
-      errorContainer.classList.remove('hidden');
-      document.getElementById('error-message').textContent = error.message;
+      console.error("Error loading logs:", error);
+
+      if (loadingDiv) loadingDiv.classList.add("hidden");
+      if (errorContainer) errorContainer.classList.remove("hidden");
+      const errorMessageEl = document.getElementById("error-message");
+      if (errorMessageEl) errorMessageEl.textContent = error.message;
     }
   }
-  
+
   // Load logs when page loads
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener("DOMContentLoaded", () => {
     loadLogs();
   });
-  
+
   // Also try immediate execution in case DOMContentLoaded already fired
-  if (document.readyState !== 'loading') {
+  if (document.readyState !== "loading") {
     loadLogs();
   }
 </script>
