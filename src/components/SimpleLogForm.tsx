@@ -14,8 +14,9 @@ export default function SimpleLogForm() {
       <h3 className="text-lg font-semibold">Simple Log Form (Test)</h3>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Ingredients</label>
+          <label htmlFor="ingredients-input" className="block text-sm font-medium text-gray-700 mb-1">Ingredients</label>
           <input
+            id="ingredients-input"
             type="text"
             value={ingredients}
             onChange={(e) => setIngredients(e.target.value)}
@@ -25,8 +26,9 @@ export default function SimpleLogForm() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+          <label htmlFor="notes-textarea" className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
           <textarea
+            id="notes-textarea"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             className="w-full border border-gray-300 rounded-md px-3 py-2"

@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useTriggerAnalysis } from "./hooks/useTriggerAnalysis";
 import { Button } from "./ui/button";
-import type { TriggerAnalysis, IngredientSymptomCorrelation } from "../types";
 
 export function TriggersList() {
-  console.log('TriggersList component rendering...');
-  
+  console.log("TriggersList component rendering...");
+
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
   const [showDetailed, setShowDetailed] = useState<boolean>(false);
   const { isLoading, error, data, fetchTriggers, reset } = useTriggerAnalysis();
 
-  console.log('TriggersList state:', { startDate, endDate, isLoading, error, data });
+  console.log("TriggersList state:", { startDate, endDate, isLoading, error, data });
 
   // Set default date range to last 30 days
   useEffect(() => {
@@ -178,7 +177,7 @@ export function TriggersList() {
                   <strong>Confidence:</strong> Higher confidence means more reliable results (based on data quantity)
                 </li>
                 <li>
-                  <strong>Consumption Count:</strong> How many times you've logged this ingredient
+                  <strong>Consumption Count:</strong> How many times you&apos;ve logged this ingredient
                 </li>
               </ul>
             </div>
@@ -187,7 +186,7 @@ export function TriggersList() {
       )}
 
       {/* Detailed Correlations View */}
-      {data && data.correlations && data.correlations.length > 0 && (
+      {data?.correlations?.length && (
         <div className="bg-white rounded-lg shadow-md p-6 mt-8">
           <h2 className="text-xl font-semibold mb-4">Detailed Ingredient-Symptom Correlations</h2>
           <div className="overflow-x-auto">
@@ -246,7 +245,7 @@ export function TriggersList() {
                 <strong>Specific Correlations:</strong> Shows exactly which ingredients trigger which symptoms
               </li>
               <li>
-                <strong>Example:</strong> "Tomatoes cause rash 60% of the time" vs "Cabbage causes gas 80% of the time"
+                <strong>Example:</strong> &quot;Tomatoes cause rash 60% of the time&quot; vs &quot;Cabbage causes gas 80% of the time&quot;
               </li>
             </ul>
           </div>
