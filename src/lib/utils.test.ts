@@ -7,7 +7,8 @@ describe("cn utility function", () => {
   });
 
   it("should handle conditional classes", () => {
-    expect(cn("base", false && "hidden", "visible")).toBe("base visible");
+    const isHidden = false;
+    expect(cn("base", isHidden && "hidden", "visible")).toBe("base visible");
   });
 
   it("should resolve conflicting Tailwind classes", () => {
@@ -15,9 +16,7 @@ describe("cn utility function", () => {
   });
 
   it("should handle arrays and objects", () => {
-    expect(cn(["px-2", "py-1"], { "bg-red-500": true, "bg-blue-500": false })).toBe(
-      "px-2 py-1 bg-red-500"
-    );
+    expect(cn(["px-2", "py-1"], { "bg-red-500": true, "bg-blue-500": false })).toBe("px-2 py-1 bg-red-500");
   });
 
   it("should handle undefined and null values", () => {

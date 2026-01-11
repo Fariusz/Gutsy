@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { POST, GET } from "../../pages/api/logs";
-import { createMockAPIContext, createMockSession, mockSupabaseClient } from "../mocks/supabase";
+import { createMockAPIContext, createMockSession } from "../mocks/supabase";
 import type { CreateLogRequest } from "../../types";
 
 // Mock the LogService module
@@ -15,7 +15,7 @@ describe("Logs API Integration", () => {
     it("should create a log successfully with valid data", async () => {
       const session = createMockSession("test-user-id");
       const context = createMockAPIContext(session);
-      
+
       const validLogData: CreateLogRequest = {
         log_date: "2023-12-26T10:00:00Z",
         notes: "Test meal",
@@ -51,7 +51,7 @@ describe("Logs API Integration", () => {
 
     it("should return 401 when not authenticated", async () => {
       const context = createMockAPIContext(null); // No session
-      
+
       const response = await POST(context);
       const responseData = await response.json();
 
@@ -63,7 +63,7 @@ describe("Logs API Integration", () => {
     it("should return 400 for invalid JSON", async () => {
       const session = createMockSession("test-user-id");
       const context = createMockAPIContext(session);
-      
+
       // Mock invalid JSON parsing
       context.request.json = vi.fn().mockRejectedValue(new Error("Invalid JSON"));
 
@@ -78,7 +78,7 @@ describe("Logs API Integration", () => {
     it("should return 400 for validation errors", async () => {
       const session = createMockSession("test-user-id");
       const context = createMockAPIContext(session);
-      
+
       const invalidLogData = {
         log_date: "invalid-date", // Invalid date format
         ingredients: [], // Empty ingredients
@@ -97,7 +97,7 @@ describe("Logs API Integration", () => {
     it("should handle service errors", async () => {
       const session = createMockSession("test-user-id");
       const context = createMockAPIContext(session);
-      
+
       const validLogData: CreateLogRequest = {
         log_date: "2023-12-26T10:00:00Z",
         ingredients: ["apple"],
@@ -108,9 +108,7 @@ describe("Logs API Integration", () => {
 
       const { LogService } = await import("../../lib/services/log-service");
       const mockLogService = vi.mocked(LogService);
-      mockLogService.prototype.createLog = vi.fn().mockRejectedValue(
-        new Error("Database connection failed")
-      );
+      mockLogService.prototype.createLog = vi.fn().mockRejectedValue(new Error("Database connection failed"));
 
       const response = await POST(context);
       const responseData = await response.json();
@@ -124,7 +122,7 @@ describe("Logs API Integration", () => {
     it("should return paginated logs successfully", async () => {
       const session = createMockSession("test-user-id");
       const context = createMockAPIContext(session);
-      
+
       // Mock URL with query parameters
       Object.defineProperty(context, "url", {
         value: new URL("http://localhost/api/logs?page=1&per_page=10"),
@@ -164,7 +162,7 @@ describe("Logs API Integration", () => {
 
     it("should return 401 when not authenticated", async () => {
       const context = createMockAPIContext(null);
-      
+
       const response = await GET(context);
       const responseData = await response.json();
 
@@ -175,7 +173,7 @@ describe("Logs API Integration", () => {
     it("should handle invalid query parameters", async () => {
       const session = createMockSession("test-user-id");
       const context = createMockAPIContext(session);
-      
+
       // Mock URL with invalid query parameters
       Object.defineProperty(context, "url", {
         value: new URL("http://localhost/api/logs?page=invalid&per_page=-1"),
@@ -192,7 +190,7 @@ describe("Logs API Integration", () => {
     it("should use default pagination when no parameters provided", async () => {
       const session = createMockSession("test-user-id");
       const context = createMockAPIContext(session);
-      
+
       Object.defineProperty(context, "url", {
         value: new URL("http://localhost/api/logs"),
         writable: false,
@@ -210,10 +208,7 @@ describe("Logs API Integration", () => {
       const response = await GET(context);
 
       expect(response.status).toBe(200);
-      expect(mockLogService.prototype.getLogs).toHaveBeenCalledWith(
-        session.user.id,
-        { page: 1, per_page: 10 }
-      );
+      expect(mockLogService.prototype.getLogs).toHaveBeenCalledWith(session.user.id, { page: 1, per_page: 10 });
     });
   });
 });

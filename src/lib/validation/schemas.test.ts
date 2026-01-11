@@ -1,5 +1,4 @@
 import { describe, it, expect } from "vitest";
-import { z } from "zod";
 import {
   CreateLogSchema,
   LogsQuerySchema,
@@ -8,7 +7,6 @@ import {
   ModelParametersSchema,
   ChatRequestSchema,
   ChatResponseSchema,
-  OpenRouterErrorSchema,
   ModelSchema,
 } from "./schemas.js";
 
@@ -137,7 +135,7 @@ describe("OpenRouter Schemas", () => {
 
     it("should reject temperature out of range", () => {
       const invalidParams = {
-        temperature: 3.0, // > 2.0
+        temperature: 3, // > 2.0
       };
 
       expect(() => ModelParametersSchema.parse(invalidParams)).toThrow();
@@ -157,9 +155,7 @@ describe("OpenRouter Schemas", () => {
     it("should validate complete chat request", () => {
       const validRequest = {
         model: "anthropic/claude-3.5-sonnet",
-        messages: [
-          { role: "user", content: "Hello" },
-        ],
+        messages: [{ role: "user", content: "Hello" }],
         systemMessage: "You are a helpful assistant",
         parameters: {
           temperature: 0.7,
@@ -234,7 +230,7 @@ describe("API Validation Schemas", () => {
 
       const result = CreateLogSchema.safeParse(validData);
       expect(result.success).toBe(true);
-      
+
       if (result.success) {
         expect(result.data).toEqual(validData);
       }
@@ -249,7 +245,7 @@ describe("API Validation Schemas", () => {
 
       const result = CreateLogSchema.safeParse(minimalData);
       expect(result.success).toBe(true);
-      
+
       if (result.success) {
         expect(result.data.notes).toBeUndefined();
         expect(result.data.ingredients).toEqual(["apple"]);
@@ -266,7 +262,7 @@ describe("API Validation Schemas", () => {
 
       const result = CreateLogSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
-      
+
       if (!result.success) {
         expect(result.error.errors[0].message).toBe("Invalid date format");
       }
@@ -280,11 +276,11 @@ describe("API Validation Schemas", () => {
 
       const result = CreateLogSchema.safeParse(incompleteData);
       expect(result.success).toBe(false);
-      
+
       if (!result.success) {
-        const errorPaths = result.error.errors.map(e => e.path.join('.'));
-        expect(errorPaths).toContain('ingredients');
-        expect(errorPaths).toContain('symptoms');
+        const errorPaths = result.error.errors.map((e) => e.path.join("."));
+        expect(errorPaths).toContain("ingredients");
+        expect(errorPaths).toContain("symptoms");
       }
     });
 
@@ -297,9 +293,9 @@ describe("API Validation Schemas", () => {
 
       const result = CreateLogSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
-      
+
       if (!result.success) {
-        expect(result.error.errors.some(e => e.path.includes('ingredients'))).toBe(true);
+        expect(result.error.errors.some((e) => e.path.includes("ingredients"))).toBe(true);
       }
     });
 
@@ -315,11 +311,9 @@ describe("API Validation Schemas", () => {
 
       const result = CreateLogSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
-      
+
       if (!result.success) {
-        const severityErrors = result.error.errors.filter(e => 
-          e.path.some(p => p === 'severity')
-        );
+        const severityErrors = result.error.errors.filter((e) => e.path.includes("severity"));
         expect(severityErrors.length).toBeGreaterThan(0);
       }
     });
@@ -333,9 +327,9 @@ describe("API Validation Schemas", () => {
 
       const result = CreateLogSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
-      
+
       if (!result.success) {
-        expect(result.error.errors.some(e => e.path.includes('symptom_id'))).toBe(true);
+        expect(result.error.errors.some((e) => e.path.includes("symptom_id"))).toBe(true);
       }
     });
   });
@@ -343,7 +337,7 @@ describe("API Validation Schemas", () => {
   describe("LogsQuerySchema", () => {
     it("should apply default values when not provided", () => {
       const result = LogsQuerySchema.parse({});
-      
+
       expect(result.page).toBe(1);
       expect(result.per_page).toBe(10);
     });
@@ -353,7 +347,7 @@ describe("API Validation Schemas", () => {
         page: "2",
         per_page: "20",
       });
-      
+
       expect(result.page).toBe(2);
       expect(result.per_page).toBe(20);
     });
@@ -384,23 +378,21 @@ describe("API Validation Schemas", () => {
       const invalidData = {
         log_date: "invalid",
         ingredients: 123, // Should be array
-        symptoms: [
-          { symptom_id: "invalid", severity: 10 }
-        ]
+        symptoms: [{ symptom_id: "invalid", severity: 10 }],
       };
 
       const result = CreateLogSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
-      
+
       if (!result.success) {
         expect(result.error.errors.length).toBeGreaterThan(1);
-        
+
         // Check that we get specific field errors
-        const errorFields = result.error.errors.map(e => e.path.join('.'));
-        expect(errorFields).toContain('log_date');
-        expect(errorFields).toContain('ingredients');
-        expect(errorFields.some(field => field.includes('symptom_id'))).toBe(true);
-        expect(errorFields.some(field => field.includes('severity'))).toBe(true);
+        const errorFields = result.error.errors.map((e) => e.path.join("."));
+        expect(errorFields).toContain("log_date");
+        expect(errorFields).toContain("ingredients");
+        expect(errorFields.some((field) => field.includes("symptom_id"))).toBe(true);
+        expect(errorFields.some((field) => field.includes("severity"))).toBe(true);
       }
     });
   });

@@ -1,5 +1,4 @@
 import { describe, it, expect } from "vitest";
-import { z } from "zod";
 import { TriggersQuerySchema } from "../../lib/validation/schemas";
 
 describe("Triggers Validation Schemas", () => {

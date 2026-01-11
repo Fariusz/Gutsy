@@ -46,25 +46,26 @@ export const createMockSession = (userId = "test-user-id") => ({
   },
 });
 
-export const createMockAPIContext = (session?: any) => ({
-  locals: {
-    supabase: {
-      ...mockSupabaseClient,
-      auth: {
-        ...mockSupabaseClient.auth,
-        getSession: vi.fn().mockResolvedValue({
-          data: { session },
-          error: null,
-        }),
-        getUser: vi.fn().mockResolvedValue({
-          data: { user: session?.user || null },
-          error: null,
-        }),
+export const createMockAPIContext = (session?: any) =>
+  ({
+    locals: {
+      supabase: {
+        ...mockSupabaseClient,
+        auth: {
+          ...mockSupabaseClient.auth,
+          getSession: vi.fn().mockResolvedValue({
+            data: { session },
+            error: null,
+          }),
+          getUser: vi.fn().mockResolvedValue({
+            data: { user: session?.user || null },
+            error: null,
+          }),
+        },
       },
     },
-  },
-  request: {
-    headers: new Headers(),
-    json: vi.fn(),
-  },
-} as any);
+    request: {
+      headers: new Headers(),
+      json: vi.fn(),
+    },
+  }) as any;

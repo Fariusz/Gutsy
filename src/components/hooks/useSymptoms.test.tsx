@@ -18,7 +18,12 @@ describe("useSymptoms", () => {
 
   it("should initialize with loading state", () => {
     // Mock pending response to keep loading state
-    mockFetch.mockImplementation(() => new Promise(() => {}));
+    mockFetch.mockImplementation(
+      () =>
+        new Promise(() => {
+          // Empty promise to keep loading state - intentionally empty
+        })
+    );
 
     const { result } = renderHook(() => useSymptoms());
 
