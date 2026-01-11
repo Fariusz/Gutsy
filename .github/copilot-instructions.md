@@ -1,6 +1,6 @@
-# AI Rules for {{project-name}}
+# AI Rules for Gutsy
 
-{{project-description}}
+A modern, opinionated starter template for building fast, accessible, and AI-friendly web applications.
 
 ## Tech Stack
 
@@ -81,7 +81,7 @@ When modifying the directory structure, always update this section.
 - Leverage View Transitions API for smooth page transitions (use ClientRouter)
 - Use content collections with type safety for blog posts, documentation, etc.
 - Leverage Server Endpoints for API routes
-- Use POST, GET  - uppercase format for endpoint handlers
+- Use POST, GET - uppercase format for endpoint handlers
 - Use `export const prerender = false` for API routes
 - Use zod for input validation in API routes
 - Extract logic into services in `src/lib/services`
@@ -111,3 +111,32 @@ When modifying the directory structure, always update this section.
 - Use Zod schemas to validate data exchanged with the backend.
 - Use supabase from context.locals in Astro routes instead of importing supabaseClient directly
 - Use SupabaseClient type from `src/db/supabase.client.ts`, not from `@supabase/supabase-js`
+
+## Developer Workflows
+
+- For local development, use `npm run dev` to start the Astro development server.
+- For building the project, use `npm run build` to generate the static site.
+- For previewing the production build, use `npm run preview`.
+- For running tests, use `npm run test`.
+- For formatting code, use `npm run format`.
+- For linting code, use `npm run lint`.
+
+## Integration Points
+
+- Integrate with third-party APIs in the `src/lib` directory.
+- Use environment variables for sensitive information and API keys.
+- Configure webhooks in Supabase for real-time updates and integrations.
+- Set up authentication providers in Supabase for user sign-up and sign-in.
+- Configure storage buckets in Supabase for file uploads and management.
+
+## Project-specific Patterns
+
+- Use the `src/lib/constants.ts` file for project-wide constants and configuration.
+- Implement feature flags in `src/lib/flags.ts` for toggling features on and off.
+- Use the `src/hooks` directory for custom React hooks.
+- Implement context providers in `src/context` for global state management.
+- Use the `src/routes` directory for defining API routes and server-side logic.
+- Implement error boundaries in React for catching and handling errors in the component tree.
+- Use the `src/styles` directory for global styles and theme configuration.
+- Implement responsive design patterns using Tailwind CSS utilities.
+- Use Astro components for layout and static content, and React components for dynamic, interactive parts of the application.

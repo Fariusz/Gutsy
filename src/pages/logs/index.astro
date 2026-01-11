@@ -1,0 +1,40 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import LogsList from "../../components/LogsList.tsx";
+
+// Check if user is authenticated
+const {
+  data: { user },
+  error,
+} = await Astro.locals.supabase.auth.getUser();
+
+if (error || !user) {
+  // Redirect to login page if not authenticated
+  return Astro.redirect("/login");
+}
+---
+
+<Layout title="My Logs - Gutsy">
+  <main class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="flex justify-between items-center mb-8">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900 mb-2">My Meal Logs</h1>
+          <p class="text-gray-600">Track and review your meal history and symptoms</p>
+        </div>
+        <a
+          href="/logs/new"
+          class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
+        >
+          + New Log
+        </a>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="p-6">
+          <LogsList client:load />
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>
