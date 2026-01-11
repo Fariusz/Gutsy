@@ -72,10 +72,12 @@ BEGIN
     SELECT id INTO symptom_id_fatigue FROM symptoms WHERE name = 'Fatigue';
 
     -- Delete existing test logs for this user to avoid conflicts
-    DELETE FROM logs WHERE user_id = target_user_id AND notes LIKE '%test%' OR notes IN (
-        'Pizza lunch', 'Scrambled eggs breakfast', 'Pasta with tomato sauce', 
-        'Coffee and nuts', 'Salad with tomatoes', 'Ice cream (dairy)',
-        'Bread and eggs', 'Spicy curry with tomatoes', 'Chocolate bar', 'Soy milk and cereal'
+    DELETE FROM logs WHERE user_id = target_user_id AND (
+        notes LIKE '%test%' OR notes IN (
+            'Pizza lunch', 'Scrambled eggs breakfast', 'Pasta with tomato sauce', 
+            'Coffee and nuts', 'Salad with tomatoes', 'Ice cream (dairy)',
+            'Bread and eggs', 'Spicy curry with tomatoes', 'Chocolate bar', 'Soy milk and cereal'
+        )
     );
 
     -- Insert test logs for the user

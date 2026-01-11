@@ -1,6 +1,5 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import LogsList from "../../components/LogsList.tsx";
 
 // Check if user is authenticated
 const {
@@ -32,9 +31,168 @@ if (error || !user) {
 
       <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="p-6">
-          <LogsList client:load />
+          <div id="loading" class="text-center py-8">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p class="text-gray-500">Loading logs...</p>
+          </div>
+          
+          <div id="logs-container" class="hidden">
+            <!-- Logs will be loaded here -->
+          </div>
+          
+          <div id="error-container" class="hidden bg-red-50 border border-red-200 rounded-lg p-4">
+            <p class="text-red-600" id="error-message"></p>
+            <button onclick="loadLogs()" class="mt-2 text-sm text-red-600 underline hover:text-red-800">
+              Try again
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </main>
 </Layout>
+
+<script>
+  let currentPage = 1;
+  const perPage = 10;
+  
+  async function loadLogs(page = 1) {
+    const loadingDiv = document.getElementById('loading');
+    const logsContainer = document.getElementById('logs-container');
+    const errorContainer = document.getElementById('error-container');
+    
+    // Show loading state
+    loadingDiv.classList.remove('hidden');
+    logsContainer.classList.add('hidden');
+    errorContainer.classList.add('hidden');
+    
+    try {
+      const response = await fetch(`/api/logs?page=${page}&per_page=${perPage}`);
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: { message: 'Unknown error' } }));
+        throw new Error(errorData.error?.message || `API returned status ${response.status}`);
+      }
+      
+      const data = await response.json();
+      currentPage = page;
+      
+      loadingDiv.classList.add('hidden');
+      
+      if (!data.data || data.data.length === 0) {
+        logsContainer.innerHTML = `
+          <div class="text-center py-12">
+            <div class="text-gray-400 mb-4">
+              <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">No logs yet</h3>
+            <p class="text-gray-600 mb-6">Start tracking your meals and symptoms to identify potential food triggers.</p>
+            <a href="/logs/new" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200">
+              Create Your First Log
+            </a>
+          </div>
+        `;
+      } else {
+        let html = '<div class="space-y-4">';
+        
+        data.data.forEach((log) => {
+          const logDate = new Date(log.log_date).toLocaleDateString();
+          const createdAt = new Date(log.created_at).toLocaleDateString();
+          
+          html += `
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+              <div class="flex justify-between items-start mb-4">
+                <div>
+                  <h3 class="text-lg font-semibold text-gray-900">${logDate}</h3>
+                  <p class="text-sm text-gray-500">Created ${createdAt}</p>
+                </div>
+              </div>
+              
+              <div class="space-y-4">
+                ${log.notes ? `
+                  <div>
+                    <h4 class="font-medium text-gray-900 mb-2">Notes</h4>
+                    <p class="text-gray-700">${log.notes}</p>
+                  </div>
+                ` : ''}
+                
+                <div>
+                  <h4 class="font-medium text-gray-900 mb-2">Ingredients (${log.ingredients?.length || 0})</h4>
+                  <div class="flex flex-wrap gap-2">
+                    ${(log.ingredients || []).map(ingredient => {
+                      const ingredientName = typeof ingredient === 'string' ? ingredient : (ingredient.name || ingredient.ingredient_name || JSON.stringify(ingredient));
+                      return `<span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">${ingredientName}</span>`;
+                    }).join('')}
+                    ${(log.ingredients || []).length === 0 ? '<span class="text-gray-500 text-sm">No ingredients logged</span>' : ''}
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 class="font-medium text-gray-900 mb-2">Symptoms (${log.symptoms?.length || 0})</h4>
+                  <div class="flex flex-wrap gap-2">
+                    ${(log.symptoms || []).map(symptom => {
+                      const symptomName = typeof symptom === 'string' ? symptom : (symptom.name || symptom.symptom_name || 'Unknown');
+                      const severity = typeof symptom === 'object' ? symptom.severity : '';
+                      const severityText = severity ? ` (${severity}/10)` : '';
+                      return `<span class="inline-block bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">${symptomName}${severityText}</span>`;
+                    }).join('')}
+                    ${(log.symptoms || []).length === 0 ? '<span class="text-gray-500 text-sm">No symptoms logged</span>' : ''}
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+        
+        // Add pagination if there are multiple pages
+        if (data.meta && data.meta.total_pages > 1) {
+          html += `
+            <div class="flex justify-center items-center space-x-2 mt-8">
+              <button 
+                onclick="loadLogs(${currentPage - 1})" 
+                class="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 ${currentPage <= 1 ? 'opacity-50 cursor-not-allowed' : ''}"
+                ${currentPage <= 1 ? 'disabled' : ''}
+              >
+                Previous
+              </button>
+              <span class="px-4 py-2 text-sm font-medium text-gray-700">
+                Page ${currentPage} of ${data.meta.total_pages}
+              </span>
+              <button 
+                onclick="loadLogs(${currentPage + 1})" 
+                class="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 ${currentPage >= data.meta.total_pages ? 'opacity-50 cursor-not-allowed' : ''}"
+                ${currentPage >= data.meta.total_pages ? 'disabled' : ''}
+              >
+                Next
+              </button>
+            </div>
+          `;
+        }
+        
+        html += '</div>';
+        logsContainer.innerHTML = html;
+      }
+      
+      logsContainer.classList.remove('hidden');
+      
+    } catch (error) {
+      console.error('Error loading logs:', error);
+      
+      loadingDiv.classList.add('hidden');
+      errorContainer.classList.remove('hidden');
+      document.getElementById('error-message').textContent = error.message;
+    }
+  }
+  
+  // Load logs when page loads
+  document.addEventListener('DOMContentLoaded', () => {
+    loadLogs();
+  });
+  
+  // Also try immediate execution in case DOMContentLoaded already fired
+  if (document.readyState !== 'loading') {
+    loadLogs();
+  }
+</script>

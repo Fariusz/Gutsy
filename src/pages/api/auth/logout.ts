@@ -47,7 +47,7 @@ export async function POST(context: APIContext): Promise<Response> {
       );
     }
 
-    console.log("Logout: Session found for user:", session.user.id);
+    console.log("Logout: Session found for user:", user.id);
 
     // 2. Sign out with Supabase
     const { error } = await context.locals.supabase.auth.signOut();

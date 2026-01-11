@@ -29,9 +29,14 @@ export default function LogsList({ onEditLog }: LogsListProps) {
       }
 
       const data = (await response.json()) as LogsListResponse;
+      console.log("LogsList: Raw API response:", data);
+      console.log("LogsList: Data array:", data.data);
+      console.log("LogsList: Data length:", data.data?.length);
+      console.log("LogsList: Meta:", data.meta);
       setLogs(data.data || []);
       setPagination(data.meta || pagination);
     } catch (err) {
+      console.error("LogsList: Fetch error:", err);
       const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred";
       setError(errorMessage);
     } finally {

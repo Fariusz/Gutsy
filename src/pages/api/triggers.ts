@@ -86,16 +86,7 @@ export async function GET(context: APIContext): Promise<Response> {
       p_limit: limit,
     });
     
-    // Also try the debug version with lower requirements
-    const { data: debugData, error: debugError } = await context.locals.supabase.rpc("get_top_triggers_debug", {
-      p_user_id: userId,
-      p_start_date: start_date,
-      p_end_date: end_date,
-      p_limit: limit,
-    });
-    
-    console.log("Triggers GET: Debug RPC response:", { data: debugData, error: debugError });
-    
+    // Call the main RPC function
     const { data: simplifiedData, error: triggersError } = await context.locals.supabase.rpc("get_top_triggers", {
       p_user_id: userId,
       p_start_date: start_date,
