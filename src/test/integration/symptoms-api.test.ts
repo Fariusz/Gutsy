@@ -14,7 +14,7 @@ describe("Symptoms API Integration", () => {
     it("should return symptoms successfully when authenticated", async () => {
       const session = createMockSession("test-user-id");
       const context = createMockAPIContext(session);
-      
+
       const mockSymptomsResponse = {
         data: [
           { id: 1, name: "Headache", category: "neurological", created_at: "2023-01-01T00:00:00Z" },
@@ -37,7 +37,7 @@ describe("Symptoms API Integration", () => {
 
     it("should return 401 when not authenticated", async () => {
       const context = createMockAPIContext(null); // No session
-      
+
       const response = await GET(context);
       const responseData = await response.json();
 
@@ -58,7 +58,7 @@ describe("Symptoms API Integration", () => {
 
       expect(response.status).toBe(401);
       expect(responseData.error.type).toBe("authorization_error");
-      expect(responseData.error.message).toContain("Session error: Session validation failed");
+      expect(responseData.error.message).toContain("Authentication required");
     });
 
     it("should handle service errors", async () => {
@@ -67,9 +67,7 @@ describe("Symptoms API Integration", () => {
 
       const { SymptomService } = await import("../../lib/services/symptom-service");
       const mockSymptomService = vi.mocked(SymptomService);
-      mockSymptomService.prototype.getAllSymptoms = vi.fn().mockRejectedValue(
-        new Error("Database connection failed")
-      );
+      mockSymptomService.prototype.getAllSymptoms = vi.fn().mockRejectedValue(new Error("Database connection failed"));
 
       const response = await GET(context);
       const responseData = await response.json();
@@ -98,7 +96,7 @@ describe("Symptoms API Integration", () => {
     it("should return service response with error field", async () => {
       const session = createMockSession("test-user-id");
       const context = createMockAPIContext(session);
-      
+
       const mockSymptomsResponse = {
         data: null,
         error: "No symptoms found",

@@ -37,22 +37,23 @@ describe("Triggers API Integration", () => {
         },
       ];
 
-      // Mock the RPC calls - first call for get_top_triggers, second for get_ingredient_symptom_correlations
-      mockSupabaseClient.rpc = vi.fn().mockResolvedValueOnce({
+      // Mock the RPC calls - only one call for get_top_triggers (since detailed=false)
+      context.locals.supabase.rpc = vi.fn().mockResolvedValueOnce({
         data: mockTriggersData,
         error: null,
       });
 
-      // Mock count query
+      // Mock count query - return destructurable object with count property
       const mockFromChain = {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
         gte: vi.fn().mockReturnThis(),
         lte: vi.fn().mockReturnThis(),
-        count: vi.fn().mockResolvedValue({ count: 25, error: null }),
+        count: 25,
+        error: null,
       };
 
-      mockSupabaseClient.from = vi.fn(() => mockFromChain);
+      context.locals.supabase.from = vi.fn(() => mockFromChain);
 
       const response = await GET(context);
       const responseData = (await response.json()) as TriggerAnalysisResponse;
@@ -62,7 +63,7 @@ describe("Triggers API Integration", () => {
       expect(responseData.analysis_period).toEqual({
         start_date: "2024-01-01",
         end_date: "2024-01-31",
-        total_logs: 0,
+        total_logs: 25,
       });
     });
 
@@ -112,21 +113,22 @@ describe("Triggers API Integration", () => {
       ];
 
       // Mock RPC calls - first call for detailed correlations, second for simplified triggers
-      mockSupabaseClient.rpc = vi
+      context.locals.supabase.rpc = vi
         .fn()
         .mockResolvedValueOnce({ data: mockCorrelationsData, error: null })
         .mockResolvedValueOnce({ data: mockTriggersData, error: null });
 
-      // Mock count query
+      // Mock count query - return destructurable object with count property
       const mockFromChain = {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
         gte: vi.fn().mockReturnThis(),
         lte: vi.fn().mockReturnThis(),
-        count: vi.fn().mockResolvedValue({ count: 25, error: null }),
+        count: 25,
+        error: null,
       };
 
-      mockSupabaseClient.from = vi.fn(() => mockFromChain);
+      context.locals.supabase.from = vi.fn(() => mockFromChain);
 
       const response = await GET(context);
       const responseData = (await response.json()) as TriggerAnalysisResponse;
@@ -134,7 +136,7 @@ describe("Triggers API Integration", () => {
       expect(response.status).toBe(200);
       expect(responseData.triggers).toEqual(mockTriggersData);
       expect(responseData.correlations).toEqual(mockCorrelationsData);
-      expect(mockSupabaseClient.rpc).toHaveBeenCalledWith("get_ingredient_symptom_correlations", {
+      expect(context.locals.supabase.rpc).toHaveBeenCalledWith("get_ingredient_symptom_correlations", {
         p_user_id: "test-user-id",
         p_start_date: "2024-01-01",
         p_end_date: "2024-01-31",
@@ -183,7 +185,7 @@ describe("Triggers API Integration", () => {
       context.request.url = mockUrl.toString();
 
       // Mock RPC error
-      mockSupabaseClient.rpc = vi.fn().mockResolvedValue({
+      context.locals.supabase.rpc = vi.fn().mockResolvedValue({
         data: null,
         error: { message: "Database error" },
       });
@@ -194,10 +196,10 @@ describe("Triggers API Integration", () => {
         eq: vi.fn().mockReturnThis(),
         gte: vi.fn().mockReturnThis(),
         lte: vi.fn().mockReturnThis(),
-        count: vi.fn().mockResolvedValue({ count: 25, error: null }),
       };
+      mockFromChain.count = vi.fn().mockResolvedValue({ count: 25, error: null });
 
-      mockSupabaseClient.from = vi.fn(() => mockFromChain);
+      context.locals.supabase.from = vi.fn(() => mockFromChain);
 
       const response = await GET(context);
       const responseData = await response.json();
@@ -216,7 +218,7 @@ describe("Triggers API Integration", () => {
       context.request.url = mockUrl.toString();
 
       // Mock detailed RPC error
-      mockSupabaseClient.rpc = vi.fn().mockResolvedValue({
+      context.locals.supabase.rpc = vi.fn().mockResolvedValue({
         data: null,
         error: { message: "Detailed analysis error" },
       });

@@ -4,10 +4,14 @@ import { Button } from "./ui/button";
 import type { TriggerAnalysis, IngredientSymptomCorrelation } from "../types";
 
 export function TriggersList() {
+  console.log('TriggersList component rendering...');
+  
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
   const [showDetailed, setShowDetailed] = useState<boolean>(false);
   const { isLoading, error, data, fetchTriggers, reset } = useTriggerAnalysis();
+
+  console.log('TriggersList state:', { startDate, endDate, isLoading, error, data });
 
   // Set default date range to last 30 days
   useEffect(() => {

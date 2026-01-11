@@ -4,6 +4,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 export const mockSupabaseClient: SupabaseClient = {
   auth: {
     getSession: vi.fn(),
+    getUser: vi.fn(),
     signUp: vi.fn(),
     signInWithPassword: vi.fn(),
     signOut: vi.fn(),
@@ -53,6 +54,10 @@ export const createMockAPIContext = (session?: any) => ({
         ...mockSupabaseClient.auth,
         getSession: vi.fn().mockResolvedValue({
           data: { session },
+          error: null,
+        }),
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: session?.user || null },
           error: null,
         }),
       },
