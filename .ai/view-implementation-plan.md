@@ -3,12 +3,7 @@ This plan outlines the steps to create a new view for users to log their meals, 
 
 Steps
 Create the new
-page file at src/pages/logs/new.astro.
-2. Develop a CreateLogForm React component in src/components/CreateLogForm.tsx to manage the form state and user input.
-3. Implement a custom hook useCreateLog at src/components/hooks/useCreateLog.ts to handle API submission logic.
-4. Add required shadcn/ui components like Input, Calendar, Select, and Textarea to build the form.
-5. Define a CreateLogViewModel type in types.ts for the form's state management.
-6. Connect the form to the POST /api/logs endpoint and handle success and error states.
+page file at src/pages/logs/new.astro. 2. Develop a CreateLogForm React component in src/components/CreateLogForm.tsx to manage the form state and user input. 3. Implement a custom hook useCreateLog at src/components/hooks/useCreateLog.ts to handle API submission logic. 4. Add required shadcn/ui components like Input, Calendar, Select, and Textarea to build the form. 5. Define a CreateLogViewModel type in types.ts for the form's state management. 6. Connect the form to the POST /api/logs endpoint and handle success and error states.
 
 Further Considerations
 The database schema in database.types.ts lacks the meal_photo_url field mentioned in the PRD and used in log-repository.ts. Should the plan include a schema migration to add this field and update the API to handle photo uploads?

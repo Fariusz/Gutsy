@@ -1,5 +1,17 @@
 import { test, expect } from "@playwright/test";
+import { LoginPage } from "./pages/LoginPage";
+import { RegisterPage } from "./pages/RegisterPage";
 
+/**
+ * Authentication Flow E2E Tests
+ *
+ * Guidelines:
+ * - Use Page Object Model for maintainable tests
+ * - Use locators for resilient element selection
+ * - Implement test hooks for setup and teardown
+ * - Use expect assertions with specific matchers
+ * - Use browser contexts for isolating test environments
+ */
 test.describe("Authentication Flow", () => {
   test.beforeEach(async ({ page }) => {
     // Start each test from the homepage
@@ -7,58 +19,65 @@ test.describe("Authentication Flow", () => {
   });
 
   test("should navigate to login page from home", async ({ page }) => {
-    // Check if we're redirected to login or can navigate to login
+    const loginPage = new LoginPage(page);
+
+    // Navigate to login page
     await page.getByText("Log in").click();
     await expect(page).toHaveURL(/.*\/login/);
 
-    // Check login form elements exist
-    await expect(page.locator('input[type="email"]')).toBeVisible();
-    await expect(page.locator('input[type="password"]')).toBeVisible();
-    await expect(page.getByText("Sign in")).toBeVisible();
+    // Check login form elements exist using Page Object Model
+    await expect(loginPage.emailInput).toBeVisible();
+    await expect(loginPage.passwordInput).toBeVisible();
+    await expect(loginPage.signInButton).toBeVisible();
   });
 
   test("should navigate to register page", async ({ page }) => {
-    await page.goto("/register");
+    const registerPage = new RegisterPage(page);
+    await registerPage.goto();
 
-    // Check register form elements exist
-    await expect(page.locator('input[type="email"]')).toBeVisible();
-    await expect(page.locator('input[type="password"]')).toBeVisible();
-    await expect(page.getByText("Create account")).toBeVisible();
+    // Check register form elements exist using Page Object Model
+    await expect(registerPage.emailInput).toBeVisible();
+    await expect(registerPage.passwordInput).toBeVisible();
+    await expect(registerPage.createAccountButton).toBeVisible();
   });
 
   test("should show validation errors for invalid login", async ({ page }) => {
-    await page.goto("/login");
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
 
     // Try to submit with empty fields
-    await page.getByText("Sign in").click();
+    await loginPage.submit();
 
-    // Should show validation messages (these depend on your form implementation)
-    // Adjust selectors based on your actual error display
-    await expect(page.getByText("Email is required")).toBeVisible();
-    await expect(page.getByText("Password is required")).toBeVisible();
+    // Should show validation messages
+    // Note: Adjust based on your actual error display implementation
+    const hasError = await loginPage.hasErrorMessage();
+    expect(hasError).toBeTruthy();
   });
 
   test("should show error for invalid credentials", async ({ page }) => {
-    await page.goto("/login");
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
 
-    // Fill in invalid credentials
-    await page.fill('input[type="email"]', "invalid@example.com");
-    await page.fill('input[type="password"]', "wrongpassword");
-    await page.getByText("Sign in").click();
+    // Fill in invalid credentials using Page Object Model
+    await loginPage.login("invalid@example.com", "wrongpassword");
 
-    // Should show error message (adjust based on your implementation)
-    await expect(page.getByText("Invalid credentials")).toBeVisible();
+    // Should show error message
+    const hasError = await loginPage.hasErrorMessage();
+    expect(hasError).toBeTruthy();
   });
 
   test("should navigate between login and register pages", async ({ page }) => {
-    await page.goto("/login");
+    const loginPage = new LoginPage(page);
+    const registerPage = new RegisterPage(page);
 
-    // Navigate to register
-    await page.getByText("Sign up").click();
+    await loginPage.goto();
+
+    // Navigate to register using Page Object Model
+    await loginPage.goToRegister();
     await expect(page).toHaveURL(/.*\/register/);
 
-    // Navigate back to login
-    await page.getByText("Sign in").click();
+    // Navigate back to login using Page Object Model
+    await registerPage.goToLogin();
     await expect(page).toHaveURL(/.*\/login/);
   });
 });

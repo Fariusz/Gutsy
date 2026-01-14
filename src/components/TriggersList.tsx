@@ -245,7 +245,8 @@ export function TriggersList() {
                 <strong>Specific Correlations:</strong> Shows exactly which ingredients trigger which symptoms
               </li>
               <li>
-                <strong>Example:</strong> &quot;Tomatoes cause rash 60% of the time&quot; vs &quot;Cabbage causes gas 80% of the time&quot;
+                <strong>Example:</strong> &quot;Tomatoes cause rash 60% of the time&quot; vs &quot;Cabbage causes gas
+                80% of the time&quot;
               </li>
             </ul>
           </div>

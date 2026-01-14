@@ -1,231 +1,270 @@
-# Testing Guide
+# Testing Guide - Gutsy
 
-This document outlines the comprehensive testing strategy implemented for the Gutsy application.
+This document describes the testing setup and how to run tests for the Gutsy application.
 
-## Test Types
+## Overview
 
-### Unit Tests
-Located in `src/**/*.test.ts` files, covering:
-- **Utility functions** (`cn`, error handlers, auth helpers)
-- **Business logic** (services, repositories)
-- **Validation schemas** (Zod schemas for API inputs)
-- **React hooks** (custom hooks for log creation and symptom fetching)
+The project uses two main testing frameworks:
 
-### Integration Tests
-Located in `src/test/integration/`, covering:
-- **API endpoints** with mocked Supabase client
-- **Full request/response cycles** without hitting real database
-- **Authentication flows** and error scenarios
-
-### End-to-End Tests  
-Located in `e2e/`, covering:
-- **User authentication flows** (login, register, logout)
-- **Complete log creation** (from form to database to display)
-- **Cross-browser compatibility**
-
-## Running Tests
-
-```bash
-# Run all tests
-npm test
-
-# Unit tests only
-npm run test:unit
-
-# Integration tests only  
-npm run test:integration
-
-# E2E tests
-npm run test:e2e
-
-# E2E tests with browser UI
-npm run test:e2e:ui
-
-# Test coverage report
-npm run test:coverage
-```
+- **Vitest** - For unit and integration tests
+- **Playwright** - For end-to-end (E2E) tests
 
 ## Test Structure
 
-### Unit Tests
-- `src/lib/utils.test.ts` - Tests for `cn` utility function
-- `src/lib/utils/error-handlers.test.ts` - Error handling utilities
-- `src/lib/auth/auth-helpers.test.ts` - Authentication utilities
-- `src/lib/services/log-service.test.ts` - Log business logic
-- `src/components/hooks/*.test.tsx` - React hooks testing
-- `src/lib/validation/schemas.test.ts` - Zod schema validation
-
-### Integration Tests
-- `src/test/integration/logs-api.test.ts` - Logs API endpoint testing
-- `src/test/integration/symptoms-api.test.ts` - Symptoms API endpoint testing
-
-### E2E Tests
-- `e2e/auth-flow.spec.ts` - User authentication scenarios
-- `e2e/create-log.spec.ts` - Complete log creation workflow
-- `e2e/helpers.ts` - Reusable test utilities
-
-## Test Configuration
-
-### Vitest Configuration
-- **Environment**: jsdom for React component testing, node for API testing
-- **Setup**: `src/test/setup.ts` configures global test utilities
-- **Mocks**: `src/test/mocks/` contains Supabase and other service mocks
-- **Coverage**: Excludes test files, config files, and type definitions
-
-### Playwright Configuration
-- **Browsers**: Chrome, Firefox, Safari, mobile viewports
-- **Base URL**: `http://localhost:4321` (Astro dev server)
-- **Auto-start**: Dev server starts automatically for E2E tests
-- **Retry policy**: 2 retries on CI, 0 retries locally
-
-## Mocking Strategy
-
-### Supabase Client Mock
-Located in `src/test/mocks/supabase.ts`:
-- Provides mock authentication sessions
-- Mocks database operations (insert, select, etc.)
-- Creates test API contexts for endpoint testing
-
-### Service Layer Mocking
-- Services are mocked at the class level in integration tests
-- Allows testing API endpoints without running business logic
-- Ensures tests focus on HTTP handling, authentication, and validation
-
-## Best Practices
-
-### Unit Testing
-- Test business logic in isolation
-- Mock external dependencies (Supabase, external APIs)
-- Focus on edge cases and error conditions
-- Validate input/output types and schemas
-
-### Integration Testing
-- Test complete API request/response cycles
-- Include authentication and authorization scenarios
-- Test error handling and edge cases
-- Validate response formats match expected types
-
-### E2E Testing
-- Test critical user journeys end-to-end
-- Include happy path and common error scenarios
-- Test across different browsers and viewports
-- Use page object patterns for maintainable tests
-
-## Test Data Management
-
-### Unit/Integration Tests
-- Use mock data factories for consistent test data
-- Create minimal viable test data to reduce test complexity
-- Isolate tests with fresh mock instances
-
-### E2E Tests
-- Consider using test-specific database or user accounts
-- Clean up test data after each test run
-- Use deterministic test data for predictable results
-
-## Continuous Integration
-
-Tests run automatically on:
-- Every pull request
-- Main branch commits
-- Before deployments
-
-The CI pipeline:
-1. Runs unit tests with coverage reporting
-2. Runs integration tests with mocked services
-3. Runs E2E tests with a real application instance
-4. Fails the build if any tests fail or coverage drops below threshold
-
-## Coverage Goals
-
-- **Unit tests**: 80%+ coverage for business logic
-- **Integration tests**: All API endpoints covered
-- **E2E tests**: Critical user flows covered
-
-Run `npm run test:coverage` to see current coverage report.
-
-## Debugging Tests
-
-### Unit/Integration Tests
-```bash
-# Run tests in watch mode
-npm run test
-
-# Run specific test file
-npm run test src/lib/utils.test.ts
-
-# Debug with browser UI
-npm run test:ui
+```
+.
+├── e2e/                          # E2E tests (Playwright)
+│   ├── pages/                    # Page Object Model classes
+│   │   ├── BasePage.ts
+│   │   ├── LoginPage.ts
+│   │   ├── RegisterPage.ts
+│   │   ├── LogsPage.ts
+│   │   ├── CreateLogPage.ts
+│   │   └── TriggersPage.ts
+│   ├── auth-flow.spec.ts
+│   ├── create-log.spec.ts
+│   ├── triggers-flow.spec.ts
+│   ├── api-validation.spec.ts
+│   ├── visual-comparison.spec.ts
+│   └── helpers.ts
+├── src/
+│   └── test/                      # Unit and integration tests (Vitest)
+│       ├── setup.ts              # Global test setup
+│       ├── mocks/                # Mock implementations
+│       │   └── supabase.ts
+│       ├── unit/                 # Unit tests
+│       └── integration/           # Integration tests
+└── src/**/*.test.ts              # Component and utility tests
 ```
 
-### E2E Tests
-```bash
-# Run with browser visible
-npm run test:e2e:headed
+## Running Tests
 
-# Run with Playwright UI for debugging
+### Unit and Integration Tests (Vitest)
+
+```bash
+# Run all tests in watch mode (recommended during development)
+npm test
+
+# Run tests once
+npm run test:unit
+
+# Run tests with UI mode (visual test explorer)
+npm run test:ui
+
+# Run tests with coverage report
+npm run test:coverage
+
+# Run only integration tests
+npm run test:integration
+```
+
+### End-to-End Tests (Playwright)
+
+```bash
+# Run all E2E tests
+npm run test:e2e
+
+# Run E2E tests with UI mode (interactive)
 npm run test:e2e:ui
+
+# Run E2E tests in headed mode (see browser)
+npm run test:e2e:headed
 
 # Run specific test file
 npx playwright test e2e/auth-flow.spec.ts
 ```
 
-## Adding New Tests
+## Test Configuration
 
-### For New Features
-1. **Unit tests** for business logic and utilities
-2. **Integration tests** for new API endpoints
-3. **E2E tests** for new user workflows
+### Vitest Configuration
 
-### For Bug Fixes
-1. Write a failing test that reproduces the bug
-2. Fix the bug
-3. Ensure the test passes
-4. Consider edge cases and add additional tests
+The Vitest configuration (`vitest.config.ts`) includes:
 
-## Common Testing Patterns
+- **Environment**: jsdom for DOM testing
+- **Coverage**: v8 provider with thresholds (80% lines, functions, statements; 75% branches)
+- **Setup**: Global test setup file at `src/test/setup.ts`
+- **Aliases**: Path aliases for `@/`, `@/db`, `@/lib`, `@/components`
 
-### Testing React Hooks
+### Playwright Configuration
+
+The Playwright configuration (`playwright.config.ts`) includes:
+
+- **Browser**: Chromium/Desktop Chrome only (as per guidelines)
+- **Base URL**: http://localhost:4321
+- **Web Server**: Automatically starts dev server before tests
+- **Trace**: Enabled on first retry for debugging
+- **Screenshots**: Captured on failure
+- **Videos**: Retained on failure
+
+## Best Practices
+
+### Vitest Guidelines
+
+1. **Use `vi` object for test doubles**
+   - `vi.fn()` for function mocks
+   - `vi.spyOn()` to monitor existing functions
+   - `vi.stubGlobal()` for global mocks
+
+2. **Master `vi.mock()` factory patterns**
+   - Place mock factories at the top level
+   - Return typed mock implementations
+   - Use `mockImplementation()` or `mockReturnValue()` for dynamic control
+
+3. **Use inline snapshots**
+   - Replace complex equality checks with `expect(value).toMatchInlineSnapshot()`
+   - Makes changes more visible in code reviews
+
+4. **Structure tests for maintainability**
+   - Group related tests with `describe` blocks
+   - Use explicit assertion messages
+   - Follow Arrange-Act-Assert pattern
+
+5. **Leverage TypeScript type checking**
+   - Enable strict typing in tests
+   - Use `expectTypeOf()` for type-level assertions
+
+### Playwright Guidelines
+
+1. **Use Page Object Model (POM)**
+   - Encapsulate page interactions in classes
+   - Located in `e2e/pages/` directory
+   - Extend `BasePage` for common functionality
+
+2. **Use locators for element selection**
+   - Prefer `page.getByRole()`, `page.getByText()`, `page.locator()`
+   - Avoid brittle selectors like `page.$('div.class')`
+
+3. **Leverage API testing**
+   - Test backend endpoints directly with `request` fixture
+   - Validate response structure and status codes
+
+4. **Implement visual comparison**
+   - Use `expect(page).toHaveScreenshot()` for UI regression testing
+   - See `e2e/visual-comparison.spec.ts` for examples
+
+5. **Use test hooks**
+   - `test.beforeEach()` for setup
+   - `test.afterEach()` for cleanup
+   - `test.describe()` for grouping
+
+6. **Use browser contexts**
+   - Isolate test environments
+   - Each test gets its own context automatically
+
+## Writing Tests
+
+### Unit Test Example
+
 ```typescript
-import { renderHook, act } from "@testing-library/react";
-import { useCreateLog } from "./useCreateLog";
+import { describe, it, expect, vi } from "vitest";
 
-test('should handle log creation', async () => {
-  const { result } = renderHook(() => useCreateLog());
-  
-  await act(async () => {
-    await result.current.createLog(mockData);
+describe("MyFunction", () => {
+  it("should return expected value", () => {
+    // Arrange
+    const input = "test";
+
+    // Act
+    const result = myFunction(input);
+
+    // Assert
+    expect(result).toBe("expected");
   });
-  
-  expect(result.current.isSuccess).toBe(true);
 });
 ```
 
-### Testing API Endpoints
+### E2E Test Example
+
 ```typescript
-import { POST } from "../../pages/api/logs";
-import { createMockAPIContext } from "../mocks/supabase";
+import { test, expect } from "@playwright/test";
+import { LoginPage } from "./pages/LoginPage";
 
-test('should create log', async () => {
-  const context = createMockAPIContext(mockSession);
-  context.request.json = vi.fn().mockResolvedValue(mockData);
-  
-  const response = await POST(context);
-  
-  expect(response.status).toBe(201);
+test.describe("Authentication", () => {
+  test("should login successfully", async ({ page }) => {
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.login("user@example.com", "password");
+    await expect(page).toHaveURL(/.*\/logs/);
+  });
 });
 ```
 
-### Testing Validation Schemas
-```typescript
-import { CreateLogSchema } from "./schemas";
+## Coverage Goals
 
-test('should validate log data', () => {
-  const result = CreateLogSchema.safeParse(mockData);
-  
-  expect(result.success).toBe(true);
-  if (result.success) {
-    expect(result.data).toEqual(mockData);
-  }
-});
+The project aims for:
+
+- **80%** line coverage
+- **80%** function coverage
+- **80%** statement coverage
+- **75%** branch coverage
+
+Focus on meaningful tests rather than arbitrary coverage percentages.
+
+## CI/CD Integration
+
+Tests are automatically run in GitHub Actions:
+
+- Unit and integration tests run on every push
+- E2E tests run on pull requests
+- Coverage reports are generated and uploaded
+
+## Debugging Tests
+
+### Vitest
+
+```bash
+# Run in watch mode for instant feedback
+npm test
+
+# Use UI mode for complex test suites
+npm run test:ui
+
+# Run specific test
+npm test -- my-test-file.test.ts
 ```
+
+### Playwright
+
+```bash
+# Use trace viewer for debugging failures
+npx playwright show-trace trace.zip
+
+# Run in headed mode to see browser
+npm run test:e2e:headed
+
+# Use UI mode for interactive debugging
+npm run test:e2e:ui
+
+# Run with debugger
+PWDEBUG=1 npx playwright test
+```
+
+## Test Data
+
+- Test data should be isolated per test
+- Use test fixtures or factories for creating test data
+- Clean up test data in `afterEach` hooks
+- For E2E tests, consider using test-specific authentication helpers
+
+## Troubleshooting
+
+### Tests fail with "Cannot find module"
+
+- Ensure all dependencies are installed: `npm install`
+- Check that path aliases are correctly configured in `vitest.config.ts`
+
+### Playwright tests timeout
+
+- Ensure dev server is running or configured in `playwright.config.ts`
+- Check that base URL is correct
+- Increase timeout in test configuration if needed
+
+### Coverage not generating
+
+- Ensure `@vitest/coverage-v8` is installed
+- Check `vitest.config.ts` coverage configuration
+
+## Additional Resources
+
+- [Vitest Documentation](https://vitest.dev/)
+- [Playwright Documentation](https://playwright.dev/)
+- [Testing Library Documentation](https://testing-library.com/)

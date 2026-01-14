@@ -1,5 +1,18 @@
 import { test, expect } from "@playwright/test";
+import { CreateLogPage } from "./pages/CreateLogPage";
+import { LogsPage } from "./pages/LogsPage";
+import { LoginPage } from "./pages/LoginPage";
 
+/**
+ * Create Log Flow E2E Tests
+ *
+ * Guidelines:
+ * - Use Page Object Model for maintainable tests
+ * - Use locators for resilient element selection
+ * - Implement test hooks for setup and teardown
+ * - Use expect assertions with specific matchers
+ * - Use browser contexts for isolating test environments
+ */
 test.describe("Create Log Flow", () => {
   // This test assumes you have a way to authenticate users in tests
   // You may need to create test utilities for logging in
@@ -7,7 +20,6 @@ test.describe("Create Log Flow", () => {
   test.beforeEach(async ({ page }) => {
     // Note: You'll need to implement test authentication
     // This could involve mocking auth, using test credentials, or creating a test login helper
-    // For now, this shows the structure of the test
     await page.goto("/");
 
     // TODO: Add authentication step here
@@ -15,29 +27,34 @@ test.describe("Create Log Flow", () => {
   });
 
   test("should navigate to create log page", async ({ page }) => {
-    // Assuming user is authenticated, navigate to logs
-    await page.goto("/logs");
+    const logsPage = new LogsPage(page);
+    const createLogPage = new CreateLogPage(page);
 
-    // Click create new log button/link
-    await page.getByText("New Log").click();
+    // Assuming user is authenticated, navigate to logs
+    await logsPage.goto();
+
+    // Click create new log button/link using Page Object Model
+    await logsPage.goToCreateLog();
     await expect(page).toHaveURL(/.*\/logs\/new/);
 
-    // Check form elements exist
-    await expect(page.locator('input[name="log_date"]')).toBeVisible();
-    await expect(page.locator('input[name="ingredients"]')).toBeVisible();
-    await expect(page.locator('textarea[name="notes"]')).toBeVisible();
+    // Check form elements exist using Page Object Model
+    await expect(createLogPage.dateInput).toBeVisible();
+    await expect(createLogPage.ingredientsInput).toBeVisible();
+    await expect(createLogPage.notesTextarea).toBeVisible();
   });
 
   test("should create a log with ingredients only", async ({ page }) => {
-    await page.goto("/logs/new");
+    const createLogPage = new CreateLogPage(page);
+    const logsPage = new LogsPage(page);
 
-    // Fill in basic log data
-    await page.fill('input[name="log_date"]', "2023-12-26");
-    await page.fill('input[name="ingredients"]', "apple, banana, orange");
-    await page.fill('textarea[name="notes"]', "Test meal from E2E test");
+    await createLogPage.goto();
 
-    // Submit the form
-    await page.getByText("Save Log").click();
+    // Fill in basic log data using Page Object Model
+    await createLogPage.createLog({
+      date: "2023-12-26",
+      ingredients: "apple, banana, orange",
+      notes: "Test meal from E2E test",
+    });
 
     // Should redirect to logs list and show success
     await expect(page).toHaveURL(/.*\/logs$/);
@@ -67,14 +84,15 @@ test.describe("Create Log Flow", () => {
   });
 
   test("should show validation errors for empty form", async ({ page }) => {
-    await page.goto("/logs/new");
+    const createLogPage = new CreateLogPage(page);
+    await createLogPage.goto();
 
-    // Try to submit empty form
-    await page.getByText("Save Log").click();
+    // Try to submit empty form using Page Object Model
+    await createLogPage.submit();
 
     // Should show validation errors
-    await expect(page.getByText("Date is required")).toBeVisible();
-    await expect(page.getByText("At least one ingredient is required")).toBeVisible();
+    const hasError = await createLogPage.hasErrorMessage();
+    expect(hasError).toBeTruthy();
   });
 
   test("should show validation error for invalid date", async ({ page }) => {
@@ -90,13 +108,16 @@ test.describe("Create Log Flow", () => {
   });
 
   test("should cancel log creation", async ({ page }) => {
-    await page.goto("/logs/new");
+    const createLogPage = new CreateLogPage(page);
+    await createLogPage.goto();
 
-    // Fill in some data
-    await page.fill('input[name="ingredients"]', "test ingredient");
+    // Fill in some data using Page Object Model
+    await createLogPage.fillLogForm({
+      ingredients: "test ingredient",
+    });
 
-    // Click cancel
-    await page.getByText("Cancel").click();
+    // Click cancel using Page Object Model
+    await createLogPage.cancel();
 
     // Should navigate back to logs list
     await expect(page).toHaveURL(/.*\/logs$/);

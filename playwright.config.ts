@@ -1,20 +1,41 @@
 import { defineConfig, devices } from "@playwright/test";
 
 /**
+ * Playwright configuration for E2E tests
+ *
+ * Guidelines:
+ * - Initialize configuration only with Chromium/Desktop Chrome browser
+ * - Use browser contexts for isolating test environments
+ * - Implement the Page Object Model for maintainable tests
+ * - Use locators for resilient element selection
+ * - Leverage API testing for backend validation
+ * - Implement visual comparison with expect(page).toHaveScreenshot()
+ * - Use the codegen tool for test recording
+ * - Leverage trace viewer for debugging test failures
+ * - Implement test hooks for setup and teardown
+ * - Use expect assertions with specific matchers
+ * - Leverage parallel execution for faster test runs
+ *
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
   testDir: "./e2e",
+
   /* Run tests in files in parallel */
   fullyParallel: true,
+
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
+
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
+
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
+
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: "html",
+  reporter: [["html"], ["list"], ...(process.env.CI ? [["github"]] : [])],
+
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
@@ -22,44 +43,20 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
+
+    /* Screenshot on failure */
+    screenshot: "only-on-failure",
+
+    /* Video on failure */
+    video: "retain-on-failure",
   },
 
-  /* Configure projects for major browsers */
+  /* Configure projects - Only Chromium/Desktop Chrome as per guidelines */
   projects: [
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
     },
-
-    {
-      name: "firefox",
-      use: { ...devices["Desktop Firefox"] },
-    },
-
-    {
-      name: "webkit",
-      use: { ...devices["Desktop Safari"] },
-    },
-
-    /* Test against mobile viewports. */
-    {
-      name: "Mobile Chrome",
-      use: { ...devices["Pixel 5"] },
-    },
-    {
-      name: "Mobile Safari",
-      use: { ...devices["iPhone 12"] },
-    },
-
-    /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-    // },
   ],
 
   /* Run your local dev server before starting the tests */
@@ -67,5 +64,6 @@ export default defineConfig({
     command: "npm run dev",
     url: "http://localhost:4321",
     reuseExistingServer: !process.env.CI,
+    timeout: 120 * 1000,
   },
 });

@@ -31,6 +31,7 @@ Gutsy is a starter + MVP scaffold for building a fast, accessible, and AI-friend
 - Styling: Tailwind 4, Shadcn/ui
 - Backend & infra: Supabase (Auth, PostgreSQL, Storage, RPCs)
 - Validation: Zod
+- Testing: Vitest (unit & integration tests), Playwright (E2E tests)
 - CI/CD: GitHub Actions
 - Hosting: Vercel (frontend), Supabase Cloud (database/storage)
 
@@ -89,6 +90,8 @@ Scripts are taken from `package.json`:
 - `lint`: Run ESLint over the project (`eslint .`).
 - `lint:fix`: Run ESLint and attempt to fix issues (`eslint . --fix`).
 - `format`: Format files using Prettier (`prettier --write .`).
+- `test`: Run unit and integration tests with Vitest.
+- `test:e2e`: Run end-to-end tests with Playwright.
 
 ## Project scope
 

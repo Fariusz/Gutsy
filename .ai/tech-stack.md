@@ -37,6 +37,21 @@
 
 - **GitHub Actions** - Automated tests, linting, deployment
 
+## Testing
+
+### Unit & Integration Tests
+
+- **Vitest** - Fast unit and integration test framework for TypeScript/JavaScript
+  - Used for testing utility functions, React hooks, services, and Zod schemas
+  - Runs in Node.js environment with fast execution
+
+### End-to-End Tests
+
+- **Playwright** - Cross-browser E2E testing framework
+  - Used for testing complete user flows (registration, login, log creation, trigger analysis)
+  - Supports multiple browsers (Chrome, Firefox, Safari, Edge)
+  - Runs in CI/CD pipeline via GitHub Actions
+
 ## Stack Justification
 
 | MVP Requirement        | Solution          |

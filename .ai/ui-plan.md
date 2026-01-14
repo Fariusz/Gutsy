@@ -5,12 +5,14 @@
 Gutsy's UI follows a privacy-first, mobile-responsive architecture built on Astro 5 with React 19 components for interactive elements. The interface prioritizes intuitive meal logging, clear data visualization, and actionable trigger insights while maintaining accessibility compliance and secure user data handling.
 
 The architecture employs a hybrid approach:
+
 - **Static Astro components** for layouts, landing pages, and authentication flows
 - **Interactive React components** for forms, data entry, calendars, and dynamic visualizations
 - **Responsive design patterns** using Tailwind 4 with mobile-first approach
 - **Progressive enhancement** ensuring core functionality without JavaScript
 
 Key architectural principles:
+
 - **User data isolation** through Supabase RLS policies
 - **Real-time validation** with Zod schemas for immediate user feedback
 - **Optimistic updates** with server confirmation for smooth UX
@@ -19,6 +21,7 @@ Key architectural principles:
 ## 2. View List
 
 ### Landing Page
+
 - **View name**: Landing Page
 - **View path**: `/`
 - **Main purpose**: Marketing introduction and user acquisition with clear value proposition
@@ -29,6 +32,7 @@ Key architectural principles:
 - **Security considerations**: No sensitive data exposure, secure auth redirect
 
 ### Authentication Views
+
 - **View name**: Sign Up / Login
 - **View path**: `/auth/signup`, `/auth/login`
 - **Main purpose**: Secure user onboarding and session establishment
@@ -39,6 +43,7 @@ Key architectural principles:
 - **Security considerations**: Supabase Auth integration, HTTPS enforcement, GDPR consent capture
 
 ### Dashboard/Home
+
 - **View name**: Dashboard
 - **View path**: `/dashboard`
 - **Main purpose**: Central navigation hub and quick access to primary actions
@@ -49,6 +54,7 @@ Key architectural principles:
 - **Security considerations**: User session validation, secure data fetching
 
 ### New Log Creation
+
 - **View name**: Create Log
 - **View path**: `/logs/new`
 - **Main purpose**: Primary meal logging workflow with photo, ingredients, and symptoms
@@ -59,6 +65,7 @@ Key architectural principles:
 - **Security considerations**: Photo size validation, ingredient normalization, user data encryption
 
 ### Log Calendar View
+
 - **View name**: Calendar
 - **View path**: `/logs/calendar`
 - **Main purpose**: Historical log overview with monthly navigation and day-level detail access
@@ -69,6 +76,7 @@ Key architectural principles:
 - **Security considerations**: Paginated data loading, user-specific log filtering
 
 ### Log Detail View
+
 - **View name**: Log Detail
 - **View path**: `/logs/[id]`
 - **Main purpose**: Comprehensive individual log inspection with full data display
@@ -79,6 +87,7 @@ Key architectural principles:
 - **Security considerations**: User ownership verification, secure photo URL generation
 
 ### Triggers Analysis
+
 - **View name**: Triggers
 - **View path**: `/triggers`
 - **Main purpose**: Correlation analysis results with actionable dietary insights
@@ -89,6 +98,7 @@ Key architectural principles:
 - **Security considerations**: Date range validation, user-specific correlation data
 
 ### Ingredients Management
+
 - **View name**: Ingredients
 - **View path**: `/ingredients`
 - **Main purpose**: Canonical ingredient browsing and new ingredient proposal submission
@@ -99,6 +109,7 @@ Key architectural principles:
 - **Security considerations**: Proposal validation, duplicate prevention, admin role verification
 
 ### Profile and Settings
+
 - **View name**: Profile
 - **View path**: `/profile`
 - **Main purpose**: User account management, preferences, and data export/deletion
@@ -109,6 +120,7 @@ Key architectural principles:
 - **Security considerations**: Re-authentication for sensitive actions, secure data export, GDPR compliance
 
 ### Error Pages
+
 - **View name**: Error Pages (404, 500, Offline)
 - **View path**: `/404`, `/500`, `/offline`
 - **Main purpose**: Graceful error handling with recovery guidance
@@ -143,41 +155,50 @@ Key architectural principles:
 ### Secondary User Journeys
 
 **Ingredient Management Flow:**
+
 - Log creation → Unknown ingredient → "Propose New Ingredient"
 - Ingredients page → Search existing → Submit proposal → Confirmation
 
 **Data Export Flow:**
+
 - Profile page → Data export section → Format selection → Download
 - Triggers page → Export button → Date range confirmation → CSV/JSON download
 
 **Account Management Flow:**
+
 - Profile page → Account settings → Privacy preferences → Data deletion → Confirmation
 
 ### Error Recovery Journeys
 
 **Photo Upload Failure:**
+
 - Log creation → Photo capture → Upload error → Retry option → Alternative: continue without photo
 
 **Network Failure:**
+
 - Any page → Connection loss → Offline indicator → Local storage draft → Sync when reconnected
 
 **Insufficient Data for Analysis:**
+
 - Triggers page → "Need more data" message → Guide to logging → Quick log creation link
 
 ## 4. Layout and Navigation Structure
 
 ### Primary Navigation
+
 - **Top-level tabs**: Dashboard, Logs, Triggers, Ingredients, Profile
 - **Mobile**: Bottom tab bar with icons and labels
 - **Desktop**: Horizontal navigation bar with dropdown menus
 
 ### Secondary Navigation
+
 - **Contextual breadcrumbs** for deep pages (Log Detail, specific dates)
 - **Date navigation** within calendar and triggers views
 - **Modal navigation** for log creation and editing
 - **Back buttons** for linear workflows
 
 ### Navigation Hierarchy
+
 ```
 Dashboard (Home)
 ├── Quick Actions
@@ -201,11 +222,13 @@ Dashboard (Home)
 ```
 
 ### Responsive Behavior
+
 - **Mobile First**: Touch-optimized controls, collapsed navigation, stacked layouts
 - **Tablet**: Enhanced grid layouts, side navigation options, improved data density
 - **Desktop**: Multi-column layouts, hover states, keyboard shortcuts, expanded navigation
 
 ### State Management
+
 - **Authentication state** maintained across all views with automatic refresh
 - **Form state** preserved during navigation and auto-saved for recovery
 - **Filter state** maintained within sessions for triggers and calendar views
@@ -214,6 +237,7 @@ Dashboard (Home)
 ## 5. Key Components
 
 ### Form Components
+
 - **`IngredientAutocomplete`**: Search and select from canonical ingredients with fallback to raw text entry
 - **`SeveritySelector`**: 1-5 scale input with visual and numeric indicators
 - **`PhotoCapture`**: Camera integration with preview, compression, and upload with fallback
@@ -221,6 +245,7 @@ Dashboard (Home)
 - **`ValidationMessage`**: Consistent error and success messaging with ARIA announcements
 
 ### Data Visualization Components
+
 - **`CalendarGrid`**: Monthly view with log indicators, touch-friendly date selection
 - **`TriggerRankingTable`**: Sortable table with confidence intervals and visual indicators
 - **`ConfidenceIndicator`**: Visual representation of correlation confidence with explanations
@@ -228,6 +253,7 @@ Dashboard (Home)
 - **`LogSummaryCard`**: Compact log display for lists and previews
 
 ### Navigation Components
+
 - **`TabNavigation`**: Responsive tab bar with active states and badge indicators
 - **`Breadcrumbs`**: Contextual navigation path with accessibility support
 - **`DateNavigation`**: Previous/next controls for calendar and time-based views
@@ -235,6 +261,7 @@ Dashboard (Home)
 - **`ActionButton`**: Consistent CTA styling with loading states and accessibility
 
 ### Utility Components
+
 - **`LoadingSpinner`**: Progress indication with accessible labeling
 - **`ErrorBoundary`**: Graceful error handling with recovery options
 - **`ConfirmationDialog`**: Accessible modal dialogs for destructive actions
@@ -242,6 +269,7 @@ Dashboard (Home)
 - **`EmptyState`**: Helpful messaging and actions when no data is available
 
 ### Layout Components
+
 - **`PageLayout`**: Consistent page structure with navigation and responsive behavior
 - **`Modal`**: Accessible overlay for forms and detailed views
 - **`CardContainer`**: Consistent content grouping with responsive spacing
@@ -249,6 +277,7 @@ Dashboard (Home)
 - **`StickyHeader`**: Context-aware headers that maintain visibility during scroll
 
 ### Security and Privacy Components
+
 - **`ConsentManager`**: GDPR compliance with clear consent options and withdrawal
 - **`SecureImage`**: Signed URL handling with fallback and error states
 - **`AuthGuard`**: Route protection with redirect handling and loading states

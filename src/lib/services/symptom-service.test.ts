@@ -23,7 +23,7 @@ describe("SymptomService", () => {
 
     // Create a new instance of SymptomService before each test
     symptomService = new SymptomService(mockSupabase);
-    
+
     // Get the mocked instance
     mockSymptomRepository = vi.mocked(SymptomRepository).mock.instances[0] as vi.Mocked<SymptomRepository>;
   });

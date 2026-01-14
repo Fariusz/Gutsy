@@ -82,7 +82,9 @@ export default function ForgotPasswordForm({ onSuccess }: ForgotPasswordFormProp
         </div>
 
         <div className="text-center">
-          <p className="text-sm text-gray-500 mb-4">Didn&apos;t receive an email? Check your spam folder or try again.</p>
+          <p className="text-sm text-gray-500 mb-4">
+            Didn&apos;t receive an email? Check your spam folder or try again.
+          </p>
           <Button
             variant="outline"
             onClick={() => {
@@ -108,7 +110,9 @@ export default function ForgotPasswordForm({ onSuccess }: ForgotPasswordFormProp
     <div className="w-full max-w-md mx-auto space-y-6">
       <div className="text-center">
         <h1 className="text-2xl font-bold text-gray-900">Forgot Password?</h1>
-        <p className="text-gray-600 mt-2">Enter your email address and we&apos;ll send you a link to reset your password.</p>
+        <p className="text-gray-600 mt-2">
+          Enter your email address and we&apos;ll send you a link to reset your password.
+        </p>
       </div>
 
       {error && (

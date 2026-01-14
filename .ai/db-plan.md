@@ -18,7 +18,7 @@ After review, we've chosen the **simplest possible approach** for the MVP:
 6.  **Row-Level Security**: Enable RLS on all tables with policies scoped by `auth.uid()` to ensure users can only access their own data.
 7.  **Canonical Symptom Access**: Allow `SELECT` access to the canonical `symptoms` table for all authenticated users.
 
-## Database Schema 
+## Database Schema
 
 The database schema for Gutsy MVP establishes a privacy-first food intolerance tracking application built on Supabase. The core entities include user logs, a canonical symptoms list, and a join table to connect them.
 
