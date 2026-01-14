@@ -1,87 +1,85 @@
-<div
-  class="relative w-full mx-auto min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900 p-4 sm:p-8"
->
+<div class="relative w-full mx-auto min-h-screen bg-background p-4 sm:p-8">
   <div
-    class="relative max-w-4xl mx-auto backdrop-blur-xl bg-gradient-to-b from-white/10 to-white/5 rounded-2xl shadow-2xl p-8 text-white border border-white/10"
+    class="relative max-w-4xl mx-auto bg-card rounded-2xl shadow-lg p-8 text-card-foreground border border-border"
   >
     <div class="space-y-8">
       <div class="text-center">
         <h1
-          class="text-6xl font-bold mb-4 bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 text-transparent bg-clip-text drop-shadow-lg"
+          class="text-6xl font-bold mb-4 text-primary drop-shadow-lg"
         >
           Welcome to Gutsy!
         </h1>
-        <p class="text-xl text-blue-100/90 drop-shadow-md mb-8">
+        <p class="text-xl text-muted-foreground drop-shadow-md mb-8">
           Your privacy-first food intolerance tracking companion
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <a
             href="/logs/new"
-            class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-4 px-12 text-lg rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-200 w-full sm:w-auto text-center"
+            class="bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-4 px-12 text-lg rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 w-full sm:w-auto text-center"
           >
             🍽️ Create New Meal Log
           </a>
-          <div class="text-sm text-blue-100/70 sm:ml-4">Track your meals and symptoms</div>
+          <div class="text-sm text-muted-foreground sm:ml-4">Track your meals and symptoms</div>
         </div>
 
         <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mt-6">
           <a
             href="/triggers"
-            class="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-semibold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 w-full sm:w-auto text-center"
+            class="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 w-full sm:w-auto text-center"
           >
             📊 Analyze Triggers
           </a>
-          <div class="text-sm text-blue-100/70 sm:ml-4">Discover your food triggers</div>
+          <div class="text-sm text-muted-foreground sm:ml-4">Discover your food triggers</div>
         </div>
       </div>
 
       <div class="flex flex-col gap-6 max-w-2xl mx-auto">
-        <div class="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-lg rounded-xl p-6 border border-white/10">
+        <div class="bg-card-foreground/5 backdrop-blur-lg rounded-xl p-6 border border-border">
           <h2
-            class="text-2xl font-semibold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200"
+            class="text-2xl font-semibold mb-4 text-primary"
           >
             Features
           </h2>
           <ul class="space-y-3">
             <li class="flex items-center space-x-3">
-              <span class="font-mono bg-blue-900/50 px-3 py-1.5 rounded-lg text-blue-200 shadow-sm">Meal Tracking</span>
-              <span class="text-blue-100/90">- Log your meals and ingredients</span>
+              <span class="font-mono bg-primary/10 px-3 py-1.5 rounded-lg text-primary shadow-sm">Meal Tracking</span>
+              <span class="text-muted-foreground">- Log your meals and ingredients</span>
             </li>
             <li class="flex items-center space-x-3">
-              <span class="font-mono bg-blue-900/50 px-3 py-1.5 rounded-lg text-blue-200 shadow-sm">Symptoms</span>
-              <span class="text-blue-100/90">- Track symptoms with severity levels</span>
+              <span class="font-mono bg-primary/10 px-3 py-1.5 rounded-lg text-primary shadow-sm">Symptoms</span>
+              <span class="text-muted-foreground">- Track symptoms with severity levels</span>
             </li>
             <li class="flex items-center space-x-3">
-              <span class="font-mono bg-purple-900/50 px-3 py-1.5 rounded-lg text-purple-200 shadow-sm"
+              <span class="font-mono bg-secondary/20 px-3 py-1.5 rounded-lg text-secondary-foreground shadow-sm"
                 >Trigger Analysis</span
               >
-              <span class="text-blue-100/90">- Discover which foods cause symptoms</span>
+              <span class="text-muted-foreground">- Discover which foods cause symptoms</span>
             </li>
             <li class="flex items-center space-x-3">
-              <span class="font-mono bg-blue-900/50 px-3 py-1.5 rounded-lg text-blue-200 shadow-sm">Privacy First</span>
-              <span class="text-blue-100/90">- Your data stays secure and private</span>
+              <span class="font-mono bg-primary/10 px-3 py-1.5 rounded-lg text-primary shadow-sm">Privacy First</span>
+              <span class="text-muted-foreground">- Your data stays secure and private</span>
             </li>
           </ul>
         </div>
 
-        <div class="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-lg rounded-xl p-6 border border-white/10">
+        <div class="bg-card-foreground/5 backdrop-blur-lg rounded-xl p-6 border border-border">
           <h2
-            class="text-2xl font-semibold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200"
+            class="text-2xl font-semibold mb-4 text-primary"
           >
             How It Works
           </h2>
           <ul class="space-y-3">
             <li class="flex items-center space-x-3">
-              <span class="font-mono bg-blue-900/50 px-3 py-1.5 rounded-lg text-blue-200 shadow-sm">1.</span>
-              <span class="text-blue-100/90">Log your meals and any ingredients you consumed</span>
+              <span class="font-mono bg-primary/10 px-3 py-1.5 rounded-lg text-primary shadow-sm">1.</span>
+              <span class="text-muted-foreground">Log your meals and any ingredients you consumed</span>
             </li>
             <li class="flex items-center space-x-3">
-              <span class="font-mono bg-blue-900/50 px-3 py-1.5 rounded-lg text-blue-200 shadow-sm">2.</span>
-              <span class="text-blue-100/90">Record any symptoms with their severity levels</span>
+              <span class="font-mono bg-primary/10 px-3 py-1.5 rounded-lg text-primary shadow-sm">2.</span>
+              <span class="text-muted-foreground">Record any symptoms with their severity levels</span>
             </li>
             <li class="flex items-center space-x-3">
-              <span class="font-mono bg-purple-900/50 px-3 py-1.5 rounded-lg text-purple-200 shadow-sm">3.</span>
-              <span class="text-blue-100/90"
+              <span class="font-mono bg-secondary/20 px-3 py-1.5 rounded-lg text-secondary-foreground shadow-sm">3.</span>
+              <span class="text-muted-foreground"
                 >Use our statistical analysis to identify which ingredients trigger symptoms</span
               >
             </li>
@@ -89,9 +87,9 @@
         </div>
       </div>
 
-      <p class="text-lg text-center text-blue-100/90 mt-8 leading-relaxed">
+      <p class="text-lg text-center text-muted-foreground mt-8 leading-relaxed">
         Start your food intolerance tracking journey today! <br class="hidden sm:block" />
-        <span class="font-semibold bg-gradient-to-r from-blue-200 to-purple-200 text-transparent bg-clip-text"
+        <span class="font-semibold text-primary"
           >Take control of your dietary health!</span
         >
       </p>
