@@ -93,6 +93,7 @@ export default function LoginForm({ onSuccess }: Readonly<LoginFormProps>) {
             required
             disabled={isSubmitting}
             className={validationErrors.email ? "border-red-300 focus:border-red-500" : ""}
+            data-test-id="login-email-input"
           />
           {validationErrors.email && <p className="text-red-600 text-sm mt-1">{validationErrors.email}</p>}
         </div>
@@ -110,6 +111,7 @@ export default function LoginForm({ onSuccess }: Readonly<LoginFormProps>) {
             required
             disabled={isSubmitting}
             className={validationErrors.password ? "border-red-300 focus:border-red-500" : ""}
+            data-test-id="login-password-input"
           />
           {validationErrors.password && <p className="text-red-600 text-sm mt-1">{validationErrors.password}</p>}
         </div>
@@ -120,7 +122,7 @@ export default function LoginForm({ onSuccess }: Readonly<LoginFormProps>) {
           </a>
         </div>
 
-        <Button type="submit" className="w-full" disabled={isSubmitting}>
+        <Button type="submit" className="w-full" disabled={isSubmitting} data-test-id="login-submit-button">
           {isSubmitting ? "Signing in..." : "Sign in"}
         </Button>
       </form>
