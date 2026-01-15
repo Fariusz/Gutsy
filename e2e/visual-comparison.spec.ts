@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
-import { LoginPage } from "./pages/LoginPage";
-import { RegisterPage } from "./pages/RegisterPage";
+import { LoginPage } from "./page-objects/LoginPage";
+import { RegisterPage } from "./page-objects/RegisterPage";
 
 /**
  * Visual Comparison E2E Tests
@@ -18,7 +18,7 @@ test.describe("Visual Comparison", () => {
     // Take screenshot and compare
     await expect(page).toHaveScreenshot("login-page.png", {
       fullPage: true,
-      maxDiffPixels: 100, // Allow small differences
+      maxDiffPixels: 100,
     });
   });
 
@@ -37,7 +37,7 @@ test.describe("Visual Comparison", () => {
     const loginPage = new LoginPage(page);
     await loginPage.goto();
 
-    // Trigger validation errors
+    // Trigger validation errors by trying to submit empty form
     await loginPage.submit();
 
     // Wait for error messages to appear

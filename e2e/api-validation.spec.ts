@@ -9,7 +9,7 @@ import { test, expect } from "@playwright/test";
  * - Verify response structure and status codes
  */
 test.describe("API Validation", () => {
-  const baseURL = "http://localhost:4321";
+  const baseURL = "http://localhost:3000";
 
   test("should validate auth status endpoint", async ({ request }) => {
     const response = await request.get(`${baseURL}/api/auth/status`);
