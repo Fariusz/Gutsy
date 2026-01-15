@@ -62,6 +62,14 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key # only for server-side jobs
 # Other env variables (add as needed)
 ```
 
+- For E2E testing, create a `.env.test` file (not committed) with test environment variables. This file is automatically loaded when running `npm run dev:e2e`:
+
+```env
+SUPABASE_URL=your-test-supabase-url
+SUPABASE_KEY=your-test-supabase-anon-key
+# OPENROUTER_API_KEY=your-test-openrouter-api-key (optional)
+```
+
 Run development server
 
 ```bash
@@ -84,6 +92,7 @@ Notes
 Scripts are taken from `package.json`:
 
 - `dev`: Runs the Astro development server (`astro dev`).
+- `dev:e2e`: Runs the Astro development server in test mode (`astro dev --mode test`). Loads `.env.test` file for E2E testing environment variables.
 - `build`: Build the production site (`astro build`).
 - `preview`: Preview the built site locally (`astro preview`).
 - `astro`: Shortcut to run the `astro` CLI.
@@ -91,7 +100,7 @@ Scripts are taken from `package.json`:
 - `lint:fix`: Run ESLint and attempt to fix issues (`eslint . --fix`).
 - `format`: Format files using Prettier (`prettier --write .`).
 - `test`: Run unit and integration tests with Vitest.
-- `test:e2e`: Run end-to-end tests with Playwright.
+- `test:e2e`: Run end-to-end tests with Playwright (automatically uses `dev:e2e` script).
 
 ## Project scope
 
