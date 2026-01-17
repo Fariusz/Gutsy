@@ -149,8 +149,8 @@ jobs:
               issue_number: number,
             });
 
-            const botComments = comments.data.filter(comment => 
-              comment.user.type === 'Bot' && 
+            const botComments = comments.data.filter(comment =>
+              comment.user.type === 'Bot' &&
               comment.body.includes('🤖 Pull Request Checks Status')
             );
 
@@ -218,8 +218,8 @@ jobs:
               issue_number: number,
             });
 
-            const botComments = comments.data.filter(comment => 
-              comment.user.type === 'Bot' && 
+            const botComments = comments.data.filter(comment =>
+              comment.user.type === 'Bot' &&
               comment.body.includes('🤖 Pull Request Checks Status')
             );
 
