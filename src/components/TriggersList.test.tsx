@@ -191,9 +191,10 @@ describe("TriggersList Component", () => {
 
     expect(screen.getByText("Analysis Results")).toBeInTheDocument();
     expect(screen.getByText(/Based on \d+ logs from/)).toBeInTheDocument();
-    // Date format may vary by locale (e.g., "1/1/2024" or "1.01.2024"), so use flexible matching
-    expect(screen.getByText(/1[./]01?[./]2024/)).toBeInTheDocument();
-    expect(screen.getByText(/31[./]01?[./]2024/)).toBeInTheDocument();
+    // Date format may vary by locale, use flexible matching that handles split text nodes
+    const analysisText = screen.getByText(/Based on \d+ logs from/).textContent || "";
+    expect(analysisText).toMatch(/1[./]0?1?[./]2024/);
+    expect(analysisText).toMatch(/31[./]0?1?[./]2024/);
 
     // Check trigger results
     expect(screen.getByText("tomatoes")).toBeInTheDocument();
