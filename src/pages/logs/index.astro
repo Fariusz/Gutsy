@@ -192,6 +192,7 @@ if (error || !user) {
 
       if (logsContainer) logsContainer.classList.remove("hidden");
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error loading logs:", error);
 
       if (loadingDiv) loadingDiv.classList.add("hidden");

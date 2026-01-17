@@ -20,7 +20,7 @@ try {
     user = authUser;
   }
 } catch (error) {
-  console.error("Error checking user authentication:", error);
+  logger.error("Error checking user authentication", { error });
 }
 ---
 
@@ -112,9 +112,11 @@ try {
                 // Redirect to home page after successful logout
                 window.location.href = "/";
               } else {
+                // eslint-disable-next-line no-console
                 console.error("Logout failed");
               }
             } catch (error) {
+              // eslint-disable-next-line no-console
               console.error("Error during logout:", error);
             }
           });
