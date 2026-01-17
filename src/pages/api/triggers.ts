@@ -2,6 +2,7 @@ import type { APIContext } from "astro";
 import { TriggersQuerySchema } from "../../lib/validation/schemas.js";
 import type { TriggerAnalysisResponse } from "../../types";
 
+/* eslint-disable no-console */
 export const prerender = false;
 
 /**

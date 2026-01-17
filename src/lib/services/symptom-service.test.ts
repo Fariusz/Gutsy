@@ -7,6 +7,7 @@ vi.mock("./symptom-repository");
 
 describe("SymptomService", () => {
   let symptomService: SymptomService;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let mockSupabase: any;
   let mockSymptomRepository: vi.Mocked<SymptomRepository>;
 

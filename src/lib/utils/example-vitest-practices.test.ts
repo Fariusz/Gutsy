@@ -73,9 +73,10 @@ describe("Vitest Best Practices Examples", () => {
   describe("Using vi.spyOn() to monitor existing functions", () => {
     it("should use vi.spyOn() to monitor function calls", () => {
       // Arrange: Create a spy on console.log
-      const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
 
       // Act
+      // eslint-disable-next-line no-console
       console.log("test message");
 
       // Assert: Verify the function was called
@@ -96,7 +97,7 @@ describe("Vitest Best Practices Examples", () => {
       // Arrange: Mock fetch globally
       global.fetch = vi.fn().mockResolvedValue({
         json: vi.fn().mockResolvedValue({ data: "test data" }),
-      } as any);
+      } as unknown as Response);
 
       // Act
       const result = await fetchData("https://api.example.com/data");
@@ -150,7 +151,7 @@ describe("Vitest Best Practices Examples", () => {
   describe("Handling optional dependencies with smart mocking", () => {
     it("should handle optional dependencies gracefully", () => {
       // Arrange: No logger set
-      const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
 
       // Act: Should not throw error
       logMessage("test message");

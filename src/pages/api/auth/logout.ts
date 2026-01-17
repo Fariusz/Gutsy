@@ -1,5 +1,6 @@
 import type { APIContext } from "astro";
 
+/* eslint-disable no-console */
 export const prerender = false;
 
 /**

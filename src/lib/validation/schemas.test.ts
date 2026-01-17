@@ -88,6 +88,7 @@ describe("Log Schemas", () => {
       // Test null and undefined separately as they may be handled differently by Zod
       expect(() =>
         CreateLogSchema.parse({
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           log_date: null as any,
           ingredients: ["chicken"],
           symptoms: [],
@@ -96,6 +97,7 @@ describe("Log Schemas", () => {
 
       expect(() =>
         CreateLogSchema.parse({
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           log_date: undefined as any,
           ingredients: ["chicken"],
           symptoms: [],

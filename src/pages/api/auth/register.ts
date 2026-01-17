@@ -2,6 +2,7 @@ import type { APIContext } from "astro";
 import { z } from "zod";
 import type { AuthResponse, ErrorResponse } from "../../../types";
 
+/* eslint-disable no-console */
 export const prerender = false;
 
 // Strong password validation schema based on NIST guidelines

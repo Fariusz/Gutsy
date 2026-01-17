@@ -1,6 +1,7 @@
 import type { APIContext } from "astro";
 import { SymptomService } from "../../lib/services/symptom-service";
 
+/* eslint-disable no-console */
 export const prerender = false;
 
 /**

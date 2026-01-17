@@ -4,6 +4,7 @@ import { LogService } from "../../lib/services/log-service";
 import type { CreateLogRequest } from "../../types";
 import { CreateLogSchema, LogsQuerySchema } from "../../lib/validation/schemas.js";
 
+/* eslint-disable no-console */
 export const prerender = false;
 
 // Extend the base query schema with pagination

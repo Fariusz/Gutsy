@@ -2,6 +2,7 @@ import type { APIContext } from "astro";
 import { z } from "zod";
 import type { AuthResponse } from "../../../types";
 
+/* eslint-disable no-console */
 export const prerender = false;
 
 const LoginSchema = z.object({
