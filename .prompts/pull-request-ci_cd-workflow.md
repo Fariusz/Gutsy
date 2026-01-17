@@ -10,6 +10,7 @@ The "pull-request.yml" scenario should work as follows:
 - Finally - status-comment (comment to PR about the status of the whole)
 
 Additional notes:
+
 - status-comment runs only when the previous set of 3 passes correctly
 - in the e2e job download browsers according to @playwright.config.ts
 - in the e2e job set the "integration" environment and variables from secrets according to @.env.example

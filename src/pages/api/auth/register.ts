@@ -116,7 +116,7 @@ export async function POST(context: APIContext): Promise<Response> {
     // 4. Persist session on the server (set cookies) if session returned
     if (data.session) {
       try {
-        const { data: sessionSetData, error: sessionSetError } = await context.locals.supabase.auth.setSession({
+        const { error: sessionSetError } = await context.locals.supabase.auth.setSession({
           access_token: data.session.access_token,
           refresh_token: data.session.refresh_token,
         });

@@ -21,7 +21,7 @@ export const mockSupabaseClient: SupabaseClient = {
     single: vi.fn(),
   })),
   rpc: vi.fn(),
-} as any;
+} as Record<string, unknown>;
 
 export const createMockSession = (userId = "test-user-id") => ({
   access_token: "mock-access-token",
@@ -46,7 +46,7 @@ export const createMockSession = (userId = "test-user-id") => ({
   },
 });
 
-export const createMockAPIContext = (session?: any) =>
+export const createMockAPIContext = (session?: unknown) =>
   ({
     locals: {
       supabase: {
@@ -68,4 +68,4 @@ export const createMockAPIContext = (session?: any) =>
       headers: new Headers(),
       json: vi.fn(),
     },
-  }) as any;
+  }) as Record<string, unknown>;

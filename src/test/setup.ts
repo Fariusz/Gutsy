@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import { vi, expect, afterEach, beforeAll, afterAll } from "vitest";
+import { vi, afterEach, beforeAll, afterAll } from "vitest";
 import { cleanup } from "@testing-library/react";
 
 /**
@@ -18,7 +18,7 @@ vi.mock("../env.d.ts", () => ({}));
 // Setup console logging for tests - filter out known React warnings
 const originalError = console.error;
 beforeAll(() => {
-  console.error = (...args: any[]) => {
+  console.error = (...args: unknown[]) => {
     if (
       typeof args[0] === "string" &&
       (args[0].includes("Warning: ReactDOM.render is deprecated") ||
@@ -60,23 +60,25 @@ Object.defineProperty(window, "matchMedia", {
 });
 
 // Mock IntersectionObserver for components that use it
-global.IntersectionObserver = class IntersectionObserver {
-  constructor() {}
-  disconnect() {}
-  observe() {}
-  takeRecords() {
-    return [];
-  }
-  unobserve() {}
-} as any;
+const mockIntersectionObserver = vi.fn().mockImplementation(() => ({
+  observe: vi.fn(),
+  unobserve: vi.fn(),
+  disconnect: vi.fn(),
+  root: null,
+  rootMargin: "",
+  thresholds: [],
+}));
+
+global.IntersectionObserver = mockIntersectionObserver;
 
 // Mock ResizeObserver for components that use it
-global.ResizeObserver = class ResizeObserver {
-  constructor() {}
-  disconnect() {}
-  observe() {}
-  unobserve() {}
-} as any;
+const mockResizeObserver = vi.fn().mockImplementation(() => ({
+  observe: vi.fn(),
+  unobserve: vi.fn(),
+  disconnect: vi.fn(),
+}));
+
+global.ResizeObserver = mockResizeObserver;
 
 // Extend Vitest's expect with custom matchers if needed
 // Example: expect.extend({ ... })

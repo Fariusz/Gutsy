@@ -95,17 +95,6 @@ export interface LogsListResponse {
 // Error Handling
 // =============================================================================
 
-/**
- * Standardized error response for API failures
- */
-export interface ErrorResponse {
-  error: {
-    type: "validation_error" | "authorization_error" | "business_logic_error" | "not_found";
-    message: string;
-    details?: any;
-  };
-}
-
 // =============================================================================
 // Log Resource DTOs
 // =============================================================================
@@ -287,6 +276,23 @@ export interface TriggersQueryParams {
   start?: string; // ISO date string, default: 30 days ago
   end?: string; // ISO date string, default: today
   limit?: number; // Default: 10, max: 50
+}
+
+/**
+ * Confidence interval for statistical calculations
+ */
+export interface ConfidenceInterval {
+  lower: number;
+  upper: number;
+  confidence_level: number; // e.g., 0.95 for 95% confidence
+}
+
+/**
+ * Date range for filtering and analysis
+ */
+export interface DateRange {
+  start: string; // ISO date string
+  end: string; // ISO date string
 }
 
 /**

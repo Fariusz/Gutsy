@@ -9,8 +9,8 @@ export class TriggersPage {
   constructor(page: Page) {
     this.page = page;
     this.triggersContainer = page.locator('[data-test-id^="trigger-item-"]');
-    this.emptyState = page.locator('text=/no triggers|no data|create logs/i');
-    this.loadingState = page.locator('text=/loading/i');
+    this.emptyState = page.locator("text=/no triggers|no data|create logs/i");
+    this.loadingState = page.locator("text=/loading/i");
   }
 
   async goto() {

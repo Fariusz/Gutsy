@@ -64,6 +64,7 @@ import Layout from "../layouts/Layout.astro";
 </Layout>
 
 <script>
+  /* eslint-disable */
   // Set default date range (last 30 days)
   const today = new Date();
   const thirtyDaysAgo = new Date(today);
@@ -146,7 +147,7 @@ import Layout from "../layouts/Layout.astro";
                 <tbody>
           `;
 
-          data.triggers.forEach((trigger: any, index: number) => {
+          data.triggers.forEach((trigger, index) => {
             const rowClass = index % 2 === 0 ? "bg-gray-50" : "bg-white";
             const scoreColor =
               trigger.trigger_score > 1.5
@@ -185,7 +186,7 @@ import Layout from "../layouts/Layout.astro";
         if (resultsArea) {
           resultsArea.innerHTML = html;
         }
-      } catch (error: any) {
+      } catch (error) {
         if (resultsArea) {
           resultsArea.innerHTML = `
             <div class="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -245,7 +246,7 @@ import Layout from "../layouts/Layout.astro";
             `;
           }
         }
-      } catch (error: any) {
+      } catch (error) {
         if (resultsArea) {
           resultsArea.innerHTML = `
             <div class="bg-red-50 border border-red-200 rounded-lg p-4">

@@ -75,7 +75,8 @@ export async function GET(context: APIContext): Promise<Response> {
     const detailed = queryParams.detailed === "true";
 
     // 3. Call the appropriate RPC function
-    let triggersData, correlationsData;
+    let triggersData: TriggerResponse[] = [];
+    let correlationsData: IngredientSymptomCorrelation[] = [];
 
     if (detailed) {
       // Get detailed ingredient-symptom correlations

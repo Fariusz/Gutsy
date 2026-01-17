@@ -153,7 +153,6 @@ test.describe("Add Log Flow", () => {
     await expect(createLogPage.dateInput).not.toHaveValue("");
   });
 
-  
   test("should cancel log creation", async ({ page }) => {
     const createLogPage = new CreateLogPage(page);
     await createLogPage.goto();
