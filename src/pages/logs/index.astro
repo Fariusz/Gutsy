@@ -53,6 +53,7 @@ if (error || !user) {
 </Layout>
 
 <script>
+  /* eslint-disable */
   let currentPage = 1;
   const perPage = 10;
 
@@ -99,7 +100,7 @@ if (error || !user) {
       } else {
         let html = '<div class="space-y-4">';
 
-        data.data.forEach((log: any) => {
+        data.data.forEach((log) => {
           const logDate = new Date(log.log_date).toLocaleDateString();
           const createdAt = new Date(log.created_at).toLocaleDateString();
 
@@ -128,7 +129,7 @@ if (error || !user) {
                   <h4 class="font-medium text-gray-900 mb-2">Ingredients (${log.ingredients?.length || 0})</h4>
                   <div class="flex flex-wrap gap-2">
                     ${(log.ingredients || [])
-                      .map((ingredient: any) => {
+                      .map((ingredient) => {
                         const ingredientName =
                           typeof ingredient === "string"
                             ? ingredient
@@ -144,7 +145,7 @@ if (error || !user) {
                   <h4 class="font-medium text-gray-900 mb-2">Symptoms (${log.symptoms?.length || 0})</h4>
                   <div class="flex flex-wrap gap-2">
                     ${(log.symptoms || [])
-                      .map((symptom: any) => {
+                      .map((symptom) => {
                         const symptomName =
                           typeof symptom === "string" ? symptom : symptom.name || symptom.symptom_name || "Unknown";
                         const severity = typeof symptom === "object" ? symptom.severity : "";
@@ -191,6 +192,7 @@ if (error || !user) {
 
       if (logsContainer) logsContainer.classList.remove("hidden");
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error loading logs:", error);
 
       if (loadingDiv) loadingDiv.classList.add("hidden");

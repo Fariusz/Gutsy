@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import type { LogResponse, LogsListResponse, ErrorResponse } from "../types";
+import { logger } from "../lib/utils/logger";
 
 interface LogsListProps {
   onEditLog?: (logId: string) => void;
@@ -16,37 +17,45 @@ export default function LogsList({ onEditLog }: Readonly<LogsListProps>) {
     total_pages: 0,
   });
 
-  const fetchLogs = async (page = 1) => {
-    setIsLoading(true);
-    setError(null);
+  const fetchLogs = useCallback(
+    async (page = 1) => {
+      setIsLoading(true);
+      setError(null);
 
-    try {
-      const response = await fetch(`/api/logs?page=${page}&per_page=${pagination.per_page}`);
+      try {
+        const response = await fetch(`/api/logs?page=${page}&per_page=${pagination.per_page}`);
 
-      if (!response.ok) {
-        const errorData = (await response.json()) as ErrorResponse;
-        throw new Error(errorData.error?.message || "Failed to fetch logs");
+        if (!response.ok) {
+          const errorData = (await response.json()) as ErrorResponse;
+          throw new Error(errorData.error?.message || "Failed to fetch logs");
+        }
+
+        const data = (await response.json()) as LogsListResponse;
+        // Logowanie tylko w trybie development
+        if (process.env.NODE_ENV === "development") {
+          logger.debug("LogsList: Raw API response", { data });
+          logger.debug("LogsList: Data array", { dataLength: data.data?.length });
+          logger.debug("LogsList: Meta", { meta: data.meta });
+        }
+        setLogs(data.data || []);
+        setPagination(data.meta || pagination);
+      } catch (err) {
+        // Logowanie błędów tylko w trybie development
+        if (process.env.NODE_ENV === "development") {
+          logger.error("LogsList: Fetch error", { error: err });
+        }
+        const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred";
+        setError(errorMessage);
+      } finally {
+        setIsLoading(false);
       }
-
-      const data = (await response.json()) as LogsListResponse;
-      console.log("LogsList: Raw API response:", data);
-      console.log("LogsList: Data array:", data.data);
-      console.log("LogsList: Data length:", data.data?.length);
-      console.log("LogsList: Meta:", data.meta);
-      setLogs(data.data || []);
-      setPagination(data.meta || pagination);
-    } catch (err) {
-      console.error("LogsList: Fetch error:", err);
-      const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred";
-      setError(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+    [pagination]
+  );
 
   useEffect(() => {
     fetchLogs();
-  }, []);
+  }, [fetchLogs]);
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= pagination.total_pages) {
@@ -83,6 +92,14 @@ export default function LogsList({ onEditLog }: Readonly<LogsListProps>) {
     );
   }
 
+  // Format symptom name by converting snake_case to Title Case
+  const formatSymptomName = (name: string) => {
+    return name
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
   if (logs.length === 0) {
     return (
       <div className="text-center py-12">
@@ -103,6 +120,7 @@ export default function LogsList({ onEditLog }: Readonly<LogsListProps>) {
         <a
           href="/logs/new"
           className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
+          data-test-id="create-first-log-button"
         >
           Create Your First Log
         </a>
@@ -115,7 +133,11 @@ export default function LogsList({ onEditLog }: Readonly<LogsListProps>) {
       {/* Logs List */}
       <div className="space-y-4">
         {logs.map((log) => (
-          <div key={log.id} className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+          <div
+            key={log.id}
+            className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm"
+            data-test-id={`log-item-${log.id}`}
+          >
             <div className="flex justify-between items-start mb-4">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">{formatDate(log.log_date)}</h3>
@@ -135,8 +157,12 @@ export default function LogsList({ onEditLog }: Readonly<LogsListProps>) {
             <div className="mb-4">
               <h4 className="text-sm font-medium text-gray-700 mb-2">Ingredients</h4>
               <div className="flex flex-wrap gap-2">
-                {log.ingredients.map((ingredient) => (
-                  <span key={ingredient.name} className="px-2 py-1 bg-green-100 text-green-800 text-sm rounded-full">
+                {log.ingredients.map((ingredient, index) => (
+                  <span
+                    key={ingredient.name}
+                    className="px-2 py-1 bg-green-100 text-green-800 text-sm rounded-full"
+                    data-test-id={`ingredient-${index}`}
+                  >
                     {ingredient.name}
                   </span>
                 ))}
@@ -148,8 +174,12 @@ export default function LogsList({ onEditLog }: Readonly<LogsListProps>) {
               <div className="mb-4">
                 <h4 className="text-sm font-medium text-gray-700 mb-2">Symptoms</h4>
                 <div className="space-y-2">
-                  {log.symptoms.map((symptom) => (
-                    <div key={symptom.symptom_id} className="flex items-center justify-between">
+                  {log.symptoms.map((symptom, index) => (
+                    <div
+                      key={symptom.symptom_id}
+                      className="flex items-center justify-between"
+                      data-test-id={`symptom-${index}`}
+                    >
                       <span className="text-sm text-gray-700">{formatSymptomName(symptom.name)}</span>
                       <div className="flex items-center">
                         <span className="text-sm text-gray-600 mr-2">Severity:</span>
@@ -184,12 +214,16 @@ export default function LogsList({ onEditLog }: Readonly<LogsListProps>) {
 
       {/* Pagination */}
       {pagination.total_pages > 1 && (
-        <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3 sm:px-6">
+        <div
+          className="flex items-center justify-between border-t border-gray-200 px-4 py-3 sm:px-6"
+          data-test-id="pagination"
+        >
           <div className="flex flex-1 justify-between sm:hidden">
             <button
               onClick={() => handlePageChange(pagination.page - 1)}
               disabled={pagination.page <= 1}
               className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              data-test-id="pagination-prev"
             >
               Previous
             </button>
@@ -197,6 +231,7 @@ export default function LogsList({ onEditLog }: Readonly<LogsListProps>) {
               onClick={() => handlePageChange(pagination.page + 1)}
               disabled={pagination.page >= pagination.total_pages}
               className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              data-test-id="pagination-next"
             >
               Next
             </button>

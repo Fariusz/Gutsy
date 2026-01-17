@@ -12,6 +12,7 @@ const { href, text, icon = "+" } = Astro.props;
   <a
     href={href}
     class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-4 rounded-full shadow-xl hover:shadow-2xl transform hover:scale-110 transition-all duration-200 flex items-center space-x-2 group"
+    data-test-id="fab-new-log"
   >
     <span class="text-xl">{icon}</span>
     <span class="hidden group-hover:block text-sm whitespace-nowrap">{text}</span>

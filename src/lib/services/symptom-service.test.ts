@@ -7,6 +7,7 @@ vi.mock("./symptom-repository");
 
 describe("SymptomService", () => {
   let symptomService: SymptomService;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let mockSupabase: any;
   let mockSymptomRepository: vi.Mocked<SymptomRepository>;
 
@@ -23,7 +24,7 @@ describe("SymptomService", () => {
 
     // Create a new instance of SymptomService before each test
     symptomService = new SymptomService(mockSupabase);
-    
+
     // Get the mocked instance
     mockSymptomRepository = vi.mocked(SymptomRepository).mock.instances[0] as vi.Mocked<SymptomRepository>;
   });

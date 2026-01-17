@@ -35,7 +35,7 @@ export async function POST(context: APIContext): Promise<Response> {
     console.log("Create test data: User ID:", userId);
 
     // 2. Call the function to create test data for this user
-    const rpcResult = await context.locals.supabase.rpc("create_test_data_for_user" as any, {
+    const rpcResult = await context.locals.supabase.rpc("create_test_data_for_user", {
       target_user_id: userId,
     });
     const { error } = rpcResult;

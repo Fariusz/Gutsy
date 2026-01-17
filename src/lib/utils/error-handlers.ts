@@ -1,6 +1,7 @@
 import { ZodError } from "zod";
 import { AuthenticationError } from "../auth/auth-helpers";
 import type { ErrorResponse, ValidationErrorDetail } from "../../types";
+import { logger } from "./logger";
 
 /**
  * Standardized error handling utilities for API endpoints
@@ -45,7 +46,7 @@ export class RateLimitError extends Error {
  * Centralizes error handling logic across all endpoints
  */
 export function handleApiError(error: unknown, customMessage?: string): Response {
-  console.error("API Error:", error);
+  logger.error("API Error", { error, customMessage });
 
   // Validation errors (Zod)
   if (error instanceof ZodError) {

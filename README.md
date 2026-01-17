@@ -31,6 +31,7 @@ Gutsy is a starter + MVP scaffold for building a fast, accessible, and AI-friend
 - Styling: Tailwind 4, Shadcn/ui
 - Backend & infra: Supabase (Auth, PostgreSQL, Storage, RPCs)
 - Validation: Zod
+- Testing: Vitest (unit & integration tests), Playwright (E2E tests)
 - CI/CD: GitHub Actions
 - Hosting: Vercel (frontend), Supabase Cloud (database/storage)
 
@@ -61,6 +62,14 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key # only for server-side jobs
 # Other env variables (add as needed)
 ```
 
+- For E2E testing, create a `.env.test` file (not committed) with test environment variables. This file is automatically loaded when running `npm run dev:e2e`:
+
+```env
+SUPABASE_URL=your-test-supabase-url
+SUPABASE_KEY=your-test-supabase-anon-key
+# OPENROUTER_API_KEY=your-test-openrouter-api-key (optional)
+```
+
 Run development server
 
 ```bash
@@ -83,12 +92,15 @@ Notes
 Scripts are taken from `package.json`:
 
 - `dev`: Runs the Astro development server (`astro dev`).
+- `dev:e2e`: Runs the Astro development server in test mode (`astro dev --mode test`). Loads `.env.test` file for E2E testing environment variables.
 - `build`: Build the production site (`astro build`).
 - `preview`: Preview the built site locally (`astro preview`).
 - `astro`: Shortcut to run the `astro` CLI.
 - `lint`: Run ESLint over the project (`eslint .`).
 - `lint:fix`: Run ESLint and attempt to fix issues (`eslint . --fix`).
 - `format`: Format files using Prettier (`prettier --write .`).
+- `test`: Run unit and integration tests with Vitest.
+- `test:e2e`: Run end-to-end tests with Playwright (automatically uses `dev:e2e` script).
 
 ## Project scope
 

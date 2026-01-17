@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { cn } from "./utils";
+import { cn, formatSymptomName } from "./utils";
 
 describe("cn utility function", () => {
   it("should merge class names correctly", () => {
@@ -25,5 +25,67 @@ describe("cn utility function", () => {
 
   it("should handle empty input", () => {
     expect(cn()).toBe("");
+  });
+});
+
+describe("formatSymptomName utility function", () => {
+  it("should convert snake_case to Title Case", () => {
+    // Arrange: Input with snake_case
+    const input = "stomach_pain";
+    const expected = "Stomach Pain";
+
+    // Act: Execute the function
+    const result = formatSymptomName(input);
+
+    // Assert: Verify conversion
+    expect(result).toBe(expected);
+  });
+
+  it("should handle single word", () => {
+    expect(formatSymptomName("nausea")).toBe("Nausea");
+  });
+
+  it("should handle multiple underscores", () => {
+    expect(formatSymptomName("severe_stomach_pain")).toBe("Severe Stomach Pain");
+  });
+
+  it("should handle uppercase input", () => {
+    expect(formatSymptomName("STOMACH_PAIN")).toBe("Stomach Pain");
+  });
+
+  it("should handle mixed case input", () => {
+    expect(formatSymptomName("StOmAcH_pAiN")).toBe("Stomach Pain");
+  });
+
+  it("should handle empty string", () => {
+    // Arrange: Empty string input
+    const input = "";
+    const expected = "";
+
+    // Act: Execute the function
+    const result = formatSymptomName(input);
+
+    // Assert: Verify empty string handling
+    expect(result).toBe(expected);
+  });
+
+  it("should handle single character", () => {
+    // Arrange: Single character input
+    const input = "a";
+    const expected = "A";
+
+    // Act: Execute the function
+    const result = formatSymptomName(input);
+
+    // Assert: Verify single character capitalization
+    expect(result).toBe(expected);
+  });
+
+  it("should handle leading/trailing underscores", () => {
+    expect(formatSymptomName("_stomach_pain_")).toBe(" Stomach Pain ");
+  });
+
+  it("should handle consecutive underscores", () => {
+    expect(formatSymptomName("stomach__pain")).toBe("Stomach  Pain");
   });
 });

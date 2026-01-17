@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "../../db/database.types";
 import type { SymptomResponse } from "../../types";
+import { logger } from "../utils/logger";
 
 /**
  * Repository for symptom-related database operations
@@ -17,7 +18,7 @@ export class SymptomRepository {
       const { data, error } = await this.supabase.from("symptoms").select("id, name");
 
       if (error) {
-        console.error("Supabase error fetching symptoms:", {
+        logger.error("Supabase error fetching symptoms", {
           message: error.message,
           details: error.details,
           hint: error.hint,
@@ -27,17 +28,17 @@ export class SymptomRepository {
       }
 
       if (!data) {
-        console.warn("No symptoms data returned from database");
+        logger.warn("No symptoms data returned from database");
         return [];
       }
 
-      console.log(`Successfully fetched ${data.length} symptoms`);
+      logger.info(`Successfully fetched ${data.length} symptoms`);
       return data.map((symptom) => ({
         id: symptom.id,
         name: symptom.name,
       }));
     } catch (error) {
-      console.error("Repository error in getAllSymptoms:", error);
+      logger.error("Repository error in getAllSymptoms", { error });
       if (error instanceof Error) {
         throw error;
       }

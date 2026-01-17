@@ -98,7 +98,7 @@ export const POST: APIRoute = async (context: APIContext) => {
 
     // Handle OpenRouter service errors specifically
     if (error && typeof error === "object" && "name" in error && error.name === "OpenRouterServiceError") {
-      const serviceError = error as any;
+      const serviceError = error as { code?: string; message?: string };
 
       const statusCode = (() => {
         switch (serviceError.code) {
@@ -198,7 +198,7 @@ export const GET: APIRoute = async (context: APIContext) => {
 
     // Handle OpenRouter service errors
     if (error && typeof error === "object" && "name" in error && error.name === "OpenRouterServiceError") {
-      const serviceError = error as any;
+      const serviceError = error as { code?: string; message?: string };
 
       return new Response(
         JSON.stringify({

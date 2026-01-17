@@ -58,7 +58,7 @@ describe("Triggers API Integration", () => {
       vi.mocked(mockFromChain.gte).mockImplementation(() => mockFromChain);
       vi.mocked(mockFromChain.lte).mockImplementation(() => mockCountResult);
 
-      (context.locals.supabase.from as any) = vi.fn(() => mockFromChain);
+      (context.locals.supabase.from as ReturnType<typeof vi.fn>) = vi.fn(() => mockFromChain);
 
       const response = await GET(context);
       const responseData = (await response.json()) as TriggerAnalysisResponse;
@@ -133,7 +133,7 @@ describe("Triggers API Integration", () => {
         error: null,
       };
 
-      (context.locals.supabase.from as any) = vi.fn(() => mockFromChain);
+      (context.locals.supabase.from as ReturnType<typeof vi.fn>) = vi.fn(() => mockFromChain);
 
       const response = await GET(context);
       const responseData = (await response.json()) as TriggerAnalysisResponse;

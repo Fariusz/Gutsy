@@ -2,6 +2,8 @@
  * Performance monitoring utilities for API operations
  */
 
+import { logger } from "./logger";
+
 /**
  * Performance thresholds for monitoring
  */
@@ -61,20 +63,20 @@ function logRpcPerformanceMetrics(metrics: PerformanceMetrics): void {
   const { duration, operation, success } = metrics;
 
   if (!success) {
-    console.error(`❌ RPC operation failed: ${operation} (${duration}ms)`);
+    logger.error(`❌ RPC operation failed: ${operation} (${duration}ms)`);
     return;
   }
 
   if (duration > PERFORMANCE_THRESHOLDS.RPC_ERROR_MS) {
-    console.error(
+    logger.error(
       `🐌 Very slow RPC detected: ${operation} took ${duration}ms (threshold: ${PERFORMANCE_THRESHOLDS.RPC_ERROR_MS}ms)`
     );
   } else if (duration > PERFORMANCE_THRESHOLDS.RPC_WARNING_MS) {
-    console.warn(
+    logger.warn(
       `⚠️  Slow RPC detected: ${operation} took ${duration}ms (threshold: ${PERFORMANCE_THRESHOLDS.RPC_WARNING_MS}ms)`
     );
   } else {
-    console.log(`✅ RPC completed: ${operation} (${duration}ms)`);
+    logger.info(`✅ RPC completed: ${operation} (${duration}ms)`);
   }
 }
 
@@ -86,7 +88,7 @@ export function logQueryPerformance(startTime: number, queryType: string, record
 
   // Log slow queries (over 1 second)
   if (duration > 1000) {
-    console.warn(`Slow query detected: ${queryType} took ${duration}ms for ${recordCount} records`, {
+    logger.warn(`Slow query detected: ${queryType} took ${duration}ms for ${recordCount} records`, {
       queryType,
       duration,
       recordCount,
@@ -96,7 +98,7 @@ export function logQueryPerformance(startTime: number, queryType: string, record
 
   // Log very slow queries as errors (over 5 seconds)
   if (duration > 5000) {
-    console.error(`Very slow query: ${queryType} took ${duration}ms for ${recordCount} records`, {
+    logger.error(`Very slow query: ${queryType} took ${duration}ms for ${recordCount} records`, {
       queryType,
       duration,
       recordCount,
@@ -117,7 +119,7 @@ export async function timeFunction<T>(fn: () => Promise<T>, operation: string, u
 
     if (duration > 500) {
       // Log operations over 500ms
-      console.log(`Operation ${operation} completed in ${duration}ms`, {
+      logger.info(`Operation ${operation} completed in ${duration}ms`, {
         operation,
         duration,
         userId: userId ? `user_${userId.substring(0, 8)}...` : "unknown",
@@ -127,7 +129,7 @@ export async function timeFunction<T>(fn: () => Promise<T>, operation: string, u
     return result;
   } catch (error) {
     const duration = Date.now() - startTime;
-    console.error(`Operation ${operation} failed after ${duration}ms`, {
+    logger.error(`Operation ${operation} failed after ${duration}ms`, {
       operation,
       duration,
       error: error instanceof Error ? error.message : "Unknown error",

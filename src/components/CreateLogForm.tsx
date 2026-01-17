@@ -1,4 +1,4 @@
-import React, { useState, useCallback, memo } from "react";
+import React, { useState, useCallback, memo, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -116,6 +116,7 @@ export default memo(function CreateLogForm({ onSuccess }: CreateLogFormProps) {
     selectedSymptomId: "",
     selectedSeverity: "",
   });
+  const [isSymptomSelected, setIsSymptomSelected] = useState(false);
 
   const { symptoms, isLoading: symptomsLoading, error: symptomsError } = useSymptoms();
   const { isLoading, error, isSuccess, createLog, reset } = useCreateLog();
@@ -133,6 +134,15 @@ export default memo(function CreateLogForm({ onSuccess }: CreateLogFormProps) {
     },
     mode: "onChange",
   });
+
+  useEffect(() => {
+    const symptomIdNum = Number.parseInt(symptomSelector.selectedSymptomId);
+    if (!Number.isNaN(symptomIdNum)) {
+      setIsSymptomSelected(selectedSymptoms.some((s) => s.symptomId === symptomIdNum));
+    } else {
+      setIsSymptomSelected(false);
+    }
+  }, [symptomSelector.selectedSymptomId, selectedSymptoms]);
 
   const handleAddSymptom = () => {
     const symptomIdNum = Number.parseInt(symptomSelector.selectedSymptomId);
@@ -231,6 +241,7 @@ export default memo(function CreateLogForm({ onSuccess }: CreateLogFormProps) {
         onSubmit={handleSubmit(onSubmit)}
         className="space-y-6 max-w-2xl mx-auto p-6"
         aria-label="Create new meal log"
+        data-test-id="create-log-form"
       >
         <div className="space-y-2">
           <label htmlFor="logDate" className="block text-sm font-medium text-gray-700">
@@ -243,6 +254,7 @@ export default memo(function CreateLogForm({ onSuccess }: CreateLogFormProps) {
             max={new Date().toISOString().split("T")[0]}
             className="w-full"
             aria-describedby={errors.log_date ? "date-error" : undefined}
+            data-test-id="log-date-input"
           />
           {errors.log_date && (
             <p id="date-error" className="text-sm text-red-600" role="alert">
@@ -262,6 +274,7 @@ export default memo(function CreateLogForm({ onSuccess }: CreateLogFormProps) {
             placeholder="Enter ingredients separated by commas (e.g., tomatoes, cheese, basil)"
             className="w-full"
             aria-describedby="ingredients-help ingredients-error"
+            data-test-id="ingredients-input"
           />
           {errors.ingredients && (
             <p id="ingredients-error" className="text-sm text-red-600" role="alert">
@@ -317,6 +330,7 @@ export default memo(function CreateLogForm({ onSuccess }: CreateLogFormProps) {
                   }}
                   disabled={symptomsLoading || symptomsError !== null || symptoms.length === 0}
                   aria-label="Select symptom type"
+                  data-test-id="symptom-select"
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder={getSymptomSelectorPlaceholder()} />
@@ -344,7 +358,9 @@ export default memo(function CreateLogForm({ onSuccess }: CreateLogFormProps) {
                   onValueChange={(value) => {
                     setSymptomSelector((prev) => ({ ...prev, selectedSeverity: value }));
                   }}
+                  disabled={!symptomSelector.selectedSymptomId}
                   aria-label="Select symptom severity level"
+                  data-test-id="severity-select"
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select severity" />
@@ -371,8 +387,9 @@ export default memo(function CreateLogForm({ onSuccess }: CreateLogFormProps) {
                   onClick={handleAddSymptom}
                   disabled={!symptomSelector.selectedSymptomId || !symptomSelector.selectedSeverity}
                   className="px-6"
+                  data-test-id="add-symptom-button"
                 >
-                  Add Symptom
+                  {isSymptomSelected ? "Update Symptom" : "Add Symptom"}
                 </Button>
               </div>
             </div>
@@ -400,9 +417,10 @@ export default memo(function CreateLogForm({ onSuccess }: CreateLogFormProps) {
           <Textarea
             id="notes"
             {...register("notes")}
-            placeholder="Any additional notes about your meal or symptoms..."
-            rows={3}
-            className="w-full"
+            placeholder="Add any additional notes about your meal..."
+            className="min-h-[100px]"
+            aria-describedby="notes-help"
+            data-test-id="notes-textarea"
           />
           {errors.notes && <p className="text-sm text-red-600">{errors.notes.message}</p>}
         </div>
@@ -437,7 +455,12 @@ export default memo(function CreateLogForm({ onSuccess }: CreateLogFormProps) {
         )}
 
         <div className="flex gap-4">
-          <Button type="submit" disabled={isLoading || !isValid} className="flex-1">
+          <Button
+            type="submit"
+            disabled={isLoading || !isValid}
+            className="flex-1"
+            data-test-id="create-log-submit-button"
+          >
             {isLoading ? "Creating Log..." : "Create Log"}
           </Button>
           <Button type="button" variant="outline" onClick={() => globalThis.history.back()} className="px-6">

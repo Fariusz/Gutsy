@@ -167,8 +167,8 @@ describe("Trigger Analysis Types", () => {
       };
 
       expect(response.correlations).toHaveLength(1);
-      expect(response.correlations![0].ingredient_name).toBe("tomatoes");
-      expect(response.correlations![0].symptom_name).toBe("rash");
+      expect(response.correlations[0].ingredient_name).toBe("tomatoes");
+      expect(response.correlations[0].symptom_name).toBe("rash");
     });
 
     it("should handle empty results", () => {

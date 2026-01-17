@@ -2,6 +2,7 @@ import type { APIContext } from "astro";
 import { z } from "zod";
 import type { AuthResponse } from "../../../types";
 
+/* eslint-disable no-console */
 export const prerender = false;
 
 const LoginSchema = z.object({
@@ -102,7 +103,24 @@ export async function POST(context: APIContext): Promise<Response> {
 
     console.log("Login: Successfully authenticated user:", data.user.id);
 
-    // 4. Return success response
+    // 4. Persist session on the server (set cookies) so subsequent server-side requests are authenticated.
+    //    Use the server-side client to set the session cookies via the provided cookie adapter.
+    try {
+      const { error: sessionSetError } = await context.locals.supabase.auth.setSession({
+        access_token: data.session.access_token,
+        refresh_token: data.session.refresh_token,
+      });
+
+      if (sessionSetError) {
+        console.error("Login: Failed to set server session cookies:", sessionSetError);
+      } else {
+        console.log("Login: Server session set successfully");
+      }
+    } catch (setErr) {
+      console.error("Login: Exception while setting server session:", setErr);
+    }
+
+    // 5. Return success response
     const authResponse: AuthResponse = {
       user: {
         id: data.user.id,

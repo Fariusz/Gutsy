@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import type { SymptomResponse } from "../../types";
+import { logger } from "../../lib/utils/logger";
 
 interface UseSymptomsReturn {
   symptoms: SymptomResponse[];
@@ -40,12 +41,12 @@ export function useSymptoms(): UseSymptomsReturn {
           // Handle API-level errors
           throw new Error(data.error);
         } else {
-          console.error("Invalid symptoms data structure:", data);
+          logger.error("Invalid symptoms data structure:", { data });
           throw new Error("Invalid symptoms data structure received");
         }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred";
-        console.error("Symptoms fetch error:", err);
+        logger.error("Symptoms fetch error", { error: err });
         setError(errorMessage);
       } finally {
         setIsLoading(false);
