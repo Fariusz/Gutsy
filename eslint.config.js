@@ -60,6 +60,7 @@ const astroConfig = tseslint.config({
   files: ["**/*.astro"],
   rules: {
     "no-undef": "off",
+    "prettier/prettier": "off",
   },
 });
 
@@ -68,7 +69,7 @@ export default tseslint.config(
   baseConfig,
   jsxA11yConfig,
   reactConfig,
+  eslintPluginPrettier,
   eslintPluginAstro.configs["flat/recommended"],
-  astroConfig,
-  eslintPluginPrettier
+  astroConfig
 );

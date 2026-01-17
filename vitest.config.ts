@@ -31,15 +31,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "html", "json", "lcov"],
-      exclude: [
-        "node_modules/",
-        "src/test/",
-        "**/*.d.ts",
-        "**/*.config.*",
-        "**/coverage/**",
-        "**/types.ts",
-        "**/database.types.ts",
-      ],
+      exclude: ["node_modules/", "src/test/", "**/*.d.ts", "**/*.config.*", "**/coverage/**", "**/types.ts", "**/database.types.ts"],
       /* Coverage thresholds - focus on meaningful tests rather than arbitrary percentages */
       thresholds: {
         lines: 80,

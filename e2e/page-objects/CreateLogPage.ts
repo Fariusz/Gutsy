@@ -13,11 +13,7 @@ export class CreateLogPage {
   constructor(page: Page) {
     this.page = page;
     // Primary test-id locators with resilient fallbacks (label / placeholder / type-based)
-    this.dateInput = page
-      .getByTestId("log-date-input")
-      .or(page.locator('input[type="date"]'))
-      .or(page.getByLabel("Date"))
-      .first();
+    this.dateInput = page.getByTestId("log-date-input").or(page.locator('input[type="date"]')).or(page.getByLabel("Date")).first();
 
     this.ingredientsInput = page
       .getByTestId("ingredients-input")
@@ -110,9 +106,7 @@ export class CreateLogPage {
       return;
     } catch {
       // eslint-disable-next-line no-console
-      console.warn(
-        "Submit button not clickable or not enabled within short timeout; failing fast to allow test fallback"
-      );
+      console.warn("Submit button not clickable or not enabled within short timeout; failing fast to allow test fallback");
       throw new Error("Submit button not clickable or not enabled");
     }
   }

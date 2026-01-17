@@ -27,13 +27,7 @@ interface SymptomSelectorState {
 }
 
 // Memoized component for individual symptom items to prevent unnecessary re-renders
-const SymptomItem = memo(function SymptomItem({
-  symptom,
-  onRemove,
-}: {
-  symptom: FormSymptom;
-  onRemove: (symptomId: number) => void;
-}) {
+const SymptomItem = memo(function SymptomItem({ symptom, onRemove }: { symptom: FormSymptom; onRemove: (symptomId: number) => void }) {
   const handleRemove = useCallback(() => {
     onRemove(symptom.symptomId);
   }, [onRemove, symptom.symptomId]);
@@ -44,13 +38,7 @@ const SymptomItem = memo(function SymptomItem({
         <span className="font-medium">{formatSymptomName(symptom.symptomName)}</span>
         <span className="ml-2 text-sm text-gray-600">Severity: {symptom.severity}/5</span>
       </div>
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        onClick={handleRemove}
-        aria-label={`Remove ${symptom.symptomName} symptom`}
-      >
+      <Button type="button" variant="outline" size="sm" onClick={handleRemove} aria-label={`Remove ${symptom.symptomName} symptom`}>
         Remove
       </Button>
     </li>
@@ -165,9 +153,7 @@ export default memo(function CreateLogForm({ onSuccess }: CreateLogFormProps) {
     // Check if symptom is already added
     if (selectedSymptoms.some((s) => s.symptomId === symptomIdNum)) {
       // Update existing symptom severity
-      setSelectedSymptoms((prev) =>
-        prev.map((s) => (s.symptomId === symptomIdNum ? { ...s, severity: severityNum } : s))
-      );
+      setSelectedSymptoms((prev) => prev.map((s) => (s.symptomId === symptomIdNum ? { ...s, severity: severityNum } : s)));
     } else {
       // Add new symptom
       setSelectedSymptoms((prev) => [
@@ -298,9 +284,7 @@ export default memo(function CreateLogForm({ onSuccess }: CreateLogFormProps) {
 
           {/* Show loading/error states for symptoms */}
           {symptomsLoading && (
-            <div className="p-3 text-sm text-blue-700 bg-blue-50 border border-blue-200 rounded-lg">
-              Loading symptoms...
-            </div>
+            <div className="p-3 text-sm text-blue-700 bg-blue-50 border border-blue-200 rounded-lg">Loading symptoms...</div>
           )}
 
           {symptomsError && (
@@ -317,9 +301,7 @@ export default memo(function CreateLogForm({ onSuccess }: CreateLogFormProps) {
               <div className="p-3 bg-gray-100 rounded text-sm">
                 <strong>Symptoms Status:</strong> {getSymptomStatusText()}
                 {symptoms.length > 0 && (
-                  <div className="mt-1 text-xs text-gray-600">
-                    Available: {symptoms.map((s) => formatSymptomName(s.name)).join(", ")}
-                  </div>
+                  <div className="mt-1 text-xs text-gray-600">Available: {symptoms.map((s) => formatSymptomName(s.name)).join(", ")}</div>
                 )}
               </div>
             )}
@@ -462,12 +444,7 @@ export default memo(function CreateLogForm({ onSuccess }: CreateLogFormProps) {
         )}
 
         <div className="flex gap-4">
-          <Button
-            type="submit"
-            disabled={isLoading || !isValid}
-            className="flex-1"
-            data-test-id="create-log-submit-button"
-          >
+          <Button type="submit" disabled={isLoading || !isValid} className="flex-1" data-test-id="create-log-submit-button">
             {isLoading ? "Creating Log..." : "Create Log"}
           </Button>
           <Button type="button" variant="outline" onClick={() => globalThis.history.back()} className="px-6">

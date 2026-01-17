@@ -22,15 +22,7 @@ import { useTriggerAnalysis } from "./hooks/useTriggerAnalysis";
 
 // Mock the Button component
 vi.mock("./ui/button", () => ({
-  Button: ({
-    children,
-    onClick,
-    disabled,
-  }: {
-    children: React.ReactNode;
-    onClick?: () => void;
-    disabled?: boolean;
-  }) => (
+  Button: ({ children, onClick, disabled }: { children: React.ReactNode; onClick?: () => void; disabled?: boolean }) => (
     <button onClick={onClick} disabled={disabled}>
       {children}
     </button>
@@ -39,15 +31,9 @@ vi.mock("./ui/button", () => ({
 
 // Mock the Input component
 vi.mock("./ui/input", () => ({
-  Input: ({
-    value,
-    onChange,
-    type,
-  }: {
-    value?: string;
-    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    type?: string;
-  }) => <input type={type} value={value} onChange={onChange} />,
+  Input: ({ value, onChange, type }: { value?: string; onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void; type?: string }) => (
+    <input type={type} value={value} onChange={onChange} />
+  ),
 }));
 
 describe("TriggersList Component", () => {

@@ -343,40 +343,20 @@ export class OpenRouterService {
       case 401:
         throw new OpenRouterServiceError("Invalid API key", "AUTHENTICATION_ERROR", false, error);
       case 403:
-        throw new OpenRouterServiceError(
-          "Access forbidden - check your API key permissions",
-          "AUTHORIZATION_ERROR",
-          false,
-          error
-        );
+        throw new OpenRouterServiceError("Access forbidden - check your API key permissions", "AUTHORIZATION_ERROR", false, error);
       case 404:
         throw new OpenRouterServiceError("Model not found - check the model name", "MODEL_NOT_FOUND", false, error);
       case 400:
-        throw new OpenRouterServiceError(
-          `Invalid request: ${error.message || "Bad request"}`,
-          "VALIDATION_ERROR",
-          false,
-          error
-        );
+        throw new OpenRouterServiceError(`Invalid request: ${error.message || "Bad request"}`, "VALIDATION_ERROR", false, error);
       case 429:
         throw new OpenRouterServiceError("Rate limit exceeded - please retry later", "RATE_LIMIT_ERROR", true, error);
       case 500:
       case 502:
       case 503:
       case 504:
-        throw new OpenRouterServiceError(
-          "OpenRouter API server error - please retry later",
-          "SERVER_ERROR",
-          true,
-          error
-        );
+        throw new OpenRouterServiceError("OpenRouter API server error - please retry later", "SERVER_ERROR", true, error);
       default:
-        throw new OpenRouterServiceError(
-          `Unexpected API error: ${error.message || "Unknown error"}`,
-          "UNKNOWN_ERROR",
-          false,
-          error
-        );
+        throw new OpenRouterServiceError(`Unexpected API error: ${error.message || "Unknown error"}`, "UNKNOWN_ERROR", false, error);
     }
   }
 }

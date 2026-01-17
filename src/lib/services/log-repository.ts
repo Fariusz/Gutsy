@@ -75,12 +75,7 @@ export class LogRepository {
    */
   async getPopulatedLog(logId: string, userId: string): Promise<LogResponse> {
     // Get the main log data
-    const { data: logData, error: logError } = await this.supabase
-      .from("logs")
-      .select("*")
-      .eq("id", logId)
-      .eq("user_id", userId)
-      .single();
+    const { data: logData, error: logError } = await this.supabase.from("logs").select("*").eq("id", logId).eq("user_id", userId).single();
 
     if (logError || !logData) {
       throw new Error(`Failed to get log: ${logError?.message || "Log not found"}`);
@@ -120,9 +115,7 @@ export class LogRepository {
     let mealPhotoUrl: string | undefined;
     if (logData.meal_photo_url) {
       try {
-        const { data: signedUrlData } = await this.supabase.storage
-          .from("meal-photos")
-          .createSignedUrl(logData.meal_photo_url, 3600); // 1 hour expiry
+        const { data: signedUrlData } = await this.supabase.storage.from("meal-photos").createSignedUrl(logData.meal_photo_url, 3600); // 1 hour expiry
 
         if (signedUrlData) {
           mealPhotoUrl = signedUrlData.signedUrl;
@@ -231,10 +224,7 @@ export class LogRepository {
       }
 
       // Get total count for pagination
-      let countQuery = this.supabase
-        .from("logs")
-        .select("*", { count: "exact", head: true })
-        .eq("user_id", query.userId);
+      let countQuery = this.supabase.from("logs").select("*", { count: "exact", head: true }).eq("user_id", query.userId);
 
       if (query.start) {
         countQuery = countQuery.gte("log_date", query.start);

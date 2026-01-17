@@ -21,12 +21,7 @@ if (error || !user) {
           <h1 class="text-3xl font-bold text-gray-900 mb-2">My Meal Logs</h1>
           <p class="text-gray-600">Track and review your meal history and symptoms</p>
         </div>
-        <a
-          href="/logs/new"
-          class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
-        >
-          + New Log
-        </a>
+        <a href="/logs/new" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"> + New Log </a>
       </div>
 
       <div class="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -42,9 +37,7 @@ if (error || !user) {
 
           <div id="error-container" class="hidden bg-red-50 border border-red-200 rounded-lg p-4">
             <p class="text-red-600" id="error-message"></p>
-            <button onclick="loadLogs()" class="mt-2 text-sm text-red-600 underline hover:text-red-800">
-              Try again
-            </button>
+            <button onclick="loadLogs()" class="mt-2 text-sm text-red-600 underline hover:text-red-800"> Try again </button>
           </div>
         </div>
       </div>
@@ -131,9 +124,7 @@ if (error || !user) {
                     ${(log.ingredients || [])
                       .map((ingredient) => {
                         const ingredientName =
-                          typeof ingredient === "string"
-                            ? ingredient
-                            : ingredient.name || ingredient.ingredient_name || JSON.stringify(ingredient);
+                          typeof ingredient === "string" ? ingredient : ingredient.name || ingredient.ingredient_name || JSON.stringify(ingredient);
                         return `<span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">${ingredientName}</span>`;
                       })
                       .join("")}
@@ -146,8 +137,7 @@ if (error || !user) {
                   <div class="flex flex-wrap gap-2">
                     ${(log.symptoms || [])
                       .map((symptom) => {
-                        const symptomName =
-                          typeof symptom === "string" ? symptom : symptom.name || symptom.symptom_name || "Unknown";
+                        const symptomName = typeof symptom === "string" ? symptom : symptom.name || symptom.symptom_name || "Unknown";
                         const severity = typeof symptom === "object" ? symptom.severity : "";
                         const severityText = severity ? ` (${severity}/10)` : "";
                         return `<span class="inline-block bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">${symptomName}${severityText}</span>`;
@@ -192,7 +182,6 @@ if (error || !user) {
 
       if (logsContainer) logsContainer.classList.remove("hidden");
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("Error loading logs:", error);
 
       if (loadingDiv) loadingDiv.classList.add("hidden");

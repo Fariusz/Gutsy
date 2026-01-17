@@ -1,11 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type {
-  CreateLogRequest,
-  LogResponse,
-  CreateLogSymptomItem,
-  LogsListResponse,
-  PaginationMeta,
-} from "../../types";
+import type { CreateLogRequest, LogResponse, CreateLogSymptomItem, LogsListResponse, PaginationMeta } from "../../types";
 import type { Database } from "../../db/database.types";
 import { LogRepository } from "./log-repository";
 

@@ -57,9 +57,7 @@ export async function POST(context: APIContext): Promise<Response> {
       .eq("user_id", userId);
 
     // For simplicity, just count logs and related data
-    const { count: symptomsCount } = await context.locals.supabase
-      .from("log_symptoms")
-      .select("*", { count: "exact", head: true });
+    const { count: symptomsCount } = await context.locals.supabase.from("log_symptoms").select("*", { count: "exact", head: true });
 
     return new Response(
       JSON.stringify({

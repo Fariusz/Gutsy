@@ -86,12 +86,7 @@ export function TriggersList() {
           </div>
           <div className="flex flex-col justify-end">
             <label className="flex items-center mb-2">
-              <input
-                type="checkbox"
-                checked={showDetailed}
-                onChange={(e) => setShowDetailed(e.target.checked)}
-                className="mr-2"
-              />
+              <input type="checkbox" checked={showDetailed} onChange={(e) => setShowDetailed(e.target.checked)} className="mr-2" />
               <span className="text-sm text-gray-700">Detailed Analysis</span>
             </label>
           </div>
@@ -117,8 +112,7 @@ export function TriggersList() {
           <div className="mb-6">
             <h2 className="text-xl font-semibold mb-2">Analysis Results</h2>
             <p className="text-gray-600">
-              Based on {data.analysis_period.total_logs} logs from{" "}
-              {new Date(data.analysis_period.start_date).toLocaleDateString()} to{" "}
+              Based on {data.analysis_period.total_logs} logs from {new Date(data.analysis_period.start_date).toLocaleDateString()} to{" "}
               {new Date(data.analysis_period.end_date).toLocaleDateString()}
             </p>
           </div>
@@ -126,9 +120,7 @@ export function TriggersList() {
           {data.triggers.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-gray-500 mb-4">No trigger analysis available for the selected period.</p>
-              <p className="text-sm text-gray-400">
-                Try selecting a longer date range or log more meals with symptoms.
-              </p>
+              <p className="text-sm text-gray-400">Try selecting a longer date range or log more meals with symptoms.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -151,9 +143,7 @@ export function TriggersList() {
                         <td className="py-3 px-4">{trigger.consumption_count}</td>
                         <td className="py-3 px-4">
                           {trigger.avg_severity_when_present.toFixed(2)}
-                          <span className="text-gray-500 text-sm ml-2">
-                            (baseline: {trigger.baseline_avg_severity.toFixed(2)})
-                          </span>
+                          <span className="text-gray-500 text-sm ml-2">(baseline: {trigger.baseline_avg_severity.toFixed(2)})</span>
                         </td>
                         <td className={`py-3 px-4 font-semibold ${getTriggerScoreColor(trigger.trigger_score)}`}>
                           {formatTriggerScore(trigger.trigger_score)}
@@ -239,15 +229,13 @@ export function TriggersList() {
             <h3 className="font-medium text-green-900 mb-2">Detailed Analysis Insights:</h3>
             <ul className="text-sm text-green-800 space-y-1">
               <li>
-                <strong>Symptom Rate:</strong> Percentage of times you experienced this symptom when consuming this
-                ingredient
+                <strong>Symptom Rate:</strong> Percentage of times you experienced this symptom when consuming this ingredient
               </li>
               <li>
                 <strong>Specific Correlations:</strong> Shows exactly which ingredients trigger which symptoms
               </li>
               <li>
-                <strong>Example:</strong> &quot;Tomatoes cause rash 60% of the time&quot; vs &quot;Cabbage causes gas
-                80% of the time&quot;
+                <strong>Example:</strong> &quot;Tomatoes cause rash 60% of the time&quot; vs &quot;Cabbage causes gas 80% of the time&quot;
               </li>
             </ul>
           </div>

@@ -77,9 +77,7 @@ describe("Triggers API Integration", () => {
       const context = createMockAPIContext(session);
 
       // Mock URL with detailed analysis
-      const mockUrl = new URL(
-        "http://localhost/api/triggers?start_date=2024-01-01&end_date=2024-01-31&limit=10&detailed=true"
-      );
+      const mockUrl = new URL("http://localhost/api/triggers?start_date=2024-01-01&end_date=2024-01-31&limit=10&detailed=true");
       context.request.url = mockUrl.toString();
 
       // Mock detailed correlations response
@@ -225,9 +223,7 @@ describe("Triggers API Integration", () => {
       const session = createMockSession("test-user-id");
       const context = createMockAPIContext(session);
 
-      const mockUrl = new URL(
-        "http://localhost/api/triggers?start_date=2024-01-01&end_date=2024-01-31&limit=10&detailed=true"
-      );
+      const mockUrl = new URL("http://localhost/api/triggers?start_date=2024-01-01&end_date=2024-01-31&limit=10&detailed=true");
       context.request.url = mockUrl.toString();
 
       // Mock detailed RPC error
