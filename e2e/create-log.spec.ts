@@ -149,7 +149,7 @@ test.describe("Add Log Flow", () => {
     await createLogPage.goto();
 
     // Try to submit empty form - button should be disabled, so check for error messages instead
-    const hasErrors = await createLogPage.hasErrorMessage();
+    await createLogPage.hasErrorMessage();
 
     // The button is disabled when form is invalid, so we can't click it
     // Instead, verify the form fields show expected defaults (ingredients empty, date prefilled)

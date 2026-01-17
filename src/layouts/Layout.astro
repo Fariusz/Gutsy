@@ -20,6 +20,7 @@ try {
     user = authUser;
   }
 } catch (error) {
+  // eslint-disable-next-line no-console
   console.error("Error checking user authentication", { error });
 }
 ---
@@ -94,7 +95,7 @@ try {
     <!-- Floating Action Button for creating new logs -->
     {!hideFloatingButton && user && <FloatingActionButton href="/logs/new" text="New Meal Log" icon="🍽️" />}
 
-    <script>
+    <script is:inline>
       // Handle logout functionality
       document.addEventListener("DOMContentLoaded", () => {
         const logoutBtn = document.getElementById("logout-btn");

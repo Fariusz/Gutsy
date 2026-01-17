@@ -1,6 +1,5 @@
 import { test, expect } from "@playwright/test";
 import { LoginPage } from "./page-objects/LoginPage";
-import { HomePage } from "./page-objects/HomePage";
 import { CreateLogPage } from "./page-objects/CreateLogPage";
 
 /**
@@ -80,7 +79,6 @@ test.describe("Add Log Flow", () => {
   test.skip("powinien wyświetlić błędy walidacji przy próbie utworzenia pustego loga", async ({ page }) => {
     // TODO: This test fails because form doesn't load when navigating directly to /logs/new
     // Need to ensure proper session persistence or use different approach
-    const createLogPage = new CreateLogPage(page);
 
     // ===== ACT =====
     // Przejdź na stronę tworzenia loga

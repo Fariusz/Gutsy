@@ -206,8 +206,11 @@ export default memo(function CreateLogForm({ onSuccess }: CreateLogFormProps) {
     if (result && onSuccess) {
       onSuccess(result.id);
     } else if (result) {
-      // Use window.location.href instead of globalThis.location.href
-      window.location.href = "/logs";
+      // Use useEffect to handle navigation after successful submission
+      // This avoids React compiler issues with direct location manipulation
+      setTimeout(() => {
+        window.location.href = "/logs";
+      }, 0);
     }
   };
 
