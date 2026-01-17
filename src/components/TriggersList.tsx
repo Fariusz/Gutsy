@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useTriggerAnalysis } from "./hooks/useTriggerAnalysis";
 import { Button } from "./ui/button";
+import { logger } from "../lib/utils/logger";
 
 export function TriggersList() {
-  console.log("TriggersList component rendering...");
+  logger.info("TriggersList component rendering...");
 
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
   const [showDetailed, setShowDetailed] = useState<boolean>(false);
   const { isLoading, error, data, fetchTriggers, reset } = useTriggerAnalysis();
 
-  console.log("TriggersList state:", { startDate, endDate, isLoading, error, data });
+  logger.debug("TriggersList state", { startDate, endDate, isLoading, error, data });
 
   // Set default date range to last 30 days
   useEffect(() => {
