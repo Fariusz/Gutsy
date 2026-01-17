@@ -1,7 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { TriggersPage } from "./page-objects/TriggersPage";
 import { LogsPage } from "./page-objects/LogsPage";
-import { CreateLogPage } from "./page-objects/CreateLogPage";
 import { LoginPage } from "./page-objects/LoginPage";
 
 /**

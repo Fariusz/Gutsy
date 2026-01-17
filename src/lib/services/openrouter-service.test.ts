@@ -23,7 +23,7 @@ describe("OpenRouterService", () => {
 
     it("should throw error with invalid API key", () => {
       expect(() => new OpenRouterService("")).toThrow("OpenRouter API key is required");
-      expect(() => new OpenRouterService(null as any)).toThrow("OpenRouter API key is required");
+      expect(() => new OpenRouterService(null as unknown as string)).toThrow("OpenRouter API key is required");
     });
 
     it("should use default base URL when not provided", () => {

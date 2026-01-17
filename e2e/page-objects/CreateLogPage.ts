@@ -44,6 +44,7 @@ export class CreateLogPage {
     try {
       await this.dateInput.waitFor({ state: "visible", timeout: 3000 });
     } catch {
+      // eslint-disable-next-line no-console
       console.log("Form slow to load in goto(), continuing without waiting for full readiness");
       // Fast-fail: return early so the test can perform its own fallback logic quickly.
       return;
@@ -63,8 +64,8 @@ export class CreateLogPage {
       await this.dateInput.waitFor({ state: "visible", timeout: Math.min(5000, timeout) });
       // Ensure ingredients input is at least attached so fill operations won't fail
       await this.ingredientsInput.waitFor({ state: "attached", timeout: Math.min(5000, timeout) });
-    } catch (error) {
-      // If the form isn't loading within the timeout, log and continue to avoid flakiness.
+    } catch {
+      // eslint-disable-next-line no-console
       console.log("Form slow to load, continuing anyway");
     }
   }
@@ -107,9 +108,8 @@ export class CreateLogPage {
 
       await this.createLogButton.click();
       return;
-    } catch (error) {
-      // If the button is not clickable within a short timeframe, fail fast so the test can
-      // perform its own fallback (for example: direct API POST) without waiting for long retries.
+    } catch {
+      // eslint-disable-next-line no-console
       console.warn(
         "Submit button not clickable or not enabled within short timeout; failing fast to allow test fallback"
       );

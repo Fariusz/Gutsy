@@ -112,7 +112,7 @@ export class LogRepository {
 
     const symptoms: LogSymptomResponse[] = (symptomsData || []).map((item) => ({
       symptom_id: item.symptom_id,
-      name: (item.symptoms as any).name,
+      name: (item.symptoms as { name: string }).name,
       severity: item.severity,
     }));
 
@@ -148,7 +148,7 @@ export class LogRepository {
   /**
    * Get paginated logs for a user
    */
-  async getPaginatedLogs(userId: string, query: any) {
+  async getPaginatedLogs(userId: string, query: { page?: number; per_page?: number }) {
     const { page = 1, per_page = 10 } = query;
     const start = (page - 1) * per_page;
     const end = start + per_page - 1;
@@ -183,7 +183,7 @@ export class LogRepository {
    * @param query - Query parameters with pagination and filtering
    * @returns Paginated logs with ingredients and symptoms
    */
-  async getLogsWithPagination(query: GetLogsQuery): Promise<{ logs: any[]; totalCount: number }> {
+  async getLogsWithPagination(query: GetLogsQuery): Promise<{ logs: LogResponse[]; totalCount: number }> {
     try {
       const offset = (query.page - 1) * query.limit;
 

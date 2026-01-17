@@ -206,8 +206,8 @@ export default memo(function CreateLogForm({ onSuccess }: CreateLogFormProps) {
     if (result && onSuccess) {
       onSuccess(result.id);
     } else if (result) {
-      // Redirect to logs page to see the newly created log
-      globalThis.location.href = "/logs";
+      // Use window.location.href instead of globalThis.location.href
+      window.location.href = "/logs";
     }
   };
 

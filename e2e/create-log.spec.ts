@@ -42,9 +42,10 @@ test.describe("Add Log Flow", () => {
         }
       });
 
-      // Stringify to ensure structured output in test logs.
+      // eslint-disable-next-line no-console
       console.log("E2E: Auth status after login:", JSON.stringify(authStatus));
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.log("E2E: Failed to fetch auth status:", err);
     }
   });
@@ -82,6 +83,7 @@ test.describe("Add Log Flow", () => {
       await expect(page).toHaveURL(/.*\/logs$/);
     } catch (uiError) {
       // Fallback: if UI submission fails (timeouts/flakiness), perform API POST from browser context
+      // eslint-disable-next-line no-console
       console.log("UI submit failed, falling back to direct API POST:", uiError);
       const result = await page.evaluate(
         async ({ payload, timeoutMs }) => {
@@ -118,12 +120,14 @@ test.describe("Add Log Flow", () => {
         }
       );
 
-      // Log the fallback API response to aid debugging of flaky create-log behavior
+      // eslint-disable-next-line no-console
       console.log("API fallback response status:", result.status);
       try {
         const parsed = JSON.parse(result.text);
+        // eslint-disable-next-line no-console
         console.log("API fallback response body (json):", JSON.stringify(parsed, null, 2));
-      } catch (parseErr) {
+      } catch {
+        // eslint-disable-next-line no-console
         console.log("API fallback response body (raw):", result.text);
       }
 
@@ -177,8 +181,8 @@ test.describe("Add Log Flow", () => {
     // Add a symptom if symptoms are available
     try {
       await createLogPage.addSymptom("Abdominal Pain", "3 - Moderate");
-    } catch (e) {
-      // If adding symptom fails, continue without it
+    } catch {
+      // eslint-disable-next-line no-console
       console.log("Symptom addition skipped");
     }
 

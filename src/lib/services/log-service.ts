@@ -58,7 +58,7 @@ export class LogService {
   /**
    * Get paginated logs for a user
    */
-  async getLogs(userId: string, query: any): Promise<LogsListResponse> {
+  async getLogs(userId: string, query: { page: number; per_page: number }): Promise<LogsListResponse> {
     const { data, count, error } = await this.logRepository.getPaginatedLogs(userId, query);
 
     if (error) {
@@ -72,6 +72,7 @@ export class LogService {
         const populatedLog = await this.logRepository.getPopulatedLog(rawLog.id, userId);
         populatedLogs.push(populatedLog);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error(`Failed to populate log ${rawLog.id}:`, error);
         // Skip this log if we can't populate it
         continue;
