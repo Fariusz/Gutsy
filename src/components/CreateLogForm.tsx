@@ -117,6 +117,7 @@ export default memo(function CreateLogForm({ onSuccess }: CreateLogFormProps) {
     selectedSeverity: "",
   });
   const [isSymptomSelected, setIsSymptomSelected] = useState(false);
+  const [shouldNavigate, setShouldNavigate] = useState(false);
 
   const { symptoms, isLoading: symptomsLoading, error: symptomsError } = useSymptoms();
   const { isLoading, error, isSuccess, createLog, reset } = useCreateLog();
@@ -143,6 +144,12 @@ export default memo(function CreateLogForm({ onSuccess }: CreateLogFormProps) {
       setIsSymptomSelected(false);
     }
   }, [symptomSelector.selectedSymptomId, selectedSymptoms]);
+
+  useEffect(() => {
+    if (shouldNavigate) {
+      window.location.href = "/logs";
+    }
+  }, [shouldNavigate]);
 
   const handleAddSymptom = () => {
     const symptomIdNum = Number.parseInt(symptomSelector.selectedSymptomId);
@@ -206,11 +213,8 @@ export default memo(function CreateLogForm({ onSuccess }: CreateLogFormProps) {
     if (result && onSuccess) {
       onSuccess(result.id);
     } else if (result) {
-      // Use useEffect to handle navigation after successful submission
-      // This avoids React compiler issues with direct location manipulation
-      setTimeout(() => {
-        window.location.href = "/logs";
-      }, 0);
+      // Trigger navigation via useEffect
+      setShouldNavigate(true);
     }
   };
 

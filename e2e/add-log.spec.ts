@@ -1,6 +1,5 @@
 import { test, expect } from "@playwright/test";
 import { LoginPage } from "./page-objects/LoginPage";
-import { CreateLogPage } from "./page-objects/CreateLogPage";
 
 /**
  * Add Log E2E Test

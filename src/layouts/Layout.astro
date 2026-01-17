@@ -95,7 +95,7 @@ try {
     <!-- Floating Action Button for creating new logs -->
     {!hideFloatingButton && user && <FloatingActionButton href="/logs/new" text="New Meal Log" icon="🍽️" />}
 
-    <script is:inline>
+    <script>
       // Handle logout functionality
       document.addEventListener("DOMContentLoaded", () => {
         const logoutBtn = document.getElementById("logout-btn");
