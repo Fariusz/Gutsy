@@ -44,7 +44,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
 
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [["html"], ["list"], ...(process.env.CI ? [["github"]] : [])],
+  reporter: process.env.CI ? [["html"], ["list"], ["github"]] : [["html"], ["list"]],
 
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
@@ -54,8 +54,11 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
 
-    /* Screenshot on failure */
-    screenshot: "only-on-failure",
+    /* Screenshot on failure with platform-agnostic settings */
+    screenshot: {
+      mode: "only-on-failure",
+      fullPage: true,
+    },
 
     /* Video on failure */
     video: "retain-on-failure",

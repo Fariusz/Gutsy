@@ -64,7 +64,7 @@ jobs:
     environment: integration
     env:
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      SUPABASE_PUBLIC_KEY: ${{ secrets.SUPABASE_PUBLIC_KEY }}
+      SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
       DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
       SUPABASE_PROJECT_URL: ${{ secrets.SUPABASE_PROJECT_URL }}
       E2E_USERNAME_ID: ${{ secrets.E2E_USERNAME_ID }}
@@ -94,7 +94,7 @@ jobs:
         run: |
           cat > .env.test << EOF
           SUPABASE_URL=${{ secrets.SUPABASE_URL }}
-          SUPABASE_PUBLIC_KEY=${{ secrets.SUPABASE_PUBLIC_KEY }}
+          SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}
           DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
           SUPABASE_PROJECT_URL=${{ secrets.SUPABASE_PROJECT_URL }}
           E2E_USERNAME_ID=${{ secrets.E2E_USERNAME_ID }}
@@ -105,6 +105,14 @@ jobs:
 
       - name: Run E2E tests
         run: npm run test:e2e
+
+      - name: Update Playwright snapshots if needed
+        if: failure()
+        run: |
+          if [ -d "test-results" ]; then
+            echo "Checking for new snapshots that need to be committed..."
+            find test-results -name "*-actual.png" -type f | head -5
+          fi
 
       - name: Upload E2E test results
         uses: actions/upload-artifact@v4

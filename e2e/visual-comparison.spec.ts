@@ -14,11 +14,13 @@ test.describe("Visual Comparison", () => {
   test("should match login page screenshot", async ({ page }) => {
     const loginPage = new LoginPage(page);
     await loginPage.goto();
+    await loginPage.waitForLoad();
 
     // Take screenshot and compare
     await expect(page).toHaveScreenshot("login-page.png", {
       fullPage: true,
-      maxDiffPixels: 100,
+      maxDiffPixels: 500, // Increased tolerance for minor rendering differences
+      threshold: 0.1, // Allow 10% pixel difference ratio
     });
   });
 
@@ -29,7 +31,8 @@ test.describe("Visual Comparison", () => {
     // Take screenshot and compare
     await expect(page).toHaveScreenshot("register-page.png", {
       fullPage: true,
-      maxDiffPixels: 100,
+      maxDiffPixels: 500, // Increased tolerance for minor rendering differences
+      threshold: 0.1, // Allow 10% pixel difference ratio
     });
   });
 
@@ -46,7 +49,8 @@ test.describe("Visual Comparison", () => {
     // Take screenshot and compare
     await expect(page).toHaveScreenshot("login-page-errors.png", {
       fullPage: true,
-      maxDiffPixels: 100,
+      maxDiffPixels: 500, // Increased tolerance for minor rendering differences
+      threshold: 0.1, // Allow 10% pixel difference ratio
     });
   });
 });

@@ -66,7 +66,7 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key # only for server-side jobs
 
 ```env
 SUPABASE_URL=your-test-supabase-url
-SUPABASE_PUBLIC_KEY=your-test-supabase-anon-key
+SUPABASE_KEY=your-test-supabase-anon-key
 # OPENROUTER_API_KEY=your-test-openrouter-api-key (optional)
 ```
 
