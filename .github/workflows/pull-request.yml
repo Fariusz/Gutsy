@@ -64,7 +64,7 @@ jobs:
     environment: integration
     env:
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+      SUPABASE_PUBLIC_KEY: ${{ secrets.SUPABASE_PUBLIC_KEY }}
       DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
       SUPABASE_PROJECT_URL: ${{ secrets.SUPABASE_PROJECT_URL }}
       E2E_USERNAME_ID: ${{ secrets.E2E_USERNAME_ID }}
@@ -94,7 +94,7 @@ jobs:
         run: |
           cat > .env.test << EOF
           SUPABASE_URL=${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}
+          SUPABASE_PUBLIC_KEY=${{ secrets.SUPABASE_PUBLIC_KEY }}
           DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
           SUPABASE_PROJECT_URL=${{ secrets.SUPABASE_PROJECT_URL }}
           E2E_USERNAME_ID=${{ secrets.E2E_USERNAME_ID }}

@@ -27,6 +27,7 @@ test.describe("Visual Comparison", () => {
   test("should match register page screenshot", async ({ page }) => {
     const registerPage = new RegisterPage(page);
     await registerPage.goto();
+    await registerPage.waitForLoad();
 
     // Take screenshot and compare
     await expect(page).toHaveScreenshot("register-page.png", {
@@ -39,6 +40,7 @@ test.describe("Visual Comparison", () => {
   test("should match login form with validation errors", async ({ page }) => {
     const loginPage = new LoginPage(page);
     await loginPage.goto();
+    await loginPage.waitForLoad();
 
     // Trigger validation errors by trying to submit empty form
     await loginPage.submit();
