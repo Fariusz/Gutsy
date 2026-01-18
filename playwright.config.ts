@@ -64,6 +64,9 @@ export default defineConfig({
     video: "retain-on-failure",
   },
 
+  /* Use platform-agnostic snapshot names for consistent visual testing across CI/CD */
+  snapshotPathTemplate: "{testDir}/{testFileDir}/{testFileName}-snapshots/{arg}{ext}",
+
   /* Configure projects - Only Chromium/Desktop Chrome as per guidelines */
   projects: [
     {
