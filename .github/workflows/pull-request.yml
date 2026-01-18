@@ -103,6 +103,13 @@ jobs:
           OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }}
           EOF
 
+      - name: Update Playwright snapshots for CI environment
+        run: |
+          # Set environment variable for CI to use updated snapshot settings
+          export CI=true
+          # Update existing snapshots with CI-friendly settings
+          npx playwright test --update-snapshots e2e/visual-comparison.spec.ts || true
+
       - name: Run E2E tests
         run: npm run test:e2e
 

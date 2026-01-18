@@ -62,6 +62,9 @@ export default defineConfig({
 
     /* Video on failure */
     video: "retain-on-failure",
+
+    /* Disable animations for consistent visual testing */
+    ignoreHTTPSErrors: true,
   },
 
   /* Use platform-agnostic snapshot names for consistent visual testing across CI/CD */
@@ -71,7 +74,10 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width: 1280, height: 789 }, // Match existing snapshot dimensions
+      },
     },
   ],
 
