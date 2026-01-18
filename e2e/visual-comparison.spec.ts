@@ -9,6 +9,7 @@ import { RegisterPage } from "./page-objects/RegisterPage";
  * - Implement visual comparison with expect(page).toHaveScreenshot()
  * - Use for UI regression testing
  * - Capture screenshots of key pages
+ * - Updated tolerance for cross-platform CI compatibility
  */
 test.describe("Visual Comparison", () => {
   test("should match login page screenshot", async ({ page }) => {
