@@ -5,7 +5,7 @@
 - **Stack:** Astro 5, TypeScript 5, React 19, Tailwind 4, Shadcn/ui.
 - **Project layout:** follow the existing layout under `src/` (layouts, pages, api, middleware, db, components, lib, assets).
 - **Supabase client:** use `src/db/supabase.client.ts` and `context.locals.supabase` from middleware rather than importing the client directly.
-- **Env vars:** access `import.meta.env.SUPABASE_URL` and `SUPABASE_KEY`; keep secrets in GH Actions Secrets for CI.
+- **Env vars:** access `import.meta.env.SUPABASE_URL` and `SUPABASE_PUBLIC_KEY`; keep secrets in GH Actions Secrets for CI.
 - **Shadcn UI:** components live in `src/components/ui` and map to aliases defined in `components.json`.
 
 ## Local setup & quick commands
