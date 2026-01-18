@@ -21,6 +21,13 @@ export class RegisterPage {
     await this.page.goto("/register");
   }
 
+  async waitForLoad() {
+    await this.emailInput.waitFor({ state: "visible" });
+    await this.passwordInput.waitFor({ state: "visible" });
+    await this.confirmPasswordInput.waitFor({ state: "visible" });
+    await this.createAccountButton.waitFor({ state: "visible" });
+  }
+
   async register(email: string, password: string, confirmPassword: string) {
     await this.emailInput.fill(email);
     await this.passwordInput.fill(password);

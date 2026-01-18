@@ -30,7 +30,7 @@ test.describe("API Validation", () => {
 
     if (response.status() === 200) {
       const body = await response.json();
-      expect(Array.isArray(body) || body.hasOwnProperty("logs")).toBeTruthy();
+      expect(Array.isArray(body) || Object.prototype.hasOwnProperty.call(body, "logs")).toBeTruthy();
     }
   });
 
@@ -42,7 +42,7 @@ test.describe("API Validation", () => {
 
     if (response.status() === 200) {
       const body = await response.json();
-      expect(Array.isArray(body) || body.hasOwnProperty("triggers")).toBeTruthy();
+      expect(Array.isArray(body) || Object.prototype.hasOwnProperty.call(body, "triggers")).toBeTruthy();
     }
   });
 

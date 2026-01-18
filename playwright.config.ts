@@ -44,7 +44,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
 
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [["html"], ["list"], ...(process.env.CI ? [["github"]] : [])],
+  reporter: process.env.CI ? [["html"], ["list"], ["github"]] : [["html"], ["list"]],
 
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
@@ -54,18 +54,30 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
 
-    /* Screenshot on failure */
-    screenshot: "only-on-failure",
+    /* Screenshot on failure with platform-agnostic settings */
+    screenshot: {
+      mode: "only-on-failure",
+      fullPage: true,
+    },
 
     /* Video on failure */
     video: "retain-on-failure",
+
+    /* Disable animations for consistent visual testing */
+    ignoreHTTPSErrors: true,
   },
+
+  /* Use platform-agnostic snapshot names for consistent visual testing across CI/CD */
+  snapshotPathTemplate: "{testDir}/{testFileDir}/{testFileName}-snapshots/{arg}{ext}",
 
   /* Configure projects - Only Chromium/Desktop Chrome as per guidelines */
   projects: [
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width: 1280, height: 789 }, // Match existing snapshot dimensions
+      },
     },
   ],
 

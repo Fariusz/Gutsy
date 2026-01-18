@@ -397,10 +397,7 @@ export class IngredientNormalizationService {
       );
 
       if (unmatchedTokens.length > 0) {
-        const llmMatches = await this.llmService.normalizeWithLLM(
-          unmatchedTokens,
-          await this.getAvailableIngredients()
-        );
+        const llmMatches = await this.llmService.normalizeWithLLM(unmatchedTokens, await this.getAvailableIngredients());
         allMatches = [...deterministicMatches, ...llmMatches];
       }
     }
@@ -411,10 +408,7 @@ export class IngredientNormalizationService {
       .sort((a, b) => b.match_confidence - a.match_confidence);
 
     if (filteredMatches.length === 0) {
-      throw new BusinessLogicError(
-        "No ingredients could be matched with sufficient confidence",
-        `Raw text: "${rawText}"`
-      );
+      throw new BusinessLogicError("No ingredients could be matched with sufficient confidence", `Raw text: "${rawText}"`);
     }
 
     return {

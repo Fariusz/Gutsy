@@ -68,13 +68,9 @@ function logRpcPerformanceMetrics(metrics: PerformanceMetrics): void {
   }
 
   if (duration > PERFORMANCE_THRESHOLDS.RPC_ERROR_MS) {
-    logger.error(
-      `🐌 Very slow RPC detected: ${operation} took ${duration}ms (threshold: ${PERFORMANCE_THRESHOLDS.RPC_ERROR_MS}ms)`
-    );
+    logger.error(`🐌 Very slow RPC detected: ${operation} took ${duration}ms (threshold: ${PERFORMANCE_THRESHOLDS.RPC_ERROR_MS}ms)`);
   } else if (duration > PERFORMANCE_THRESHOLDS.RPC_WARNING_MS) {
-    logger.warn(
-      `⚠️  Slow RPC detected: ${operation} took ${duration}ms (threshold: ${PERFORMANCE_THRESHOLDS.RPC_WARNING_MS}ms)`
-    );
+    logger.warn(`⚠️  Slow RPC detected: ${operation} took ${duration}ms (threshold: ${PERFORMANCE_THRESHOLDS.RPC_WARNING_MS}ms)`);
   } else {
     logger.info(`✅ RPC completed: ${operation} (${duration}ms)`);
   }

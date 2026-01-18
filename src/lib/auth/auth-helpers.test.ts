@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { validateAuthToken, getOptionalAuth, getUserFromSession, AuthenticationError } from "./auth-helpers";
 import { createMockAPIContext, createMockSession } from "../../test/mocks/supabase";
+import type { APIContext } from "astro";
 
 describe("auth-helpers", () => {
   describe("validateAuthToken", () => {
@@ -20,7 +21,7 @@ describe("auth-helpers", () => {
     });
 
     it("should throw AuthenticationError when supabase client is missing", async () => {
-      const context = { locals: {} } as any;
+      const context = { locals: {} } as Partial<APIContext>;
 
       await expect(validateAuthToken(context)).rejects.toThrow(AuthenticationError);
       await expect(validateAuthToken(context)).rejects.toThrow("Supabase client not available");
@@ -55,7 +56,7 @@ describe("auth-helpers", () => {
     });
 
     it("should return null when authentication fails", async () => {
-      const context = { locals: {} } as any;
+      const context = { locals: {} } as Partial<APIContext>;
 
       const userId = await getOptionalAuth(context);
       expect(userId).toBeNull();

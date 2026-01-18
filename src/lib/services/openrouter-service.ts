@@ -28,7 +28,7 @@ export class OpenRouterServiceError extends Error {
     message: string,
     public code: string,
     public retryable = false,
-    public details?: any
+    public details?: unknown
   ) {
     super(message);
     this.name = "OpenRouterServiceError";
@@ -81,7 +81,7 @@ export class OpenRouterService {
     const formattedMessages = this.formatMessages(messages, systemMessage);
 
     // Build request body
-    const requestBody: any = {
+    const requestBody: Record<string, unknown> = {
       model,
       messages: formattedMessages,
     };
@@ -98,7 +98,7 @@ export class OpenRouterService {
 
     try {
       // Make the API request
-      const response = await this.makeRequest<any>("/chat/completions", {
+      const response = await this.makeRequest<unknown>("/chat/completions", {
         method: "POST",
         headers: {},
         body: JSON.stringify(requestBody),
@@ -130,7 +130,7 @@ export class OpenRouterService {
    */
   async getAvailableModels(): Promise<Model[]> {
     try {
-      const response = await this.makeRequest<any>("/models", {
+      const response = await this.makeRequest<unknown>("/models", {
         method: "GET",
         headers: {},
       });
@@ -161,7 +161,7 @@ export class OpenRouterService {
   async validateApiKey(): Promise<boolean> {
     try {
       // Make a simple request to test the API key
-      await this.makeRequest<any>("/models", {
+      await this.makeRequest<unknown>("/models", {
         method: "GET",
         headers: {},
       });
@@ -219,7 +219,7 @@ export class OpenRouterService {
   private async makeRequest<T>(endpoint: string, options: RequestOptions): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
     const maxRetries = 3;
-    let lastError: any;
+    let lastError: unknown;
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
@@ -317,7 +317,7 @@ export class OpenRouterService {
   /**
    * Converts internal response format to OpenRouter API format
    */
-  private formatResponseFormat(format?: ResponseFormat): any {
+  private formatResponseFormat(format?: ResponseFormat): Record<string, unknown> {
     if (!format) {
       return undefined;
     }
@@ -335,7 +335,7 @@ export class OpenRouterService {
   /**
    * Centralized error handling and transformation
    */
-  private handleApiError(errorResponse: { status: number; data: any }): never {
+  private handleApiError(errorResponse: { status: number; data: { error: { code: string; message: string } } }): never {
     const { status, data } = errorResponse;
     const error = data.error;
 
@@ -343,40 +343,20 @@ export class OpenRouterService {
       case 401:
         throw new OpenRouterServiceError("Invalid API key", "AUTHENTICATION_ERROR", false, error);
       case 403:
-        throw new OpenRouterServiceError(
-          "Access forbidden - check your API key permissions",
-          "AUTHORIZATION_ERROR",
-          false,
-          error
-        );
+        throw new OpenRouterServiceError("Access forbidden - check your API key permissions", "AUTHORIZATION_ERROR", false, error);
       case 404:
         throw new OpenRouterServiceError("Model not found - check the model name", "MODEL_NOT_FOUND", false, error);
       case 400:
-        throw new OpenRouterServiceError(
-          `Invalid request: ${error.message || "Bad request"}`,
-          "VALIDATION_ERROR",
-          false,
-          error
-        );
+        throw new OpenRouterServiceError(`Invalid request: ${error.message || "Bad request"}`, "VALIDATION_ERROR", false, error);
       case 429:
         throw new OpenRouterServiceError("Rate limit exceeded - please retry later", "RATE_LIMIT_ERROR", true, error);
       case 500:
       case 502:
       case 503:
       case 504:
-        throw new OpenRouterServiceError(
-          "OpenRouter API server error - please retry later",
-          "SERVER_ERROR",
-          true,
-          error
-        );
+        throw new OpenRouterServiceError("OpenRouter API server error - please retry later", "SERVER_ERROR", true, error);
       default:
-        throw new OpenRouterServiceError(
-          `Unexpected API error: ${error.message || "Unknown error"}`,
-          "UNKNOWN_ERROR",
-          false,
-          error
-        );
+        throw new OpenRouterServiceError(`Unexpected API error: ${error.message || "Unknown error"}`, "UNKNOWN_ERROR", false, error);
     }
   }
 }

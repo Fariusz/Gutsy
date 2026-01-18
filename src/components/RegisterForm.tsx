@@ -113,9 +113,7 @@ export default function RegisterForm({ onSuccess }: Readonly<RegisterFormProps>)
             className={validationErrors.password ? "border-red-300 focus:border-red-500" : ""}
           />
           {validationErrors.password && <p className="text-red-600 text-sm mt-1">{validationErrors.password}</p>}
-          <p className="text-xs text-gray-500 mt-1">
-            Must be 8+ characters with uppercase, lowercase, number, and special character
-          </p>
+          <p className="text-xs text-gray-500 mt-1">Must be 8+ characters with uppercase, lowercase, number, and special character</p>
         </div>
 
         <div>
@@ -132,9 +130,7 @@ export default function RegisterForm({ onSuccess }: Readonly<RegisterFormProps>)
             disabled={isSubmitting}
             className={validationErrors.confirmPassword ? "border-red-300 focus:border-red-500" : ""}
           />
-          {validationErrors.confirmPassword && (
-            <p className="text-red-600 text-sm mt-1">{validationErrors.confirmPassword}</p>
-          )}
+          {validationErrors.confirmPassword && <p className="text-red-600 text-sm mt-1">{validationErrors.confirmPassword}</p>}
         </div>
 
         <Button type="submit" className="w-full" disabled={isSubmitting}>

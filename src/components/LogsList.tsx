@@ -114,9 +114,7 @@ export default function LogsList({ onEditLog }: Readonly<LogsListProps>) {
           </svg>
         </div>
         <h3 className="text-lg font-medium text-gray-900 mb-2">No logs yet</h3>
-        <p className="text-gray-600 mb-6">
-          Start tracking your meals and symptoms to identify potential food triggers.
-        </p>
+        <p className="text-gray-600 mb-6">Start tracking your meals and symptoms to identify potential food triggers.</p>
         <a
           href="/logs/new"
           className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
@@ -133,21 +131,14 @@ export default function LogsList({ onEditLog }: Readonly<LogsListProps>) {
       {/* Logs List */}
       <div className="space-y-4">
         {logs.map((log) => (
-          <div
-            key={log.id}
-            className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm"
-            data-test-id={`log-item-${log.id}`}
-          >
+          <div key={log.id} className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm" data-test-id={`log-item-${log.id}`}>
             <div className="flex justify-between items-start mb-4">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">{formatDate(log.log_date)}</h3>
                 <p className="text-sm text-gray-500">Created {new Date(log.created_at).toLocaleDateString()}</p>
               </div>
               {onEditLog && (
-                <button
-                  onClick={() => onEditLog(log.id)}
-                  className="text-sm text-blue-600 hover:text-blue-800 underline"
-                >
+                <button onClick={() => onEditLog(log.id)} className="text-sm text-blue-600 hover:text-blue-800 underline">
                   Edit
                 </button>
               )}
@@ -175,11 +166,7 @@ export default function LogsList({ onEditLog }: Readonly<LogsListProps>) {
                 <h4 className="text-sm font-medium text-gray-700 mb-2">Symptoms</h4>
                 <div className="space-y-2">
                   {log.symptoms.map((symptom, index) => (
-                    <div
-                      key={symptom.symptom_id}
-                      className="flex items-center justify-between"
-                      data-test-id={`symptom-${index}`}
-                    >
+                    <div key={symptom.symptom_id} className="flex items-center justify-between" data-test-id={`symptom-${index}`}>
                       <span className="text-sm text-gray-700">{formatSymptomName(symptom.name)}</span>
                       <div className="flex items-center">
                         <span className="text-sm text-gray-600 mr-2">Severity:</span>
@@ -187,9 +174,7 @@ export default function LogsList({ onEditLog }: Readonly<LogsListProps>) {
                           {[1, 2, 3, 4, 5].map((level) => (
                             <div
                               key={level}
-                              className={`w-3 h-3 rounded-full ${
-                                level <= symptom.severity ? "bg-red-500" : "bg-gray-200"
-                              }`}
+                              className={`w-3 h-3 rounded-full ${level <= symptom.severity ? "bg-red-500" : "bg-gray-200"}`}
                             />
                           ))}
                         </div>
@@ -214,10 +199,7 @@ export default function LogsList({ onEditLog }: Readonly<LogsListProps>) {
 
       {/* Pagination */}
       {pagination.total_pages > 1 && (
-        <div
-          className="flex items-center justify-between border-t border-gray-200 px-4 py-3 sm:px-6"
-          data-test-id="pagination"
-        >
+        <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3 sm:px-6" data-test-id="pagination">
           <div className="flex flex-1 justify-between sm:hidden">
             <button
               onClick={() => handlePageChange(pagination.page - 1)}
@@ -240,8 +222,8 @@ export default function LogsList({ onEditLog }: Readonly<LogsListProps>) {
             <div>
               <p className="text-sm text-gray-700">
                 Showing <span className="font-medium">{(pagination.page - 1) * pagination.per_page + 1}</span> to{" "}
-                <span className="font-medium">{Math.min(pagination.page * pagination.per_page, pagination.total)}</span>{" "}
-                of <span className="font-medium">{pagination.total}</span> results
+                <span className="font-medium">{Math.min(pagination.page * pagination.per_page, pagination.total)}</span> of{" "}
+                <span className="font-medium">{pagination.total}</span> results
               </p>
             </div>
             <div>

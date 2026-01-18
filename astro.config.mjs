@@ -45,13 +45,7 @@ export default defineConfig({
     // Configure server to ignore test files from watching
     server: {
       watch: {
-        ignored: [
-          "**/*.test.{ts,tsx,js,jsx}",
-          "**/*.spec.{ts,tsx,js,jsx}",
-          "**/test/**",
-          "**/e2e/**",
-          "**/__tests__/**",
-        ],
+        ignored: ["**/*.test.{ts,tsx,js,jsx}", "**/*.spec.{ts,tsx,js,jsx}", "**/test/**", "**/e2e/**", "**/__tests__/**"],
       },
     },
     // Exclude test files from SSR processing

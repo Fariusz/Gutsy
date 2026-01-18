@@ -45,9 +45,7 @@ export async function GET(context: APIContext): Promise<Response> {
     console.log("Auth Status: User authenticated:", user.id);
 
     // Check if user exists in auth.users by trying to query their profile
-    const { error: userCheckError } = await context.locals.supabase
-      .rpc("get_user_exists", { user_id: user.id })
-      .single();
+    const { error: userCheckError } = await context.locals.supabase.rpc("get_user_exists", { user_id: user.id }).single();
 
     return new Response(
       JSON.stringify({

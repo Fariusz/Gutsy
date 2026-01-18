@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { LogService } from "./log-service";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "../../db/database.types";
-import { LogRepository } from "./log-repository";
 
 // Create shared mock functions
 const mockGetPaginatedLogs = vi.fn();

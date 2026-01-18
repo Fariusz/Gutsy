@@ -1,10 +1,5 @@
 import { describe, it, expect } from "vitest";
-import type {
-  TriggerAnalysis,
-  IngredientSymptomCorrelation,
-  TriggerAnalysisRequest,
-  TriggerAnalysisResponse,
-} from "../../types";
+import type { TriggerAnalysis, IngredientSymptomCorrelation, TriggerAnalysisRequest, TriggerAnalysisResponse } from "../../types";
 
 describe("Trigger Analysis Types", () => {
   describe("TriggerAnalysis", () => {

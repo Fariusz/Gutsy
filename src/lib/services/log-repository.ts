@@ -75,12 +75,7 @@ export class LogRepository {
    */
   async getPopulatedLog(logId: string, userId: string): Promise<LogResponse> {
     // Get the main log data
-    const { data: logData, error: logError } = await this.supabase
-      .from("logs")
-      .select("*")
-      .eq("id", logId)
-      .eq("user_id", userId)
-      .single();
+    const { data: logData, error: logError } = await this.supabase.from("logs").select("*").eq("id", logId).eq("user_id", userId).single();
 
     if (logError || !logData) {
       throw new Error(`Failed to get log: ${logError?.message || "Log not found"}`);
@@ -112,7 +107,7 @@ export class LogRepository {
 
     const symptoms: LogSymptomResponse[] = (symptomsData || []).map((item) => ({
       symptom_id: item.symptom_id,
-      name: (item.symptoms as any).name,
+      name: (item.symptoms as { name: string }).name,
       severity: item.severity,
     }));
 
@@ -120,9 +115,7 @@ export class LogRepository {
     let mealPhotoUrl: string | undefined;
     if (logData.meal_photo_url) {
       try {
-        const { data: signedUrlData } = await this.supabase.storage
-          .from("meal-photos")
-          .createSignedUrl(logData.meal_photo_url, 3600); // 1 hour expiry
+        const { data: signedUrlData } = await this.supabase.storage.from("meal-photos").createSignedUrl(logData.meal_photo_url, 3600); // 1 hour expiry
 
         if (signedUrlData) {
           mealPhotoUrl = signedUrlData.signedUrl;
@@ -148,7 +141,7 @@ export class LogRepository {
   /**
    * Get paginated logs for a user
    */
-  async getPaginatedLogs(userId: string, query: any) {
+  async getPaginatedLogs(userId: string, query: { page?: number; per_page?: number }) {
     const { page = 1, per_page = 10 } = query;
     const start = (page - 1) * per_page;
     const end = start + per_page - 1;
@@ -183,7 +176,7 @@ export class LogRepository {
    * @param query - Query parameters with pagination and filtering
    * @returns Paginated logs with ingredients and symptoms
    */
-  async getLogsWithPagination(query: GetLogsQuery): Promise<{ logs: any[]; totalCount: number }> {
+  async getLogsWithPagination(query: GetLogsQuery): Promise<{ logs: LogResponse[]; totalCount: number }> {
     try {
       const offset = (query.page - 1) * query.limit;
 
@@ -231,10 +224,7 @@ export class LogRepository {
       }
 
       // Get total count for pagination
-      let countQuery = this.supabase
-        .from("logs")
-        .select("*", { count: "exact", head: true })
-        .eq("user_id", query.userId);
+      let countQuery = this.supabase.from("logs").select("*", { count: "exact", head: true }).eq("user_id", query.userId);
 
       if (query.start) {
         countQuery = countQuery.gte("log_date", query.start);

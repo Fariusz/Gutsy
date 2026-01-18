@@ -43,6 +43,7 @@ export function useTriggerAnalysis(): UseTriggerAnalysisReturn {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to fetch trigger analysis";
       setError(errorMessage);
+      // eslint-disable-next-line no-console
       console.error("Failed to fetch triggers:", err);
     } finally {
       setIsLoading(false);

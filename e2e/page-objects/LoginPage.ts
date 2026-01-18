@@ -17,6 +17,12 @@ export class LoginPage {
     await this.page.goto("/login");
   }
 
+  async waitForLoad() {
+    await this.emailInput.waitFor({ state: "visible" });
+    await this.passwordInput.waitFor({ state: "visible" });
+    await this.signInButton.waitFor({ state: "visible" });
+  }
+
   async login(email: string, password_val: string) {
     await this.emailInput.fill(email);
     await this.passwordInput.fill(password_val);

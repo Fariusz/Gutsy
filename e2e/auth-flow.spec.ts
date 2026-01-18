@@ -91,7 +91,7 @@ test.describe("Authentication Flow", () => {
     }
 
     await loginPage.goto();
-    await loginPage.login(testEmail!, testPassword!);
+    await loginPage.login(testEmail, testPassword);
 
     // Should redirect to logs page after successful login
     await expect(page).toHaveURL(/.*\/logs/, { timeout: 10000 });

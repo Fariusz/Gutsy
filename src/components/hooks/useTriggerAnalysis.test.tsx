@@ -147,15 +147,12 @@ describe("useTriggerAnalysis", () => {
     expect(result.current.data?.correlations).toEqual(mockCorrelations);
 
     // Verify fetch was called with detailed parameter
-    expect(mockFetch).toHaveBeenCalledWith(
-      "/api/triggers?start_date=2024-01-01&end_date=2024-01-31&limit=5&detailed=true",
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    expect(mockFetch).toHaveBeenCalledWith("/api/triggers?start_date=2024-01-01&end_date=2024-01-31&limit=5&detailed=true", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
   });
 
   it("should handle API errors", async () => {
