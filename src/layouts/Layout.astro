@@ -1,24 +1,128 @@
 ---
 import "../styles/global.css";
+import FloatingActionButton from "../components/FloatingActionButton.astro";
 
 interface Props {
   title?: string;
+  hideFloatingButton?: boolean;
 }
 
-const { title = "10x Astro Starter" } = Astro.props;
+const { title = "10x Astro Starter", hideFloatingButton = false } = Astro.props;
+
+// Check if user is authenticated
+let user = null;
+try {
+  const {
+    data: { user: authUser },
+    error,
+  } = await Astro.locals.supabase.auth.getUser();
+  if (!error && authUser) {
+    user = authUser;
+  }
+} catch (error) {
+  // eslint-disable-next-line no-console
+  console.error("Error checking user authentication", { error });
+}
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8" /> 
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
   </head>
   <body>
+    <div id="portal-root"></div>
+    <header class="bg-background border-b border-border">
+      <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-4">
+          <div class="flex items-center space-x-8">
+            <a href="/" class="text-xl font-bold text-foreground">Gutsy</a>
+            {
+              user && (
+                <div class="flex space-x-4">
+                  <a
+                    href="/logs/new"
+                    class="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
+                    data-test-id="new-log-button-header"
+                  >
+                    + New Log
+                  </a>
+                  <div class="hidden md:flex space-x-6 items-center">
+                    <a href="/logs" class="text-muted-foreground hover:text-foreground font-medium">
+                      My Logs
+                    </a>
+                    <a href="/triggers" class="text-muted-foreground hover:text-foreground font-medium">
+                      Triggers
+                    </a>
+                  </div>
+                </div>
+              )
+            }
+          </div>
+          <div class="flex items-center space-x-4">
+            {
+              user ? (
+                <div class="flex items-center space-x-4">
+                  <span class="text-sm text-muted-foreground hidden sm:inline">{user.email}</span>
+                  <button id="logout-btn" class="text-muted-foreground hover:text-foreground font-medium text-sm">
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <div class="flex items-center space-x-4">
+                  <a href="/login" class="text-muted-foreground hover:text-foreground font-medium text-sm">
+                    Sign In
+                  </a>
+                  <a
+                    href="/register"
+                    class="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
+                  >
+                    Sign Up
+                  </a>
+                </div>
+              )
+            }
+          </div>
+        </div>
+      </nav>
+    </header>
     <slot />
+
+    {!hideFloatingButton && user && <FloatingActionButton href="/logs/new" text="New Meal Log" icon="fork" />}
+
+    <script>
+      // Handle logout functionality
+      document.addEventListener("DOMContentLoaded", () => {
+        const logoutBtn = document.getElementById("logout-btn");
+        if (logoutBtn) {
+          logoutBtn.addEventListener("click", async () => {
+            try {
+              const response = await fetch("/api/auth/logout", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              });
+
+              if (response.ok) {
+                // Redirect to home page after successful logout
+                window.location.href = "/";
+              } else {
+                // eslint-disable-next-line no-console
+                console.error("Logout failed");
+              }
+            } catch (error) {
+              // eslint-disable-next-line no-console
+              console.error("Error during logout:", error);
+            }
+          });
+        }
+      });
+    </script>
   </body>
 </html>
 
