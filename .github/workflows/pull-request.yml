@@ -66,7 +66,6 @@ jobs:
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_PUBLIC_KEY: ${{ secrets.SUPABASE_PUBLIC_KEY }}
       DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-      SUPABASE_PUBLIC_KEY: ${{ secrets.SUPABASE_PUBLIC_KEY }}
       SUPABASE_PROJECT_URL: ${{ secrets.SUPABASE_PROJECT_URL }}
       E2E_USERNAME_ID: ${{ secrets.E2E_USERNAME_ID }}
       E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
@@ -97,7 +96,6 @@ jobs:
           SUPABASE_URL=${{ secrets.SUPABASE_URL }}
           SUPABASE_PUBLIC_KEY=${{ secrets.SUPABASE_PUBLIC_KEY }}
           DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
-          SUPABASE_PUBLIC_KEY=${{ secrets.SUPABASE_PUBLIC_KEY }}
           SUPABASE_PROJECT_URL=${{ secrets.SUPABASE_PROJECT_URL }}
           E2E_USERNAME_ID=${{ secrets.E2E_USERNAME_ID }}
           E2E_USERNAME=${{ secrets.E2E_USERNAME }}
