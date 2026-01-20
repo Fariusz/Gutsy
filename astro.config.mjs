@@ -8,13 +8,11 @@ import tailwindcss from "@tailwindcss/vite";
 
 // https://astro.build/config
 export default defineConfig({
+  site: "https://gutsy.pages.dev",
   output: "server",
   integrations: [react(), sitemap()],
   server: { port: 3000 },
-  adapter: cloudflare({
-    mode: "advanced",
-    functionPerRoute: false,
-  }),
+  adapter: cloudflare(),
   vite: {
     plugins: [
       tailwindcss(),
