@@ -1,4 +1,5 @@
 import type { APIContext } from "astro";
+import { logger } from "../../lib/utils/logger";
 
 export const prerender = false;
 
@@ -7,7 +8,7 @@ export const prerender = false;
  */
 export async function POST(context: APIContext): Promise<Response> {
   try {
-    console.log("Create test data: Starting request");
+    logger.info("Create test data: Starting request");
 
     // 1. Check authentication
     const {
@@ -16,7 +17,7 @@ export async function POST(context: APIContext): Promise<Response> {
     } = await context.locals.supabase.auth.getUser();
 
     if (authError) {
-      console.error("Create test data auth error:", authError);
+      logger.error("Create test data auth error:", { error: authError });
       return new Response(JSON.stringify({ error: "Authentication failed" }), {
         status: 401,
         headers: { "Content-Type": "application/json" },
@@ -24,7 +25,7 @@ export async function POST(context: APIContext): Promise<Response> {
     }
 
     if (!user) {
-      console.log("Create test data: No user found");
+      logger.info("Create test data: No user found");
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { "Content-Type": "application/json" },
@@ -32,7 +33,7 @@ export async function POST(context: APIContext): Promise<Response> {
     }
 
     const userId = user.id;
-    console.log("Create test data: User ID:", userId);
+    logger.info("Create test data: User ID:", { userId });
 
     // 2. Call the function to create test data for this user
     const rpcResult = await context.locals.supabase.rpc("create_test_data_for_user", {
@@ -41,14 +42,14 @@ export async function POST(context: APIContext): Promise<Response> {
     const { error } = rpcResult;
 
     if (error) {
-      console.error("Create test data RPC error:", error);
+      logger.error("Create test data RPC error:", { error });
       return new Response(JSON.stringify({ error: "Failed to create test data: " + error.message }), {
         status: 500,
         headers: { "Content-Type": "application/json" },
       });
     }
 
-    console.log("Create test data: Success");
+    logger.info("Create test data: Success");
 
     // 3. Return summary of created data
     const { count: logsCount } = await context.locals.supabase
@@ -79,7 +80,7 @@ export async function POST(context: APIContext): Promise<Response> {
       }
     );
   } catch (error) {
-    console.error("Create test data API error:", error);
+    logger.error("Create test data API error:", { error });
     return new Response(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },

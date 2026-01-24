@@ -105,7 +105,6 @@ export class CreateLogPage {
       await this.createLogButton.click();
       return;
     } catch {
-      // eslint-disable-next-line no-console
       console.warn("Submit button not clickable or not enabled within short timeout; failing fast to allow test fallback");
       throw new Error("Submit button not clickable or not enabled");
     }
