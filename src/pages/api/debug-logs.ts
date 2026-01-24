@@ -1,4 +1,5 @@
 import type { APIContext } from "astro";
+import { logger } from "../../lib/utils/logger";
 
 export const prerender = false;
 
@@ -7,7 +8,7 @@ export const prerender = false;
  */
 export async function GET(context: APIContext): Promise<Response> {
   try {
-    console.log("Debug logs: Starting request");
+    logger.info("Debug logs: Starting request");
 
     // 1. Check authentication
     const {
@@ -16,7 +17,7 @@ export async function GET(context: APIContext): Promise<Response> {
     } = await context.locals.supabase.auth.getUser();
 
     if (authError) {
-      console.error("Debug logs auth error:", authError);
+      logger.error("Debug logs auth error:", { error: authError });
       return new Response(JSON.stringify({ error: "Authentication failed" }), {
         status: 401,
         headers: { "Content-Type": "application/json" },
@@ -24,7 +25,7 @@ export async function GET(context: APIContext): Promise<Response> {
     }
 
     if (!user) {
-      console.log("Debug logs: No user found");
+      logger.info("Debug logs: No user found");
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { "Content-Type": "application/json" },
@@ -32,7 +33,7 @@ export async function GET(context: APIContext): Promise<Response> {
     }
 
     const userId = user.id;
-    console.log("Debug logs: User ID:", userId);
+    logger.info("Debug logs: User ID:", { userId });
 
     // Get all logs for this user
     const { data: allLogs, error: logsError } = await context.locals.supabase
@@ -42,7 +43,7 @@ export async function GET(context: APIContext): Promise<Response> {
       .order("created_at", { ascending: false });
 
     if (logsError) {
-      console.error("Debug logs error:", logsError);
+      logger.error("Debug logs error:", { error: logsError });
       return new Response(JSON.stringify({ error: "Failed to fetch logs" }), {
         status: 500,
         headers: { "Content-Type": "application/json" },
@@ -110,7 +111,7 @@ export async function GET(context: APIContext): Promise<Response> {
       }
     );
   } catch (error) {
-    console.error("Debug logs API error:", error);
+    logger.error("Debug logs API error:", { error });
     return new Response(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },

@@ -1,4 +1,5 @@
 import type { APIContext } from "astro";
+import { logger } from "../../../lib/utils/logger";
 
 export const prerender = false;
 
@@ -7,7 +8,7 @@ export const prerender = false;
  */
 export async function GET(context: APIContext): Promise<Response> {
   try {
-    console.log("Auth Status: Starting request");
+    logger.info("Auth Status: Starting request");
 
     const {
       data: { user },
@@ -15,7 +16,7 @@ export async function GET(context: APIContext): Promise<Response> {
     } = await context.locals.supabase.auth.getUser();
 
     if (userError) {
-      console.error("Auth Status: User error:", userError);
+      logger.error("Auth Status: User error:", { error: userError });
       return new Response(
         JSON.stringify({
           authenticated: false,
@@ -29,7 +30,7 @@ export async function GET(context: APIContext): Promise<Response> {
     }
 
     if (!user) {
-      console.log("Auth Status: No active user");
+      logger.info("Auth Status: No active user");
       return new Response(
         JSON.stringify({
           authenticated: false,
@@ -42,7 +43,7 @@ export async function GET(context: APIContext): Promise<Response> {
       );
     }
 
-    console.log("Auth Status: User authenticated:", user.id);
+    logger.info("Auth Status: User authenticated:", { userId: user.id });
 
     // Check if user exists in auth.users by trying to query their profile
     const { error: userCheckError } = await context.locals.supabase.rpc("get_user_exists", { user_id: user.id }).single();
@@ -66,7 +67,7 @@ export async function GET(context: APIContext): Promise<Response> {
       }
     );
   } catch (error) {
-    console.error("Auth Status API error:", error);
+    logger.error("Auth Status API error:", { error });
     return new Response(
       JSON.stringify({
         authenticated: false,

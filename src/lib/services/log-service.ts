@@ -66,7 +66,6 @@ export class LogService {
         const populatedLog = await this.logRepository.getPopulatedLog(rawLog.id, userId);
         populatedLogs.push(populatedLog);
       } catch (error) {
-        // eslint-disable-next-line no-console
         console.error(`Failed to populate log ${rawLog.id}:`, error);
         // Skip this log if we can't populate it
         continue;
