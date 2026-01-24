@@ -30,4 +30,6 @@ env
 # Playwright reports
 playwright-report/
 /test-results
-/.netlify
+
+# Local Netlify folder
+.netlify
