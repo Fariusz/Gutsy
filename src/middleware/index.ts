@@ -5,15 +5,18 @@ import type { Database } from "../db/database.types.ts";
 
 export const onRequest = defineMiddleware(async (context, next) => {
   try {
-    const supabaseUrl = import.meta.env.SUPABASE_URL;
-    const supabaseAnonKey = import.meta.env.SUPABASE_PUBLIC_KEY;
+    // Quick health check path
+    if (context.url.pathname === "/health-check") {
+      return new Response("Middleware is active", { status: 200 });
+    }
+
+    const supabaseUrl = import.meta.env.SUPABASE_URL ?? process.env.SUPABASE_URL;
+    const supabaseAnonKey = import.meta.env.SUPABASE_PUBLIC_KEY ?? process.env.SUPABASE_PUBLIC_KEY;
 
     if (!supabaseUrl || !supabaseAnonKey) {
-      console.error("Missing Supabase environment variables in middleware:", {
-        url: !!supabaseUrl,
-        key: !!supabaseAnonKey,
-      });
-      return new Response("Configuration Error: Missing Supabase environment variables. Please check your Netlify settings.", { status: 500 });
+      console.error("Missing Supabase environment variables in middleware");
+      // Return 200 for debug purposes to ensure we see the message
+      return new Response(`Configuration Error: Missing Supabase environment variables. URL present: ${!!supabaseUrl}, Key present: ${!!supabaseAnonKey}. Check Netlify dashboard environment variables.`, { status: 200 });
     }
 
     const supabase = createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
@@ -31,6 +34,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
     });
 
     context.locals.supabase = supabase;
+
+    // Optional: add a way to see what's in locals for debugging
+    if (context.url.pathname === "/debug-locals") {
+       return new Response(`Locals Supabase present: ${!!context.locals.supabase}`, { status: 200 });
+    }
 
     const {
       data: { session },
@@ -51,10 +59,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
       return context.redirect("/logs");
     }
 
-    const response = await next();
-    return response;
+    return await next();
   } catch (error) {
     console.error("Critical error in middleware:", error);
-    return new Response(`Internal Server Error in Middleware: ${error instanceof Error ? error.message : "Unknown error"}`, { status: 500 });
+    return new Response(`Critical Middleware Error: ${error instanceof Error ? error.message : "Unknown error"}\n\nStack: ${error instanceof Error ? error.stack : ""}`, { status: 200 });
   }
 });

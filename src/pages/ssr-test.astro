@@ -1,0 +1,16 @@
+---
+export const prerender = false;
+const envVars = {
+  HAS_URL: !!import.meta.env.SUPABASE_URL,
+  HAS_KEY: !!import.meta.env.SUPABASE_PUBLIC_KEY,
+  NODE_ENV: process.env.NODE_ENV,
+};
+---
+
+<html>
+  <body>
+    <h1>SSR Test Page</h1>
+    <pre>{JSON.stringify(envVars, null, 2)}</pre>
+    <p>If you see this, SSR is working!</p>
+  </body>
+</html>
