@@ -1,0 +1,12 @@
+---
+import Layout from "../layouts/Layout.astro";
+import LoginForm from "../components/LoginForm.tsx";
+---
+
+<Layout title="Sign In - Gutsy" hideFloatingButton={true}>
+  <main class="min-h-screen bg-background flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="w-full max-w-md">
+      <LoginForm client:only="react" />
+    </div>
+  </main>
+</Layout>

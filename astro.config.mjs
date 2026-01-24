@@ -3,16 +3,16 @@ import { defineConfig } from "astro/config";
 
 import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
-import cloudflare from "@astrojs/cloudflare";
+import netlify from "@astrojs/netlify";
 import tailwindcss from "@tailwindcss/vite";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://gutsy.pages.dev",
+  site: "https://gutsy.netlify.app",
   output: "server",
   integrations: [react(), sitemap()],
   server: { port: 3000 },
-  adapter: cloudflare(),
+  adapter: netlify(),
   vite: {
     plugins: [
       tailwindcss(),

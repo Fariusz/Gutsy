@@ -19,7 +19,7 @@ A modern, opinionated starter for building fast, accessible, AI-friendly web app
 
 ## Project name
 
-Gutsy (MVP) — repository scaffolded from `10x-astro-starter`.
+Gutsy (MVP) — repository scaffolded from `gutsy`.
 
 ## Project description
 
