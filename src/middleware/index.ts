@@ -11,12 +11,13 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
 
     const supabaseUrl = import.meta.env.SUPABASE_URL ?? process.env.SUPABASE_URL;
-    const supabaseAnonKey = import.meta.env.SUPABASE_PUBLIC_KEY ?? process.env.SUPABASE_PUBLIC_KEY;
+    const supabaseAnonKey = import.meta.env.SUPABASE_PUBLIC_KEY ?? process.env.SUPABASE_PUBLIC_KEY ?? process.env.SUPABASE_KEY;
 
     if (!supabaseUrl || !supabaseAnonKey) {
       console.error("Missing Supabase environment variables in middleware");
-      // Return 200 for debug purposes to ensure we see the message
-      return new Response(`Configuration Error: Missing Supabase environment variables. URL present: ${!!supabaseUrl}, Key present: ${!!supabaseAnonKey}. Check Netlify dashboard environment variables.`, { status: 200 });
+      return new Response(`Configuration Error: Missing Supabase environment variables. URL present: ${!!supabaseUrl}, Key present: ${!!supabaseAnonKey}. 
+
+I found "SUPABASE_KEY" in your Netlify settings, but the code was looking for "SUPABASE_PUBLIC_KEY". I've updated the code to look for both, but for best practice, you should rename it to SUPABASE_PUBLIC_KEY in Netlify.`, { status: 200 });
     }
 
     const supabase = createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
