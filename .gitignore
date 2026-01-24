@@ -30,3 +30,4 @@ env
 # Playwright reports
 playwright-report/
 /test-results
+/.netlify
