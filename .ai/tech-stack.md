@@ -30,7 +30,7 @@
 
 ### Hosting
 
-- **Vercel** - Frontend deployment (Astro SSR)
+- **Cloudflare Pages** - Frontend deployment (Astro SSR with edge functions)
 - **Supabase Cloud** - Database and storage hosting
 
 ### CI/CD
